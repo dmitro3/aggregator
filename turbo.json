@@ -1,0 +1,20 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [],
+  "tasks": {
+    "build": {
+      "env": ["SENTRY_AUTH_TOKEN"],
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "outputs": ["dist/**"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "lint": {}
+  }
+}
