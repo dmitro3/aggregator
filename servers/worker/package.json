@@ -1,0 +1,14 @@
+{
+  "name": "@rhiva/worker",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@rhiva/decoder": "*"
+  }
+}
