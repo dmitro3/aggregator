@@ -18,36 +18,28 @@ event.on("failed", ({ jobId, failedReason }) =>
 );
 
 export const runTask = (programs: web3.PublicKey[]) => {
-  // const subscriptions: number[] = [];
+  const subscriptions: number[] = [];
 
-  // for (const program of programs) {
-  //   const subscription = connection.onLogs(program, (log) => {
-  //     logger.info(
-  //       { signature: log.signature, program: program.toBase58() },
-  //       "program.onLogs",
-  //     );
-  //     if (log.err) return;
-  //     return queue.add("processLog", log.signature, {
-  //       jobId: log.signature,
-  //       deduplication: { id: log.signature },
-  //     });
-  //   });
+  for (const program of programs) {
+    const subscription = connection.onLogs(program, (log) => {
+      logger.info(
+        { signature: log.signature, program: program.toBase58() },
+        "program.onLogs",
+      );
+      if (log.err) return;
+      return queue.add("processLog", log.signature, {
+        jobId: log.signature,
+        deduplication: { id: log.signature },
+      });
+    });
 
-  //   subscriptions.push(subscription);
-  // }
+    subscriptions.push(subscription);
+  }
 
-  // return () => {
-  //   subscriptions.map((subscription) =>
-  //     connection.removeOnLogsListener(subscription),
-  //   );
-  // };
-
-  queue.add(
-    "processLog",
-    "9RdSqeNGZwFbpjFVZqRWoWPtGd98txLaWA1vqNvESycET4RtKV3tm16CzPwfjGq9DZj3LSBgtLuGcXzR4fhkELq",
-    {
-      jobId:
-        "9RdSqeNGZwFbpjFVZqRWoWPtGd98txLaWA1vqNvESycET4RtKV3tm16CzPwfjGq9DZj3LSBgtLuGcXzR4fhkELq",
-    },
-  );
+  return async () =>
+    Promise.allSettled([
+      queue.close(),
+      event.close(),
+      subscriptions.filter(Boolean).forEach(connection.removeOnLogsListener),
+    ]);
 };

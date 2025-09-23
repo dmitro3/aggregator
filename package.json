@@ -23,6 +23,5 @@
   "workspaces": [
     "packages/*",
     "servers/*"
-  ],
-  "dependencies": {}
+  ]
 }

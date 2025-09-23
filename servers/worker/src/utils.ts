@@ -1,18 +1,48 @@
+import { format } from "util";
 import type { Client, MultiPriceResponse } from "@solana-tracker/data-api";
 
 import { redis, solanatracker } from "./instances";
+import xior from "xior";
+
+export const priceFallback = async (mints: string[]) => {
+  const response = await xior.get<Record<string, number>>(
+    format(
+      "https://fe-api.jup.ag/api/v1/prices?list_address=%s",
+      mints.join(","),
+    ),
+  );
+  return Object.entries(response.data).map(([key, price]) => ({
+    id: key,
+    price,
+    liquidity: 0,
+    priceQuote: 0,
+    lastUpdated: Date.now(),
+    marketCap: 0,
+  }));
+};
 
 export const getMultiplePrices = async (
   ...[mints, ...args]: Parameters<Client["getMultiplePrices"]>
 ): Promise<MultiPriceResponse> => {
   const prices = await cacheResult(
     async (mints) => {
-      return solanatracker.getMultiplePrices(mints, ...args).then((value) =>
-        Object.entries(value).map(([key, price]) => ({
-          id: key,
-          ...price,
-        })),
-      );
+      const unloaded: string[] = [];
+
+      const prices = await solanatracker
+        .getMultiplePrices(mints, ...args)
+        .then((value) =>
+          Object.entries(value).map(([key, price]) => {
+            if (price.price <= 0) unloaded.push(key);
+
+            return {
+              id: key,
+              ...price,
+            };
+          }),
+        );
+
+      if (unloaded.length > 0) prices.push(...(await priceFallback(unloaded)));
+      return prices;
     },
     ...mints,
   );

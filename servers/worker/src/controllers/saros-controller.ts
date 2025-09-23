@@ -38,61 +38,63 @@ const upsertPair = async (
 
   console.log(pairIds);
 
-  const notExistingPairPubKeys = pairIds
+  const nonExistingPairPubKeys = pairIds
     .map((pairId) => new web3.PublicKey(pairId))
     .filter(
       (pairId) =>
         !allPairs.some((pair) => new web3.PublicKey(pair.id).equals(pairId)),
     );
 
-  const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
-    notExistingPairPubKeys.map(async (pairPubKey) => {
-      const pair = await program.account.pair.fetch(pairPubKey);
+  if (nonExistingPairPubKeys.length > 0) {
+    const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
+      nonExistingPairPubKeys.map(async (pairPubKey) => {
+        const pair = await program.account.pair.fetch(pairPubKey);
 
-      const baseFee =
-        BigInt(pair.binStep) *
-        BigInt(pair.staticFeeParameters.baseFactor) *
-        BigInt(10);
+        const baseFee =
+          BigInt(pair.binStep) *
+          BigInt(pair.staticFeeParameters.baseFactor) *
+          BigInt(10);
 
-      await upsertMint(
+        await upsertMint(
+          db,
+          umi,
+          pair.tokenMintX.toBase58(),
+          pair.tokenMintY.toBase58(),
+        );
+
+        return {
+          id: pairPubKey.toBase58(),
+          baseMint: pair.tokenMintX.toBase58(),
+          quoteMint: pair.tokenMintY.toBase58(),
+          extra: {
+            binStep: pair.binStep,
+            maxFee: 0,
+            dynamicFee: 0,
+            marketCap: 0,
+            baseFee: Number(baseFee),
+            protocolFee: pair.staticFeeParameters.protocolShare,
+          },
+          market: "saros",
+        };
+      }),
+    );
+
+    const createdPairs = await db
+      .insert(pairs)
+      .values(values)
+      .returning({ id: pairs.id })
+      .execute();
+
+    allPairs.push(
+      ...(await getPairs(
         db,
-        umi,
-        pair.tokenMintX.toBase58(),
-        pair.tokenMintY.toBase58(),
-      );
-
-      return {
-        id: pairPubKey.toBase58(),
-        baseMint: pair.tokenMintX.toBase58(),
-        quoteMint: pair.tokenMintY.toBase58(),
-        extra: {
-          binStep: pair.binStep,
-          maxFee: 0,
-          dynamicFee: 0,
-          marketCap: 0,
-          baseFee: Number(baseFee),
-          protocolFee: pair.staticFeeParameters.protocolShare,
-        },
-        market: "saros",
-      };
-    }),
-  );
-
-  const createdPairs = await db
-    .insert(pairs)
-    .values(values)
-    .returning({ id: pairs.id })
-    .execute();
-
-  allPairs.push(
-    ...(await getPairs(
-      db,
-      inArray(
-        pairs.id,
-        createdPairs.map((pair) => pair.id),
-      ),
-    )),
-  );
+        inArray(
+          pairs.id,
+          createdPairs.map((pair) => pair.id),
+        ),
+      )),
+    );
+  }
 
   const prices = await getMultiplePrices(
     allPairs.flatMap((pair) => [pair.baseMint.id, pair.quoteMint.id]),
@@ -104,13 +106,13 @@ const upsertPair = async (
       const mints = [pair.baseMint, pair.quoteMint];
 
       const [baseMint, quoteMint] = mints.map(
-        (mint) => new web3.PublicKey(mint),
+        (mint) => new web3.PublicKey(mint.id),
       );
 
       const poolMintVaults = await Promise.all(
         mints.map((mint) =>
           getAssociatedTokenAddressSync(
-            new web3.PublicKey(mint),
+            new web3.PublicKey(mint.id),
             pairPubKey,
             true,
             new web3.PublicKey(mint.tokenProgram),
@@ -165,7 +167,7 @@ const upsertPair = async (
       db
         .update(pairs)
         .set({
-          extra: updateJSON(pairs.extra, ["marketCap"], {
+          extra: updateJSON(pairs.extra, {
             marketCap: pair.extra.marketCap,
           }),
         })

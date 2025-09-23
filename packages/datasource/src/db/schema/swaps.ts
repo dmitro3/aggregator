@@ -1,5 +1,5 @@
 import {
-  bigint,
+  decimal,
   integer,
   jsonb,
   pgTable,
@@ -21,11 +21,11 @@ export const swaps = pgTable(
       .references(() => pairs.id, { onDelete: "cascade" })
       .notNull(),
     feeUsd: integer().notNull(),
-    baseAmountUsd: integer().notNull(),
-    quoteAmountUsd: integer().notNull(),
-    fee: bigint({ mode: "number" }).notNull(),
-    baseAmount: bigint({ mode: "number" }).notNull(),
-    quoteAmount: bigint({ mode: "number" }).notNull(),
+    baseAmountUsd: decimal({ mode: "number" }).notNull(),
+    quoteAmountUsd: decimal({ mode: "number" }).notNull(),
+    fee: decimal({ mode: "number" }).notNull(),
+    baseAmount: decimal({ mode: "number" }).notNull(),
+    quoteAmount: decimal({ mode: "number" }).notNull(),
     createdAt: timestamp().defaultNow().notNull(),
   },
   (column) => [unique().on(column.signature, column.pair)],

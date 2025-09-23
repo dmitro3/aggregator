@@ -6,6 +6,11 @@ import { runTask } from "./program-log.task";
     new web3.PublicKey("1qbkdrr3z4ryLA7pZykqxvxWPoeifcVKo6ZG9CfkvVE"),
   ]);
 
-  //   process.on("SIGINT", stop);
-  //   process.on("SIGTERM", stop);
+  const shutdown = async () => {
+    await stop();
+    process.exit(0);
+  };
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 })();
