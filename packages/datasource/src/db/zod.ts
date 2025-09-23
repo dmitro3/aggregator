@@ -1,7 +1,19 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { mints, pairs, swaps } from "./schema";
+import z from "zod";
 
-export const mintInsertSchema = createInsertSchema(mints);
+export const metadata = z.object({
+  name: z.string().optional(),
+  symbol: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().url().optional(),
+  animation_url: z.url().optional(),
+  external_url: z.url().optional(),
+});
+
+export const mintInsertSchema = createInsertSchema(mints, {
+  extra: z.object({ metadata }),
+});
 export const mintSelectSchema = createSelectSchema(mints);
 
 export const pairInsertSchema = createInsertSchema(pairs);

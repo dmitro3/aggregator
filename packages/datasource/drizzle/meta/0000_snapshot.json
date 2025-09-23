@@ -122,12 +122,8 @@
           "name": "pairs_quoteMint_mints_id_fk",
           "tableFrom": "pairs",
           "tableTo": "mints",
-          "columnsFrom": [
-            "quoteMint"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["quoteMint"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -135,12 +131,8 @@
           "name": "pairs_baseMint_mints_id_fk",
           "tableFrom": "pairs",
           "tableTo": "mints",
-          "columnsFrom": [
-            "baseMint"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["baseMint"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -223,12 +215,8 @@
           "name": "swaps_pair_pairs_id_fk",
           "tableFrom": "swaps",
           "tableTo": "pairs",
-          "columnsFrom": [
-            "pair"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["pair"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -238,10 +226,7 @@
         "swaps_signature_pair_unique": {
           "name": "swaps_signature_pair_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "signature",
-            "pair"
-          ]
+          "columns": ["signature", "pair"]
         }
       },
       "policies": {},

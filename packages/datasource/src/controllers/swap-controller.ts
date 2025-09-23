@@ -3,11 +3,7 @@ import { format } from "util";
 import type z from "zod/mini";
 
 import type { getPairs } from "./pair-controller";
-import {
-  swaps,
-  type Database,
-  type swapInsertSchema,
-} from "../db";
+import { swaps, type Database, type swapInsertSchema } from "../db";
 
 export const createSwap = async (
   db: Database,

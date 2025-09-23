@@ -5,74 +5,65 @@
  * IDL can be found at `target/idl/whirlpool.json`.
  */
 export type Whirlpool = {
-  "address": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
-  "metadata": {
-    "name": "whirlpool",
-    "version": "0.6.0",
-    "spec": "0.1.0"
-  },
-  "instructions": [
+  address: "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc";
+  metadata: {
+    name: "whirlpool";
+    version: "0.6.0";
+    spec: "0.1.0";
+  };
+  instructions: [
     {
-      "name": "initializeConfig",
-      "docs": [
+      name: "initializeConfig";
+      docs: [
         "Initializes a WhirlpoolsConfig account that hosts info & authorities",
         "required to govern a set of Whirlpools.",
         "",
         "### Authority",
-        "- \"authority\" - Set authority that is one of ADMINS.",
+        '- "authority" - Set authority that is one of ADMINS.',
         "",
         "### Parameters",
         "- `fee_authority` - Authority authorized to initialize fee-tiers and set customs fees.",
         "- `collect_protocol_fees_authority` - Authority authorized to collect protocol fees.",
-        "- `reward_emissions_super_authority` - Authority authorized to set reward authorities in pools."
-      ],
-      "discriminator": [
-        208,
-        127,
-        21,
-        1,
-        194,
-        190,
-        196,
-        70
-      ],
-      "accounts": [
+        "- `reward_emissions_super_authority` - Authority authorized to set reward authorities in pools.",
+      ];
+      discriminator: [208, 127, 21, 1, 194, 190, 196, 70];
+      accounts: [
         {
-          "name": "config",
-          "writable": true,
-          "signer": true
+          name: "config";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": [
+          name: "systemProgram";
+        },
+      ];
+      args: [
         {
-          "name": "feeAuthority",
-          "type": "pubkey"
+          name: "feeAuthority";
+          type: "pubkey";
         },
         {
-          "name": "collectProtocolFeesAuthority",
-          "type": "pubkey"
+          name: "collectProtocolFeesAuthority";
+          type: "pubkey";
         },
         {
-          "name": "rewardEmissionsSuperAuthority",
-          "type": "pubkey"
+          name: "rewardEmissionsSuperAuthority";
+          type: "pubkey";
         },
         {
-          "name": "defaultProtocolFeeRate",
-          "type": "u16"
-        }
-      ]
+          name: "defaultProtocolFeeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "initializePool",
-      "docs": [
+      name: "initializePool";
+      docs: [
         "Initializes a Whirlpool account.",
         "Fee rate is set to the default values on the config and supplied fee_tier.",
         "",
@@ -84,82 +75,73 @@ export type Whirlpool = {
         "#### Special Errors",
         "`InvalidTokenMintOrder` - The order of mints have to be ordered by",
         "`SqrtPriceOutOfBounds` - provided initial_sqrt_price is not between 2^-64 to 2^64",
-        ""
-      ],
-      "discriminator": [
-        95,
-        180,
-        10,
-        172,
-        84,
-        174,
-        232,
-        40
-      ],
-      "accounts": [
+        "",
+      ];
+      discriminator: [95, 180, 10, 172, 84, 174, 232, 40];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true,
-          "signer": true
+          name: "tokenVaultA";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true,
-          "signer": true
+          name: "tokenVaultB";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "feeTier"
+          name: "feeTier";
         },
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
-        }
-      ],
-      "args": [
+          name: "rent";
+        },
+      ];
+      args: [
         {
-          "name": "bumps",
-          "type": {
-            "defined": {
-              "name": "whirlpoolBumps"
-            }
-          }
+          name: "bumps";
+          type: {
+            defined: {
+              name: "whirlpoolBumps";
+            };
+          };
         },
         {
-          "name": "tickSpacing",
-          "type": "u16"
+          name: "tickSpacing";
+          type: "u16";
         },
         {
-          "name": "initialSqrtPrice",
-          "type": "u128"
-        }
-      ]
+          name: "initialSqrtPrice";
+          type: "u128";
+        },
+      ];
     },
     {
-      "name": "initializeTickArray",
-      "docs": [
+      name: "initializeTickArray";
+      docs: [
         "Initializes a fixed-length tick_array account to represent a tick-range in a Whirlpool.",
         "",
         "### Parameters",
@@ -168,45 +150,36 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `InvalidStartTick` - if the provided start tick is out of bounds or is not a multiple of",
-        "TICK_ARRAY_SIZE * tick spacing."
-      ],
-      "discriminator": [
-        11,
-        188,
-        193,
-        214,
-        141,
-        91,
-        149,
-        184
-      ],
-      "accounts": [
+        "TICK_ARRAY_SIZE * tick spacing.",
+      ];
+      discriminator: [11, 188, 193, 214, 141, 91, 149, 184];
+      accounts: [
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "tickArray",
-          "writable": true
+          name: "tickArray";
+          writable: true;
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": [
+          name: "systemProgram";
+        },
+      ];
+      args: [
         {
-          "name": "startTickIndex",
-          "type": "i32"
-        }
-      ]
+          name: "startTickIndex";
+          type: "i32";
+        },
+      ];
     },
     {
-      "name": "initializeDynamicTickArray",
-      "docs": [
+      name: "initializeDynamicTickArray";
+      docs: [
         "Initialize a variable-length tick array for a Whirlpool.",
         "",
         "### Parameters",
@@ -217,53 +190,44 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `InvalidStartTick` - if the provided start tick is out of bounds or is not a multiple of",
-        "TICK_ARRAY_SIZE * tick spacing."
-      ],
-      "discriminator": [
-        41,
-        33,
-        165,
-        200,
-        120,
-        231,
-        142,
-        50
-      ],
-      "accounts": [
+        "TICK_ARRAY_SIZE * tick spacing.",
+      ];
+      discriminator: [41, 33, 165, 200, 120, 231, 142, 50];
+      accounts: [
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "tickArray",
-          "writable": true
+          name: "tickArray";
+          writable: true;
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": [
+          name: "systemProgram";
+        },
+      ];
+      args: [
         {
-          "name": "startTickIndex",
-          "type": "i32"
+          name: "startTickIndex";
+          type: "i32";
         },
         {
-          "name": "idempotent",
-          "type": "bool"
-        }
-      ]
+          name: "idempotent";
+          type: "bool";
+        },
+      ];
     },
     {
-      "name": "initializeFeeTier",
-      "docs": [
+      name: "initializeFeeTier";
+      docs: [
         "Initializes a fee_tier account usable by Whirlpools in a WhirlpoolConfig space.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `tick_spacing` - The tick-spacing that this fee-tier suggests the default_fee_rate for.",
@@ -272,57 +236,48 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `InvalidTickSpacing` - If the provided tick_spacing is 0.",
-        "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE."
-      ],
-      "discriminator": [
-        183,
-        74,
-        156,
-        160,
-        112,
-        2,
-        42,
-        30
-      ],
-      "accounts": [
+        "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE.",
+      ];
+      discriminator: [183, 74, 156, 160, 112, 2, 42, 30];
+      accounts: [
         {
-          "name": "config"
+          name: "config";
         },
         {
-          "name": "feeTier",
-          "writable": true
+          name: "feeTier";
+          writable: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
+          name: "feeAuthority";
+          signer: true;
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": [
+          name: "systemProgram";
+        },
+      ];
+      args: [
         {
-          "name": "tickSpacing",
-          "type": "u16"
+          name: "tickSpacing";
+          type: "u16";
         },
         {
-          "name": "defaultFeeRate",
-          "type": "u16"
-        }
-      ]
+          name: "defaultFeeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "initializeReward",
-      "docs": [
+      name: "initializeReward";
+      docs: [
         "Initialize reward for a Whirlpool. A pool can only support up to a set number of rewards.",
         "",
         "### Authority",
-        "- \"reward_authority\" - assigned authority by the reward_super_authority for the specified",
+        '- "reward_authority" - assigned authority by the reward_super_authority for the specified',
         "reward-index in this Whirlpool",
         "",
         "### Parameters",
@@ -331,64 +286,55 @@ export type Whirlpool = {
         "#### Special Errors",
         "- `InvalidRewardIndex` - If the provided reward index doesn't match the lowest uninitialized",
         "index in this pool, or exceeds NUM_REWARDS, or",
-        "all reward slots for this pool has been initialized."
-      ],
-      "discriminator": [
-        95,
-        135,
-        192,
-        196,
-        242,
-        129,
-        230,
-        68
-      ],
-      "accounts": [
+        "all reward slots for this pool has been initialized.",
+      ];
+      discriminator: [95, 135, 192, 196, 242, 129, 230, 68];
+      accounts: [
         {
-          "name": "rewardAuthority",
-          "signer": true
+          name: "rewardAuthority";
+          signer: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "rewardMint"
+          name: "rewardMint";
         },
         {
-          "name": "rewardVault",
-          "writable": true,
-          "signer": true
+          name: "rewardVault";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
-        }
-      ],
-      "args": [
+          name: "rent";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
-        }
-      ]
+          name: "rewardIndex";
+          type: "u8";
+        },
+      ];
     },
     {
-      "name": "setRewardEmissions",
-      "docs": [
+      name: "setRewardEmissions";
+      docs: [
         "Set the reward emissions for a reward in a Whirlpool.",
         "",
         "### Authority",
-        "- \"reward_authority\" - assigned authority by the reward_super_authority for the specified",
+        '- "reward_authority" - assigned authority by the reward_super_authority for the specified',
         "reward-index in this Whirlpool",
         "",
         "### Parameters",
@@ -401,45 +347,36 @@ export type Whirlpool = {
         "- `InvalidTimestamp` - Provided timestamp is not in order with the previous timestamp.",
         "- `InvalidRewardIndex` - If the provided reward index doesn't match the lowest uninitialized",
         "index in this pool, or exceeds NUM_REWARDS, or",
-        "all reward slots for this pool has been initialized."
-      ],
-      "discriminator": [
-        13,
-        197,
-        86,
-        168,
-        109,
-        176,
-        27,
-        244
-      ],
-      "accounts": [
+        "all reward slots for this pool has been initialized.",
+      ];
+      discriminator: [13, 197, 86, 168, 109, 176, 27, 244];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "rewardAuthority",
-          "signer": true
+          name: "rewardAuthority";
+          signer: true;
         },
         {
-          "name": "rewardVault"
-        }
-      ],
-      "args": [
+          name: "rewardVault";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
+          name: "rewardIndex";
+          type: "u8";
         },
         {
-          "name": "emissionsPerSecondX64",
-          "type": "u128"
-        }
-      ]
+          name: "emissionsPerSecondX64";
+          type: "u128";
+        },
+      ];
     },
     {
-      "name": "openPosition",
-      "docs": [
+      name: "openPosition";
+      docs: [
         "Open a position in a Whirlpool. A unique token will be minted to represent the position",
         "in the users wallet. The position will start off with 0 liquidity.",
         "",
@@ -449,78 +386,69 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
-        "the tick-spacing in this pool."
-      ],
-      "discriminator": [
-        135,
-        128,
-        47,
-        77,
-        15,
-        152,
-        240,
-        49
-      ],
-      "accounts": [
+        "the tick-spacing in this pool.",
+      ];
+      discriminator: [135, 128, 47, 77, 15, 152, 240, 49];
+      accounts: [
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "owner"
+          name: "owner";
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionMint",
-          "writable": true,
-          "signer": true
+          name: "positionMint";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "positionTokenAccount",
-          "writable": true
+          name: "positionTokenAccount";
+          writable: true;
         },
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
+          name: "rent";
         },
         {
-          "name": "associatedTokenProgram"
-        }
-      ],
-      "args": [
+          name: "associatedTokenProgram";
+        },
+      ];
+      args: [
         {
-          "name": "bumps",
-          "type": {
-            "defined": {
-              "name": "openPositionBumps"
-            }
-          }
+          name: "bumps";
+          type: {
+            defined: {
+              name: "openPositionBumps";
+            };
+          };
         },
         {
-          "name": "tickLowerIndex",
-          "type": "i32"
+          name: "tickLowerIndex";
+          type: "i32";
         },
         {
-          "name": "tickUpperIndex",
-          "type": "i32"
-        }
-      ]
+          name: "tickUpperIndex";
+          type: "i32";
+        },
+      ];
     },
     {
-      "name": "openPositionWithMetadata",
-      "docs": [
+      name: "openPositionWithMetadata";
+      docs: [
         "Open a position in a Whirlpool. A unique token will be minted to represent the position",
         "in the users wallet. Additional Metaplex metadata is appended to identify the token.",
         "The position will start off with 0 liquidity.",
@@ -531,91 +459,82 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
-        "the tick-spacing in this pool."
-      ],
-      "discriminator": [
-        242,
-        29,
-        134,
-        48,
-        58,
-        110,
-        14,
-        60
-      ],
-      "accounts": [
+        "the tick-spacing in this pool.",
+      ];
+      discriminator: [242, 29, 134, 48, 58, 110, 14, 60];
+      accounts: [
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "owner"
+          name: "owner";
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionMint",
-          "writable": true,
-          "signer": true
+          name: "positionMint";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "positionMetadataAccount",
-          "docs": [
-            "https://github.com/metaplex-foundation/mpl-token-metadata/blob/master/programs/token-metadata/program/src/utils/metadata.rs#L78"
-          ],
-          "writable": true
+          name: "positionMetadataAccount";
+          docs: [
+            "https://github.com/metaplex-foundation/mpl-token-metadata/blob/master/programs/token-metadata/program/src/utils/metadata.rs#L78",
+          ];
+          writable: true;
         },
         {
-          "name": "positionTokenAccount",
-          "writable": true
+          name: "positionTokenAccount";
+          writable: true;
         },
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
+          name: "rent";
         },
         {
-          "name": "associatedTokenProgram"
+          name: "associatedTokenProgram";
         },
         {
-          "name": "metadataProgram"
+          name: "metadataProgram";
         },
         {
-          "name": "metadataUpdateAuth"
-        }
-      ],
-      "args": [
+          name: "metadataUpdateAuth";
+        },
+      ];
+      args: [
         {
-          "name": "bumps",
-          "type": {
-            "defined": {
-              "name": "openPositionWithMetadataBumps"
-            }
-          }
+          name: "bumps";
+          type: {
+            defined: {
+              name: "openPositionWithMetadataBumps";
+            };
+          };
         },
         {
-          "name": "tickLowerIndex",
-          "type": "i32"
+          name: "tickLowerIndex";
+          type: "i32";
         },
         {
-          "name": "tickUpperIndex",
-          "type": "i32"
-        }
-      ]
+          name: "tickUpperIndex";
+          type: "i32";
+        },
+      ];
     },
     {
-      "name": "increaseLiquidity",
-      "docs": [
+      name: "increaseLiquidity";
+      docs: [
         "Add liquidity to a position in the Whirlpool. This call also updates the position's accrued fees and rewards.",
         "",
         "### Authority",
@@ -629,80 +548,71 @@ export type Whirlpool = {
         "#### Special Errors",
         "- `LiquidityZero` - Provided liquidity amount is zero.",
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
-        "- `TokenMaxExceeded` - The required token to perform this operation exceeds the user defined amount."
-      ],
-      "discriminator": [
-        46,
-        156,
-        243,
-        118,
-        13,
-        205,
-        251,
-        178
-      ],
-      "accounts": [
+        "- `TokenMaxExceeded` - The required token to perform this operation exceeds the user defined amount.",
+      ];
+      discriminator: [46, 156, 243, 118, 13, 205, 251, 178];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tickArrayLower",
-          "writable": true
+          name: "tickArrayLower";
+          writable: true;
         },
         {
-          "name": "tickArrayUpper",
-          "writable": true
-        }
-      ],
-      "args": [
+          name: "tickArrayUpper";
+          writable: true;
+        },
+      ];
+      args: [
         {
-          "name": "liquidityAmount",
-          "type": "u128"
+          name: "liquidityAmount";
+          type: "u128";
         },
         {
-          "name": "tokenMaxA",
-          "type": "u64"
+          name: "tokenMaxA";
+          type: "u64";
         },
         {
-          "name": "tokenMaxB",
-          "type": "u64"
-        }
-      ]
+          name: "tokenMaxB";
+          type: "u64";
+        },
+      ];
     },
     {
-      "name": "decreaseLiquidity",
-      "docs": [
+      name: "decreaseLiquidity";
+      docs: [
         "Withdraw liquidity from a position in the Whirlpool. This call also updates the position's accrued fees and rewards.",
         "",
         "### Authority",
@@ -716,280 +626,235 @@ export type Whirlpool = {
         "#### Special Errors",
         "- `LiquidityZero` - Provided liquidity amount is zero.",
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
-        "- `TokenMinSubceeded` - The required token to perform this operation subceeds the user defined amount."
-      ],
-      "discriminator": [
-        160,
-        38,
-        208,
-        111,
-        104,
-        91,
-        44,
-        1
-      ],
-      "accounts": [
+        "- `TokenMinSubceeded` - The required token to perform this operation subceeds the user defined amount.",
+      ];
+      discriminator: [160, 38, 208, 111, 104, 91, 44, 1];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tickArrayLower",
-          "writable": true
+          name: "tickArrayLower";
+          writable: true;
         },
         {
-          "name": "tickArrayUpper",
-          "writable": true
-        }
-      ],
-      "args": [
+          name: "tickArrayUpper";
+          writable: true;
+        },
+      ];
+      args: [
         {
-          "name": "liquidityAmount",
-          "type": "u128"
+          name: "liquidityAmount";
+          type: "u128";
         },
         {
-          "name": "tokenMinA",
-          "type": "u64"
+          name: "tokenMinA";
+          type: "u64";
         },
         {
-          "name": "tokenMinB",
-          "type": "u64"
-        }
-      ]
+          name: "tokenMinB";
+          type: "u64";
+        },
+      ];
     },
     {
-      "name": "updateFeesAndRewards",
-      "docs": [
+      name: "updateFeesAndRewards";
+      docs: [
         "Update the accrued fees and rewards for a position.",
         "",
         "#### Special Errors",
         "- `TickNotFound` - Provided tick array account does not contain the tick for this position.",
-        "- `LiquidityZero` - Position has zero liquidity and therefore already has the most updated fees and reward values."
-      ],
-      "discriminator": [
-        154,
-        230,
-        250,
-        13,
-        236,
-        209,
-        75,
-        223
-      ],
-      "accounts": [
+        "- `LiquidityZero` - Position has zero liquidity and therefore already has the most updated fees and reward values.",
+      ];
+      discriminator: [154, 230, 250, 13, 236, 209, 75, 223];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "tickArrayLower"
+          name: "tickArrayLower";
         },
         {
-          "name": "tickArrayUpper"
-        }
-      ],
-      "args": []
+          name: "tickArrayUpper";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "collectFees",
-      "docs": [
+      name: "collectFees";
+      docs: [
         "Collect fees accrued for this position.",
         "",
         "### Authority",
-        "- `position_authority` - authority that owns the token corresponding to this desired position."
-      ],
-      "discriminator": [
-        164,
-        152,
-        207,
-        99,
-        30,
-        186,
-        19,
-        182
-      ],
-      "accounts": [
+        "- `position_authority` - authority that owns the token corresponding to this desired position.",
+      ];
+      discriminator: [164, 152, 207, 99, 30, 186, 19, 182];
+      accounts: [
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tokenProgram"
-        }
-      ],
-      "args": []
+          name: "tokenProgram";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "collectReward",
-      "docs": [
+      name: "collectReward";
+      docs: [
         "Collect rewards accrued for this position.",
         "",
         "### Authority",
-        "- `position_authority` - authority that owns the token corresponding to this desired position."
-      ],
-      "discriminator": [
-        70,
-        5,
-        132,
-        87,
-        86,
-        235,
-        177,
-        34
-      ],
-      "accounts": [
+        "- `position_authority` - authority that owns the token corresponding to this desired position.",
+      ];
+      discriminator: [70, 5, 132, 87, 86, 235, 177, 34];
+      accounts: [
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "rewardOwnerAccount",
-          "writable": true
+          name: "rewardOwnerAccount";
+          writable: true;
         },
         {
-          "name": "rewardVault",
-          "writable": true
+          name: "rewardVault";
+          writable: true;
         },
         {
-          "name": "tokenProgram"
-        }
-      ],
-      "args": [
+          name: "tokenProgram";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
-        }
-      ]
+          name: "rewardIndex";
+          type: "u8";
+        },
+      ];
     },
     {
-      "name": "collectProtocolFees",
-      "docs": [
+      name: "collectProtocolFees";
+      docs: [
         "Collect the protocol fees accrued in this Whirlpool",
         "",
         "### Authority",
-        "- `collect_protocol_fees_authority` - assigned authority in the WhirlpoolConfig that can collect protocol fees"
-      ],
-      "discriminator": [
-        22,
-        67,
-        23,
-        98,
-        150,
-        178,
-        70,
-        220
-      ],
-      "accounts": [
+        "- `collect_protocol_fees_authority` - assigned authority in the WhirlpoolConfig that can collect protocol fees",
+      ];
+      discriminator: [22, 67, 23, 98, 150, 178, 70, 220];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "collectProtocolFeesAuthority",
-          "signer": true
+          name: "collectProtocolFeesAuthority";
+          signer: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tokenDestinationA",
-          "writable": true
+          name: "tokenDestinationA";
+          writable: true;
         },
         {
-          "name": "tokenDestinationB",
-          "writable": true
+          name: "tokenDestinationB";
+          writable: true;
         },
         {
-          "name": "tokenProgram"
-        }
-      ],
-      "args": []
+          name: "tokenProgram";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "swap",
-      "docs": [
+      name: "swap";
+      docs: [
         "Perform a swap in this Whirlpool",
         "",
         "### Authority",
-        "- \"token_authority\" - The authority to withdraw tokens from the input token account.",
+        '- "token_authority" - The authority to withdraw tokens from the input token account.',
         "",
         "### Parameters",
         "- `amount` - The amount of input or output token to swap from (depending on amount_specified_is_input).",
@@ -1006,517 +871,418 @@ export type Whirlpool = {
         "- `TickArraySequenceInvalidIndex` - The swap loop attempted to access an invalid array index during the query of the next initialized tick.",
         "- `TickArrayIndexOutofBounds` - The swap loop attempted to access an invalid array index during tick crossing.",
         "- `LiquidityOverflow` - Liquidity value overflowed 128bits during tick crossing.",
-        "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0."
-      ],
-      "discriminator": [
-        248,
-        198,
-        158,
-        145,
-        225,
-        117,
-        135,
-        200
-      ],
-      "accounts": [
+        "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0.",
+      ];
+      discriminator: [248, 198, 158, 145, 225, 117, 135, 200];
+      accounts: [
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "tokenAuthority",
-          "signer": true
+          name: "tokenAuthority";
+          signer: true;
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tickArray0",
-          "writable": true
+          name: "tickArray0";
+          writable: true;
         },
         {
-          "name": "tickArray1",
-          "writable": true
+          name: "tickArray1";
+          writable: true;
         },
         {
-          "name": "tickArray2",
-          "writable": true
+          name: "tickArray2";
+          writable: true;
         },
         {
-          "name": "oracle"
-        }
-      ],
-      "args": [
+          name: "oracle";
+        },
+      ];
+      args: [
         {
-          "name": "amount",
-          "type": "u64"
+          name: "amount";
+          type: "u64";
         },
         {
-          "name": "otherAmountThreshold",
-          "type": "u64"
+          name: "otherAmountThreshold";
+          type: "u64";
         },
         {
-          "name": "sqrtPriceLimit",
-          "type": "u128"
+          name: "sqrtPriceLimit";
+          type: "u128";
         },
         {
-          "name": "amountSpecifiedIsInput",
-          "type": "bool"
+          name: "amountSpecifiedIsInput";
+          type: "bool";
         },
         {
-          "name": "aToB",
-          "type": "bool"
-        }
-      ]
+          name: "aToB";
+          type: "bool";
+        },
+      ];
     },
     {
-      "name": "closePosition",
-      "docs": [
+      name: "closePosition";
+      docs: [
         "Close a position in a Whirlpool. Burns the position token in the owner's wallet.",
         "",
         "### Authority",
-        "- \"position_authority\" - The authority that owns the position token.",
+        '- "position_authority" - The authority that owns the position token.',
         "",
         "#### Special Errors",
-        "- `ClosePositionNotEmpty` - The provided position account is not empty."
-      ],
-      "discriminator": [
-        123,
-        134,
-        81,
-        0,
-        49,
-        68,
-        98,
-        98
-      ],
-      "accounts": [
+        "- `ClosePositionNotEmpty` - The provided position account is not empty.",
+      ];
+      discriminator: [123, 134, 81, 0, 49, 68, 98, 98];
+      accounts: [
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "receiver",
-          "writable": true
+          name: "receiver";
+          writable: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionMint",
-          "writable": true
+          name: "positionMint";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount",
-          "writable": true
+          name: "positionTokenAccount";
+          writable: true;
         },
         {
-          "name": "tokenProgram"
-        }
-      ],
-      "args": []
+          name: "tokenProgram";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setDefaultFeeRate",
-      "docs": [
+      name: "setDefaultFeeRate";
+      docs: [
         "Set the default_fee_rate for a FeeTier",
         "Only the current fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `default_fee_rate` - The default fee rate that a pool will use if the pool uses this",
         "fee tier during initialization.",
         "",
         "#### Special Errors",
-        "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE."
-      ],
-      "discriminator": [
-        118,
-        215,
-        214,
-        157,
-        182,
-        229,
-        208,
-        228
-      ],
-      "accounts": [
+        "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE.",
+      ];
+      discriminator: [118, 215, 214, 157, 182, 229, 208, 228];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "feeTier",
-          "writable": true
+          name: "feeTier";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "feeAuthority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "defaultFeeRate",
-          "type": "u16"
-        }
-      ]
+          name: "defaultFeeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "setDefaultProtocolFeeRate",
-      "docs": [
+      name: "setDefaultProtocolFeeRate";
+      docs: [
         "Sets the default protocol fee rate for a WhirlpoolConfig",
         "Protocol fee rate is represented as a basis point.",
         "Only the current fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority that can modify pool fees in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority that can modify pool fees in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `default_protocol_fee_rate` - Rate that is referenced during the initialization of a Whirlpool using this config.",
         "",
         "#### Special Errors",
-        "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_PROTOCOL_FEE_RATE."
-      ],
-      "discriminator": [
-        107,
-        205,
-        249,
-        226,
-        151,
-        35,
-        86,
-        0
-      ],
-      "accounts": [
+        "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_PROTOCOL_FEE_RATE.",
+      ];
+      discriminator: [107, 205, 249, 226, 151, 35, 86, 0];
+      accounts: [
         {
-          "name": "whirlpoolsConfig",
-          "writable": true
+          name: "whirlpoolsConfig";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "feeAuthority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "defaultProtocolFeeRate",
-          "type": "u16"
-        }
-      ]
+          name: "defaultProtocolFeeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "setFeeRate",
-      "docs": [
+      name: "setFeeRate";
+      docs: [
         "Sets the fee rate for a Whirlpool.",
         "Fee rate is represented as hundredths of a basis point.",
         "Only the current fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority that can modify pool fees in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority that can modify pool fees in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `fee_rate` - The rate that the pool will use to calculate fees going onwards.",
         "",
         "#### Special Errors",
-        "- `FeeRateMaxExceeded` - If the provided fee_rate exceeds MAX_FEE_RATE."
-      ],
-      "discriminator": [
-        53,
-        243,
-        137,
-        65,
-        8,
-        140,
-        158,
-        6
-      ],
-      "accounts": [
+        "- `FeeRateMaxExceeded` - If the provided fee_rate exceeds MAX_FEE_RATE.",
+      ];
+      discriminator: [53, 243, 137, 65, 8, 140, 158, 6];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "feeAuthority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "feeRate",
-          "type": "u16"
-        }
-      ]
+          name: "feeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "setProtocolFeeRate",
-      "docs": [
+      name: "setProtocolFeeRate";
+      docs: [
         "Sets the protocol fee rate for a Whirlpool.",
         "Protocol fee rate is represented as a basis point.",
         "Only the current fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority that can modify pool fees in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority that can modify pool fees in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `protocol_fee_rate` - The rate that the pool will use to calculate protocol fees going onwards.",
         "",
         "#### Special Errors",
-        "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_PROTOCOL_FEE_RATE."
-      ],
-      "discriminator": [
-        95,
-        7,
-        4,
-        50,
-        154,
-        79,
-        156,
-        131
-      ],
-      "accounts": [
+        "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_PROTOCOL_FEE_RATE.",
+      ];
+      discriminator: [95, 7, 4, 50, 154, 79, 156, 131];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "feeAuthority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "protocolFeeRate",
-          "type": "u16"
-        }
-      ]
+          name: "protocolFeeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "setFeeAuthority",
-      "docs": [
+      name: "setFeeAuthority";
+      docs: [
         "Sets the fee authority for a WhirlpoolConfig.",
         "The fee authority can set the fee & protocol fee rate for individual pools or",
         "set the default fee rate for newly minted pools.",
         "Only the current fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority that can modify pool fees in the WhirlpoolConfig"
-      ],
-      "discriminator": [
-        31,
-        1,
-        50,
-        87,
-        237,
-        101,
-        97,
-        132
-      ],
-      "accounts": [
+        '- "fee_authority" - Set authority that can modify pool fees in the WhirlpoolConfig',
+      ];
+      discriminator: [31, 1, 50, 87, 237, 101, 97, 132];
+      accounts: [
         {
-          "name": "whirlpoolsConfig",
-          "writable": true
+          name: "whirlpoolsConfig";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
+          name: "feeAuthority";
+          signer: true;
         },
         {
-          "name": "newFeeAuthority"
-        }
-      ],
-      "args": []
+          name: "newFeeAuthority";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setCollectProtocolFeesAuthority",
-      "docs": [
+      name: "setCollectProtocolFeesAuthority";
+      docs: [
         "Sets the fee authority to collect protocol fees for a WhirlpoolConfig.",
         "Only the current collect protocol fee authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority that can collect protocol fees in the WhirlpoolConfig"
-      ],
-      "discriminator": [
-        34,
-        150,
-        93,
-        244,
-        139,
-        225,
-        233,
-        67
-      ],
-      "accounts": [
+        '- "fee_authority" - Set authority that can collect protocol fees in the WhirlpoolConfig',
+      ];
+      discriminator: [34, 150, 93, 244, 139, 225, 233, 67];
+      accounts: [
         {
-          "name": "whirlpoolsConfig",
-          "writable": true
+          name: "whirlpoolsConfig";
+          writable: true;
         },
         {
-          "name": "collectProtocolFeesAuthority",
-          "signer": true
+          name: "collectProtocolFeesAuthority";
+          signer: true;
         },
         {
-          "name": "newCollectProtocolFeesAuthority"
-        }
-      ],
-      "args": []
+          name: "newCollectProtocolFeesAuthority";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setRewardAuthority",
-      "docs": [
+      name: "setRewardAuthority";
+      docs: [
         "Set the whirlpool reward authority at the provided `reward_index`.",
         "Only the current reward authority for this reward index has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"reward_authority\" - Set authority that can control reward emission for this particular reward.",
+        '- "reward_authority" - Set authority that can control reward emission for this particular reward.',
         "",
         "#### Special Errors",
         "- `InvalidRewardIndex` - If the provided reward index doesn't match the lowest uninitialized",
         "index in this pool, or exceeds NUM_REWARDS, or",
-        "all reward slots for this pool has been initialized."
-      ],
-      "discriminator": [
-        34,
-        39,
-        183,
-        252,
-        83,
-        28,
-        85,
-        127
-      ],
-      "accounts": [
+        "all reward slots for this pool has been initialized.",
+      ];
+      discriminator: [34, 39, 183, 252, 83, 28, 85, 127];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "rewardAuthority",
-          "signer": true
+          name: "rewardAuthority";
+          signer: true;
         },
         {
-          "name": "newRewardAuthority"
-        }
-      ],
-      "args": [
+          name: "newRewardAuthority";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
-        }
-      ]
+          name: "rewardIndex";
+          type: "u8";
+        },
+      ];
     },
     {
-      "name": "setRewardAuthorityBySuperAuthority",
-      "docs": [
+      name: "setRewardAuthorityBySuperAuthority";
+      docs: [
         "Set the whirlpool reward authority at the provided `reward_index`.",
         "Only the current reward super authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"reward_authority\" - Set authority that can control reward emission for this particular reward.",
+        '- "reward_authority" - Set authority that can control reward emission for this particular reward.',
         "",
         "#### Special Errors",
         "- `InvalidRewardIndex` - If the provided reward index doesn't match the lowest uninitialized",
         "index in this pool, or exceeds NUM_REWARDS, or",
-        "all reward slots for this pool has been initialized."
-      ],
-      "discriminator": [
-        240,
-        154,
-        201,
-        198,
-        148,
-        93,
-        56,
-        25
-      ],
-      "accounts": [
+        "all reward slots for this pool has been initialized.",
+      ];
+      discriminator: [240, 154, 201, 198, 148, 93, 56, 25];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "rewardEmissionsSuperAuthority",
-          "signer": true
+          name: "rewardEmissionsSuperAuthority";
+          signer: true;
         },
         {
-          "name": "newRewardAuthority"
-        }
-      ],
-      "args": [
+          name: "newRewardAuthority";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
-        }
-      ]
+          name: "rewardIndex";
+          type: "u8";
+        },
+      ];
     },
     {
-      "name": "setRewardEmissionsSuperAuthority",
-      "docs": [
+      name: "setRewardEmissionsSuperAuthority";
+      docs: [
         "Set the whirlpool reward super authority for a WhirlpoolConfig",
         "Only the current reward super authority has permission to invoke this instruction.",
         "This instruction will not change the authority on any `WhirlpoolRewardInfo` whirlpool rewards.",
         "",
         "### Authority",
-        "- \"reward_emissions_super_authority\" - Set authority that can control reward authorities for all pools in this config space."
-      ],
-      "discriminator": [
-        207,
-        5,
-        200,
-        209,
-        122,
-        56,
-        82,
-        183
-      ],
-      "accounts": [
+        '- "reward_emissions_super_authority" - Set authority that can control reward authorities for all pools in this config space.',
+      ];
+      discriminator: [207, 5, 200, 209, 122, 56, 82, 183];
+      accounts: [
         {
-          "name": "whirlpoolsConfig",
-          "writable": true
+          name: "whirlpoolsConfig";
+          writable: true;
         },
         {
-          "name": "rewardEmissionsSuperAuthority",
-          "signer": true
+          name: "rewardEmissionsSuperAuthority";
+          signer: true;
         },
         {
-          "name": "newRewardEmissionsSuperAuthority"
-        }
-      ],
-      "args": []
+          name: "newRewardEmissionsSuperAuthority";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "twoHopSwap",
-      "docs": [
+      name: "twoHopSwap";
+      docs: [
         "Perform a two-hop swap in this Whirlpool",
         "",
         "### Authority",
-        "- \"token_authority\" - The authority to withdraw tokens from the input token account.",
+        '- "token_authority" - The authority to withdraw tokens from the input token account.',
         "",
         "### Parameters",
         "- `amount` - The amount of input or output token to swap from (depending on amount_specified_is_input).",
@@ -1537,299 +1303,263 @@ export type Whirlpool = {
         "- `LiquidityOverflow` - Liquidity value overflowed 128bits during tick crossing.",
         "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0.",
         "- `InvalidIntermediaryMint` - Error if the intermediary mint between hop one and two do not equal.",
-        "- `DuplicateTwoHopPool` - Error if whirlpool one & two are the same pool."
-      ],
-      "discriminator": [
-        195,
-        96,
-        237,
-        108,
-        68,
-        162,
-        219,
-        230
-      ],
-      "accounts": [
+        "- `DuplicateTwoHopPool` - Error if whirlpool one & two are the same pool.",
+      ];
+      discriminator: [195, 96, 237, 108, 68, 162, 219, 230];
+      accounts: [
         {
-          "name": "tokenProgram"
+          name: "tokenProgram";
         },
         {
-          "name": "tokenAuthority",
-          "signer": true
+          name: "tokenAuthority";
+          signer: true;
         },
         {
-          "name": "whirlpoolOne",
-          "writable": true
+          name: "whirlpoolOne";
+          writable: true;
         },
         {
-          "name": "whirlpoolTwo",
-          "writable": true
+          name: "whirlpoolTwo";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountOneA",
-          "writable": true
+          name: "tokenOwnerAccountOneA";
+          writable: true;
         },
         {
-          "name": "tokenVaultOneA",
-          "writable": true
+          name: "tokenVaultOneA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountOneB",
-          "writable": true
+          name: "tokenOwnerAccountOneB";
+          writable: true;
         },
         {
-          "name": "tokenVaultOneB",
-          "writable": true
+          name: "tokenVaultOneB";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountTwoA",
-          "writable": true
+          name: "tokenOwnerAccountTwoA";
+          writable: true;
         },
         {
-          "name": "tokenVaultTwoA",
-          "writable": true
+          name: "tokenVaultTwoA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountTwoB",
-          "writable": true
+          name: "tokenOwnerAccountTwoB";
+          writable: true;
         },
         {
-          "name": "tokenVaultTwoB",
-          "writable": true
+          name: "tokenVaultTwoB";
+          writable: true;
         },
         {
-          "name": "tickArrayOne0",
-          "writable": true
+          name: "tickArrayOne0";
+          writable: true;
         },
         {
-          "name": "tickArrayOne1",
-          "writable": true
+          name: "tickArrayOne1";
+          writable: true;
         },
         {
-          "name": "tickArrayOne2",
-          "writable": true
+          name: "tickArrayOne2";
+          writable: true;
         },
         {
-          "name": "tickArrayTwo0",
-          "writable": true
+          name: "tickArrayTwo0";
+          writable: true;
         },
         {
-          "name": "tickArrayTwo1",
-          "writable": true
+          name: "tickArrayTwo1";
+          writable: true;
         },
         {
-          "name": "tickArrayTwo2",
-          "writable": true
+          name: "tickArrayTwo2";
+          writable: true;
         },
         {
-          "name": "oracleOne"
+          name: "oracleOne";
         },
         {
-          "name": "oracleTwo"
-        }
-      ],
-      "args": [
+          name: "oracleTwo";
+        },
+      ];
+      args: [
         {
-          "name": "amount",
-          "type": "u64"
+          name: "amount";
+          type: "u64";
         },
         {
-          "name": "otherAmountThreshold",
-          "type": "u64"
+          name: "otherAmountThreshold";
+          type: "u64";
         },
         {
-          "name": "amountSpecifiedIsInput",
-          "type": "bool"
+          name: "amountSpecifiedIsInput";
+          type: "bool";
         },
         {
-          "name": "aToBOne",
-          "type": "bool"
+          name: "aToBOne";
+          type: "bool";
         },
         {
-          "name": "aToBTwo",
-          "type": "bool"
+          name: "aToBTwo";
+          type: "bool";
         },
         {
-          "name": "sqrtPriceLimitOne",
-          "type": "u128"
+          name: "sqrtPriceLimitOne";
+          type: "u128";
         },
         {
-          "name": "sqrtPriceLimitTwo",
-          "type": "u128"
-        }
-      ]
+          name: "sqrtPriceLimitTwo";
+          type: "u128";
+        },
+      ];
     },
     {
-      "name": "initializePositionBundle",
-      "docs": [
-        "Initializes a PositionBundle account that bundles several positions.",
-        "A unique token will be minted to represent the position bundle in the users wallet."
-      ],
-      "discriminator": [
-        117,
-        45,
-        241,
-        149,
-        24,
-        18,
-        194,
-        65
-      ],
-      "accounts": [
-        {
-          "name": "positionBundle",
-          "writable": true
-        },
-        {
-          "name": "positionBundleMint",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "positionBundleTokenAccount",
-          "writable": true
-        },
-        {
-          "name": "positionBundleOwner"
-        },
-        {
-          "name": "funder",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "tokenProgram"
-        },
-        {
-          "name": "systemProgram"
-        },
-        {
-          "name": "rent"
-        },
-        {
-          "name": "associatedTokenProgram"
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "initializePositionBundleWithMetadata",
-      "docs": [
+      name: "initializePositionBundle";
+      docs: [
         "Initializes a PositionBundle account that bundles several positions.",
         "A unique token will be minted to represent the position bundle in the users wallet.",
-        "Additional Metaplex metadata is appended to identify the token."
-      ],
-      "discriminator": [
-        93,
-        124,
-        16,
-        179,
-        249,
-        131,
-        115,
-        245
-      ],
-      "accounts": [
+      ];
+      discriminator: [117, 45, 241, 149, 24, 18, 194, 65];
+      accounts: [
         {
-          "name": "positionBundle",
-          "writable": true
+          name: "positionBundle";
+          writable: true;
         },
         {
-          "name": "positionBundleMint",
-          "writable": true,
-          "signer": true
+          name: "positionBundleMint";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "positionBundleMetadata",
-          "docs": [
-            "https://github.com/metaplex-foundation/metaplex-program-library/blob/773a574c4b34e5b9f248a81306ec24db064e255f/token-metadata/program/src/utils/metadata.rs#L100"
-          ],
-          "writable": true
+          name: "positionBundleTokenAccount";
+          writable: true;
         },
         {
-          "name": "positionBundleTokenAccount",
-          "writable": true
+          name: "positionBundleOwner";
         },
         {
-          "name": "positionBundleOwner"
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "tokenProgram";
         },
         {
-          "name": "metadataUpdateAuth"
+          name: "systemProgram";
         },
         {
-          "name": "tokenProgram"
+          name: "rent";
         },
         {
-          "name": "systemProgram"
+          name: "associatedTokenProgram";
         },
-        {
-          "name": "rent"
-        },
-        {
-          "name": "associatedTokenProgram"
-        },
-        {
-          "name": "metadataProgram"
-        }
-      ],
-      "args": []
+      ];
+      args: [];
     },
     {
-      "name": "deletePositionBundle",
-      "docs": [
+      name: "initializePositionBundleWithMetadata";
+      docs: [
+        "Initializes a PositionBundle account that bundles several positions.",
+        "A unique token will be minted to represent the position bundle in the users wallet.",
+        "Additional Metaplex metadata is appended to identify the token.",
+      ];
+      discriminator: [93, 124, 16, 179, 249, 131, 115, 245];
+      accounts: [
+        {
+          name: "positionBundle";
+          writable: true;
+        },
+        {
+          name: "positionBundleMint";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "positionBundleMetadata";
+          docs: [
+            "https://github.com/metaplex-foundation/metaplex-program-library/blob/773a574c4b34e5b9f248a81306ec24db064e255f/token-metadata/program/src/utils/metadata.rs#L100",
+          ];
+          writable: true;
+        },
+        {
+          name: "positionBundleTokenAccount";
+          writable: true;
+        },
+        {
+          name: "positionBundleOwner";
+        },
+        {
+          name: "funder";
+          writable: true;
+          signer: true;
+        },
+        {
+          name: "metadataUpdateAuth";
+        },
+        {
+          name: "tokenProgram";
+        },
+        {
+          name: "systemProgram";
+        },
+        {
+          name: "rent";
+        },
+        {
+          name: "associatedTokenProgram";
+        },
+        {
+          name: "metadataProgram";
+        },
+      ];
+      args: [];
+    },
+    {
+      name: "deletePositionBundle";
+      docs: [
         "Delete a PositionBundle account. Burns the position bundle token in the owner's wallet.",
         "",
         "### Authority",
         "- `position_bundle_owner` - The owner that owns the position bundle token.",
         "",
         "### Special Errors",
-        "- `PositionBundleNotDeletable` - The provided position bundle has open positions."
-      ],
-      "discriminator": [
-        100,
-        25,
-        99,
-        2,
-        217,
-        239,
-        124,
-        173
-      ],
-      "accounts": [
+        "- `PositionBundleNotDeletable` - The provided position bundle has open positions.",
+      ];
+      discriminator: [100, 25, 99, 2, 217, 239, 124, 173];
+      accounts: [
         {
-          "name": "positionBundle",
-          "writable": true
+          name: "positionBundle";
+          writable: true;
         },
         {
-          "name": "positionBundleMint",
-          "writable": true
+          name: "positionBundleMint";
+          writable: true;
         },
         {
-          "name": "positionBundleTokenAccount",
-          "writable": true
+          name: "positionBundleTokenAccount";
+          writable: true;
         },
         {
-          "name": "positionBundleOwner",
-          "signer": true
+          name: "positionBundleOwner";
+          signer: true;
         },
         {
-          "name": "receiver",
-          "writable": true
+          name: "receiver";
+          writable: true;
         },
         {
-          "name": "tokenProgram"
-        }
-      ],
-      "args": []
+          name: "tokenProgram";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "openBundledPosition",
-      "docs": [
+      name: "openBundledPosition";
+      docs: [
         "Open a bundled position in a Whirlpool. No new tokens are issued",
         "because the owner of the position bundle becomes the owner of the position.",
         "The position will start off with 0 liquidity.",
@@ -1845,67 +1575,58 @@ export type Whirlpool = {
         "#### Special Errors",
         "- `InvalidBundleIndex` - If the provided bundle index is out of bounds.",
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
-        "the tick-spacing in this pool."
-      ],
-      "discriminator": [
-        169,
-        113,
-        126,
-        171,
-        213,
-        172,
-        212,
-        49
-      ],
-      "accounts": [
+        "the tick-spacing in this pool.",
+      ];
+      discriminator: [169, 113, 126, 171, 213, 172, 212, 49];
+      accounts: [
         {
-          "name": "bundledPosition",
-          "writable": true
+          name: "bundledPosition";
+          writable: true;
         },
         {
-          "name": "positionBundle",
-          "writable": true
+          name: "positionBundle";
+          writable: true;
         },
         {
-          "name": "positionBundleTokenAccount"
+          name: "positionBundleTokenAccount";
         },
         {
-          "name": "positionBundleAuthority",
-          "signer": true
+          name: "positionBundleAuthority";
+          signer: true;
         },
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
-        }
-      ],
-      "args": [
+          name: "rent";
+        },
+      ];
+      args: [
         {
-          "name": "bundleIndex",
-          "type": "u16"
+          name: "bundleIndex";
+          type: "u16";
         },
         {
-          "name": "tickLowerIndex",
-          "type": "i32"
+          name: "tickLowerIndex";
+          type: "i32";
         },
         {
-          "name": "tickUpperIndex",
-          "type": "i32"
-        }
-      ]
+          name: "tickUpperIndex";
+          type: "i32";
+        },
+      ];
     },
     {
-      "name": "closeBundledPosition",
-      "docs": [
+      name: "closeBundledPosition";
+      docs: [
         "Close a bundled position in a Whirlpool.",
         "",
         "### Authority",
@@ -1916,49 +1637,40 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `InvalidBundleIndex` - If the provided bundle index is out of bounds.",
-        "- `ClosePositionNotEmpty` - The provided position account is not empty."
-      ],
-      "discriminator": [
-        41,
-        36,
-        216,
-        245,
-        27,
-        85,
-        103,
-        67
-      ],
-      "accounts": [
+        "- `ClosePositionNotEmpty` - The provided position account is not empty.",
+      ];
+      discriminator: [41, 36, 216, 245, 27, 85, 103, 67];
+      accounts: [
         {
-          "name": "bundledPosition",
-          "writable": true
+          name: "bundledPosition";
+          writable: true;
         },
         {
-          "name": "positionBundle",
-          "writable": true
+          name: "positionBundle";
+          writable: true;
         },
         {
-          "name": "positionBundleTokenAccount"
+          name: "positionBundleTokenAccount";
         },
         {
-          "name": "positionBundleAuthority",
-          "signer": true
+          name: "positionBundleAuthority";
+          signer: true;
         },
         {
-          "name": "receiver",
-          "writable": true
-        }
-      ],
-      "args": [
+          name: "receiver";
+          writable: true;
+        },
+      ];
+      args: [
         {
-          "name": "bundleIndex",
-          "type": "u16"
-        }
-      ]
+          name: "bundleIndex";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "openPositionWithTokenExtensions",
-      "docs": [
+      name: "openPositionWithTokenExtensions";
+      docs: [
         "Open a position in a Whirlpool. A unique token will be minted to represent the position",
         "in the users wallet. Additional TokenMetadata extension is initialized to identify the token.",
         "Mint and TokenAccount are based on Token-2022.",
@@ -1971,123 +1683,105 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
-        "the tick-spacing in this pool."
-      ],
-      "discriminator": [
-        212,
-        47,
-        95,
-        92,
-        114,
-        102,
-        131,
-        250
-      ],
-      "accounts": [
+        "the tick-spacing in this pool.",
+      ];
+      discriminator: [212, 47, 95, 92, 114, 102, 131, 250];
+      accounts: [
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "owner"
+          name: "owner";
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionMint",
-          "writable": true,
-          "signer": true
+          name: "positionMint";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "positionTokenAccount",
-          "writable": true
+          name: "positionTokenAccount";
+          writable: true;
         },
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "token2022Program"
+          name: "token2022Program";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "associatedTokenProgram"
+          name: "associatedTokenProgram";
         },
         {
-          "name": "metadataUpdateAuth"
-        }
-      ],
-      "args": [
+          name: "metadataUpdateAuth";
+        },
+      ];
+      args: [
         {
-          "name": "tickLowerIndex",
-          "type": "i32"
+          name: "tickLowerIndex";
+          type: "i32";
         },
         {
-          "name": "tickUpperIndex",
-          "type": "i32"
+          name: "tickUpperIndex";
+          type: "i32";
         },
         {
-          "name": "withTokenMetadataExtension",
-          "type": "bool"
-        }
-      ]
+          name: "withTokenMetadataExtension";
+          type: "bool";
+        },
+      ];
     },
     {
-      "name": "closePositionWithTokenExtensions",
-      "docs": [
+      name: "closePositionWithTokenExtensions";
+      docs: [
         "Close a position in a Whirlpool. Burns the position token in the owner's wallet.",
         "Mint and TokenAccount are based on Token-2022. And Mint accout will be also closed.",
         "",
         "### Authority",
-        "- \"position_authority\" - The authority that owns the position token.",
+        '- "position_authority" - The authority that owns the position token.',
         "",
         "#### Special Errors",
-        "- `ClosePositionNotEmpty` - The provided position account is not empty."
-      ],
-      "discriminator": [
-        1,
-        182,
-        135,
-        59,
-        155,
-        25,
-        99,
-        223
-      ],
-      "accounts": [
+        "- `ClosePositionNotEmpty` - The provided position account is not empty.",
+      ];
+      discriminator: [1, 182, 135, 59, 155, 25, 99, 223];
+      accounts: [
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "receiver",
-          "writable": true
+          name: "receiver";
+          writable: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionMint",
-          "writable": true
+          name: "positionMint";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount",
-          "writable": true
+          name: "positionTokenAccount";
+          writable: true;
         },
         {
-          "name": "token2022Program"
-        }
-      ],
-      "args": []
+          name: "token2022Program";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "lockPosition",
-      "docs": [
+      name: "lockPosition";
+      docs: [
         "Lock the position to prevent any liquidity changes.",
         "",
         "### Authority",
@@ -2095,66 +1789,57 @@ export type Whirlpool = {
         "",
         "#### Special Errors",
         "- `PositionAlreadyLocked` - The provided position is already locked.",
-        "- `PositionNotLockable` - The provided position is not lockable (e.g. An empty position)."
-      ],
-      "discriminator": [
-        227,
-        62,
-        2,
-        252,
-        247,
-        10,
-        171,
-        185
-      ],
-      "accounts": [
+        "- `PositionNotLockable` - The provided position is not lockable (e.g. An empty position).",
+      ];
+      discriminator: [227, 62, 2, 252, 247, 10, 171, 185];
+      accounts: [
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position"
+          name: "position";
         },
         {
-          "name": "positionMint"
+          name: "positionMint";
         },
         {
-          "name": "positionTokenAccount",
-          "writable": true
+          name: "positionTokenAccount";
+          writable: true;
         },
         {
-          "name": "lockConfig",
-          "writable": true
+          name: "lockConfig";
+          writable: true;
         },
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "token2022Program"
+          name: "token2022Program";
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": [
+          name: "systemProgram";
+        },
+      ];
+      args: [
         {
-          "name": "lockType",
-          "type": {
-            "defined": {
-              "name": "lockType"
-            }
-          }
-        }
-      ]
+          name: "lockType";
+          type: {
+            defined: {
+              name: "lockType";
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "resetPositionRange",
-      "docs": [
+      name: "resetPositionRange";
+      docs: [
         "Reset the position range to a new range.",
         "",
         "### Authority",
@@ -2168,111 +1853,93 @@ export type Whirlpool = {
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
         "the tick-spacing in this pool.",
         "- `ClosePositionNotEmpty` - The provided position account is not empty.",
-        "- `SameTickRangeNotAllowed` - The provided tick range is the same as the current tick range."
-      ],
-      "discriminator": [
-        164,
-        123,
-        180,
-        141,
-        194,
-        100,
-        160,
-        175
-      ],
-      "accounts": [
+        "- `SameTickRangeNotAllowed` - The provided tick range is the same as the current tick range.",
+      ];
+      discriminator: [164, 123, 180, 141, 194, 100, 160, 175];
+      accounts: [
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": [
+          name: "systemProgram";
+        },
+      ];
+      args: [
         {
-          "name": "newTickLowerIndex",
-          "type": "i32"
+          name: "newTickLowerIndex";
+          type: "i32";
         },
         {
-          "name": "newTickUpperIndex",
-          "type": "i32"
-        }
-      ]
+          name: "newTickUpperIndex";
+          type: "i32";
+        },
+      ];
     },
     {
-      "name": "transferLockedPosition",
-      "docs": [
+      name: "transferLockedPosition";
+      docs: [
         "Transfer a locked position to a different token account.",
         "",
         "### Authority",
-        "- `position_authority` - The authority that owns the position token."
-      ],
-      "discriminator": [
-        179,
-        121,
-        229,
-        46,
-        67,
-        138,
-        194,
-        138
-      ],
-      "accounts": [
+        "- `position_authority` - The authority that owns the position token.",
+      ];
+      discriminator: [179, 121, 229, 46, 67, 138, 194, 138];
+      accounts: [
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "receiver",
-          "writable": true
+          name: "receiver";
+          writable: true;
         },
         {
-          "name": "position"
+          name: "position";
         },
         {
-          "name": "positionMint"
+          name: "positionMint";
         },
         {
-          "name": "positionTokenAccount",
-          "writable": true
+          name: "positionTokenAccount";
+          writable: true;
         },
         {
-          "name": "destinationTokenAccount",
-          "writable": true
+          name: "destinationTokenAccount";
+          writable: true;
         },
         {
-          "name": "lockConfig",
-          "writable": true
+          name: "lockConfig";
+          writable: true;
         },
         {
-          "name": "token2022Program"
-        }
-      ],
-      "args": []
+          name: "token2022Program";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "initializeAdaptiveFeeTier",
-      "docs": [
+      name: "initializeAdaptiveFeeTier";
+      docs: [
         "Initializes an adaptive_fee_tier account usable by Whirlpools in a WhirlpoolConfig space.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `fee_tier_index` - The index of the fee-tier that this adaptive fee tier will be initialized.",
@@ -2293,220 +1960,184 @@ export type Whirlpool = {
         "- `InvalidTickSpacing` - If the provided tick_spacing is 0.",
         "- `InvalidFeeTierIndex` - If the provided fee_tier_index is same to tick_spacing.",
         "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE.",
-        "- `InvalidAdaptiveFeeConstants` - If the provided adaptive fee constants are invalid."
-      ],
-      "discriminator": [
-        77,
-        99,
-        208,
-        200,
-        141,
-        123,
-        117,
-        48
-      ],
-      "accounts": [
+        "- `InvalidAdaptiveFeeConstants` - If the provided adaptive fee constants are invalid.",
+      ];
+      discriminator: [77, 99, 208, 200, 141, 123, 117, 48];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "adaptiveFeeTier",
-          "writable": true
+          name: "adaptiveFeeTier";
+          writable: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
+          name: "feeAuthority";
+          signer: true;
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": [
+          name: "systemProgram";
+        },
+      ];
+      args: [
         {
-          "name": "feeTierIndex",
-          "type": "u16"
+          name: "feeTierIndex";
+          type: "u16";
         },
         {
-          "name": "tickSpacing",
-          "type": "u16"
+          name: "tickSpacing";
+          type: "u16";
         },
         {
-          "name": "initializePoolAuthority",
-          "type": "pubkey"
+          name: "initializePoolAuthority";
+          type: "pubkey";
         },
         {
-          "name": "delegatedFeeAuthority",
-          "type": "pubkey"
+          name: "delegatedFeeAuthority";
+          type: "pubkey";
         },
         {
-          "name": "defaultBaseFeeRate",
-          "type": "u16"
+          name: "defaultBaseFeeRate";
+          type: "u16";
         },
         {
-          "name": "filterPeriod",
-          "type": "u16"
+          name: "filterPeriod";
+          type: "u16";
         },
         {
-          "name": "decayPeriod",
-          "type": "u16"
+          name: "decayPeriod";
+          type: "u16";
         },
         {
-          "name": "reductionFactor",
-          "type": "u16"
+          name: "reductionFactor";
+          type: "u16";
         },
         {
-          "name": "adaptiveFeeControlFactor",
-          "type": "u32"
+          name: "adaptiveFeeControlFactor";
+          type: "u32";
         },
         {
-          "name": "maxVolatilityAccumulator",
-          "type": "u32"
+          name: "maxVolatilityAccumulator";
+          type: "u32";
         },
         {
-          "name": "tickGroupSize",
-          "type": "u16"
+          name: "tickGroupSize";
+          type: "u16";
         },
         {
-          "name": "majorSwapThresholdTicks",
-          "type": "u16"
-        }
-      ]
+          name: "majorSwapThresholdTicks";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "setDefaultBaseFeeRate",
-      "docs": [
+      name: "setDefaultBaseFeeRate";
+      docs: [
         "Set the default_base_fee_rate for an AdaptiveFeeTier",
         "Only the current fee authority in WhirlpoolsConfig has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `default_base_fee_rate` - The default base fee rate that a pool will use if the pool uses this",
         "adaptive fee-tier during initialization.",
         "",
         "#### Special Errors",
-        "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE."
-      ],
-      "discriminator": [
-        229,
-        66,
-        84,
-        251,
-        164,
-        134,
-        183,
-        7
-      ],
-      "accounts": [
+        "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE.",
+      ];
+      discriminator: [229, 66, 84, 251, 164, 134, 183, 7];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "adaptiveFeeTier",
-          "writable": true
+          name: "adaptiveFeeTier";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "feeAuthority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "defaultBaseFeeRate",
-          "type": "u16"
-        }
-      ]
+          name: "defaultBaseFeeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "setDelegatedFeeAuthority",
-      "docs": [
+      name: "setDelegatedFeeAuthority";
+      docs: [
         "Sets the delegated fee authority for an AdaptiveFeeTier.",
         "The delegated fee authority can set the fee rate for individual pools initialized with the adaptive fee-tier.",
         "Only the current fee authority in WhirlpoolsConfig has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig"
-      ],
-      "discriminator": [
-        193,
-        234,
-        231,
-        147,
-        138,
-        57,
-        3,
-        122
-      ],
-      "accounts": [
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
+      ];
+      discriminator: [193, 234, 231, 147, 138, 57, 3, 122];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "adaptiveFeeTier",
-          "writable": true
+          name: "adaptiveFeeTier";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
+          name: "feeAuthority";
+          signer: true;
         },
         {
-          "name": "newDelegatedFeeAuthority"
-        }
-      ],
-      "args": []
+          name: "newDelegatedFeeAuthority";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setInitializePoolAuthority",
-      "docs": [
+      name: "setInitializePoolAuthority";
+      docs: [
         "Sets the initialize pool authority for an AdaptiveFeeTier.",
         "Only the initialize pool authority can initialize pools with the adaptive fee-tier.",
         "Only the current fee authority in WhirlpoolsConfig has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig"
-      ],
-      "discriminator": [
-        125,
-        43,
-        127,
-        235,
-        149,
-        26,
-        106,
-        236
-      ],
-      "accounts": [
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
+      ];
+      discriminator: [125, 43, 127, 235, 149, 26, 106, 236];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "adaptiveFeeTier",
-          "writable": true
+          name: "adaptiveFeeTier";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
+          name: "feeAuthority";
+          signer: true;
         },
         {
-          "name": "newInitializePoolAuthority"
-        }
-      ],
-      "args": []
+          name: "newInitializePoolAuthority";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setPresetAdaptiveFeeConstants",
-      "docs": [
+      name: "setPresetAdaptiveFeeConstants";
+      docs: [
         "Sets the adaptive fee constants for an AdaptiveFeeTier.",
         "Only the current fee authority in WhirlpoolsConfig has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig",
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
         "",
         "### Parameters",
         "- `filter_period` - Period determine high frequency trading time window. (seconds)",
@@ -2515,65 +2146,56 @@ export type Whirlpool = {
         "- `adaptive_fee_control_factor` - Adaptive fee control factor.",
         "- `max_volatility_accumulator` - Max volatility accumulator.",
         "- `tick_group_size` - Tick group size to define tick group index.",
-        "- `major_swap_threshold_ticks` - Major swap threshold ticks to define major swap."
-      ],
-      "discriminator": [
-        132,
-        185,
-        66,
-        148,
-        83,
-        88,
-        134,
-        198
-      ],
-      "accounts": [
+        "- `major_swap_threshold_ticks` - Major swap threshold ticks to define major swap.",
+      ];
+      discriminator: [132, 185, 66, 148, 83, 88, 134, 198];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "adaptiveFeeTier",
-          "writable": true
+          name: "adaptiveFeeTier";
+          writable: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "feeAuthority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "filterPeriod",
-          "type": "u16"
+          name: "filterPeriod";
+          type: "u16";
         },
         {
-          "name": "decayPeriod",
-          "type": "u16"
+          name: "decayPeriod";
+          type: "u16";
         },
         {
-          "name": "reductionFactor",
-          "type": "u16"
+          name: "reductionFactor";
+          type: "u16";
         },
         {
-          "name": "adaptiveFeeControlFactor",
-          "type": "u32"
+          name: "adaptiveFeeControlFactor";
+          type: "u32";
         },
         {
-          "name": "maxVolatilityAccumulator",
-          "type": "u32"
+          name: "maxVolatilityAccumulator";
+          type: "u32";
         },
         {
-          "name": "tickGroupSize",
-          "type": "u16"
+          name: "tickGroupSize";
+          type: "u16";
         },
         {
-          "name": "majorSwapThresholdTicks",
-          "type": "u16"
-        }
-      ]
+          name: "majorSwapThresholdTicks";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "initializePoolWithAdaptiveFee",
-      "docs": [
+      name: "initializePoolWithAdaptiveFee";
+      docs: [
         "Initializes a Whirlpool account and Oracle account with adaptive fee.",
         "",
         "### Parameters",
@@ -2585,428 +2207,365 @@ export type Whirlpool = {
         "`SqrtPriceOutOfBounds` - provided initial_sqrt_price is not between 2^-64 to 2^64",
         "`InvalidTradeEnableTimestamp` - provided trade_enable_timestamp is not within 72 hours or the adaptive fee-tier is permission-less",
         "`UnsupportedTokenMint` - The provided token mint is not supported by the program (e.g. it has risky token extensions)",
-        ""
-      ],
-      "discriminator": [
-        143,
-        94,
-        96,
-        76,
-        172,
-        124,
-        119,
-        199
-      ],
-      "accounts": [
+        "",
+      ];
+      discriminator: [143, 94, 96, 76, 172, 124, 119, 199];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "tokenBadgeA"
+          name: "tokenBadgeA";
         },
         {
-          "name": "tokenBadgeB"
+          name: "tokenBadgeB";
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "initializePoolAuthority",
-          "signer": true
+          name: "initializePoolAuthority";
+          signer: true;
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "oracle",
-          "writable": true
+          name: "oracle";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true,
-          "signer": true
+          name: "tokenVaultA";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true,
-          "signer": true
+          name: "tokenVaultB";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "adaptiveFeeTier"
+          name: "adaptiveFeeTier";
         },
         {
-          "name": "tokenProgramA"
+          name: "tokenProgramA";
         },
         {
-          "name": "tokenProgramB"
+          name: "tokenProgramB";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
-        }
-      ],
-      "args": [
+          name: "rent";
+        },
+      ];
+      args: [
         {
-          "name": "initialSqrtPrice",
-          "type": "u128"
+          name: "initialSqrtPrice";
+          type: "u128";
         },
         {
-          "name": "tradeEnableTimestamp",
-          "type": {
-            "option": "u64"
-          }
-        }
-      ]
+          name: "tradeEnableTimestamp";
+          type: {
+            option: "u64";
+          };
+        },
+      ];
     },
     {
-      "name": "setFeeRateByDelegatedFeeAuthority",
-      "docs": [
+      name: "setFeeRateByDelegatedFeeAuthority";
+      docs: [
         "Sets the fee rate for a Whirlpool by the delegated fee authority in AdaptiveFeeTier.",
         "Fee rate is represented as hundredths of a basis point.",
         "",
         "### Authority",
-        "- \"delegated_fee_authority\" - Set authority that can modify pool fees in the AdaptiveFeeTier",
+        '- "delegated_fee_authority" - Set authority that can modify pool fees in the AdaptiveFeeTier',
         "",
         "### Parameters",
         "- `fee_rate` - The rate that the pool will use to calculate fees going onwards.",
         "",
         "#### Special Errors",
-        "- `FeeRateMaxExceeded` - If the provided fee_rate exceeds MAX_FEE_RATE."
-      ],
-      "discriminator": [
-        121,
-        121,
-        54,
-        114,
-        131,
-        230,
-        162,
-        104
-      ],
-      "accounts": [
+        "- `FeeRateMaxExceeded` - If the provided fee_rate exceeds MAX_FEE_RATE.",
+      ];
+      discriminator: [121, 121, 54, 114, 131, 230, 162, 104];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "adaptiveFeeTier"
+          name: "adaptiveFeeTier";
         },
         {
-          "name": "delegatedFeeAuthority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "delegatedFeeAuthority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "feeRate",
-          "type": "u16"
-        }
-      ]
+          name: "feeRate";
+          type: "u16";
+        },
+      ];
     },
     {
-      "name": "setConfigFeatureFlag",
-      "docs": [
+      name: "setConfigFeatureFlag";
+      docs: [
         "Sets the feature flag for a WhirlpoolConfig.",
         "",
         "### Authority",
-        "- \"authority\" - Set authority that is one of ADMINS.",
+        '- "authority" - Set authority that is one of ADMINS.',
         "",
         "### Parameters",
-        "- `feature_flag` - The feature flag that the WhirlpoolConfig will use."
-      ],
-      "discriminator": [
-        71,
-        173,
-        228,
-        18,
-        67,
-        247,
-        210,
-        57
-      ],
-      "accounts": [
+        "- `feature_flag` - The feature flag that the WhirlpoolConfig will use.",
+      ];
+      discriminator: [71, 173, 228, 18, 67, 247, 210, 57];
+      accounts: [
         {
-          "name": "whirlpoolsConfig",
-          "writable": true
+          name: "whirlpoolsConfig";
+          writable: true;
         },
         {
-          "name": "authority",
-          "signer": true
-        }
-      ],
-      "args": [
+          name: "authority";
+          signer: true;
+        },
+      ];
+      args: [
         {
-          "name": "featureFlag",
-          "type": {
-            "defined": {
-              "name": "configFeatureFlag"
-            }
-          }
-        }
-      ]
+          name: "featureFlag";
+          type: {
+            defined: {
+              name: "configFeatureFlag";
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "migrateRepurposeRewardAuthoritySpace",
-      "docs": [
+      name: "migrateRepurposeRewardAuthoritySpace";
+      docs: [
         "Migration instruction to repurpose the reward authority space in the Whirlpool.",
-        "TODO: This instruction should be removed once all pools have been migrated."
-      ],
-      "discriminator": [
-        214,
-        161,
-        248,
-        79,
-        152,
-        98,
-        172,
-        231
-      ],
-      "accounts": [
+        "TODO: This instruction should be removed once all pools have been migrated.",
+      ];
+      discriminator: [214, 161, 248, 79, 152, 98, 172, 231];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
-        }
-      ],
-      "args": []
+          name: "whirlpool";
+          writable: true;
+        },
+      ];
+      args: [];
     },
     {
-      "name": "collectFeesV2",
-      "docs": [
+      name: "collectFeesV2";
+      docs: [
         "Collect fees accrued for this position.",
         "This instruction works with both Token and Token-2022.",
         "",
         "### Authority",
-        "- `position_authority` - authority that owns the token corresponding to this desired position."
-      ],
-      "discriminator": [
-        207,
-        117,
-        95,
-        191,
-        229,
-        180,
-        226,
-        15
-      ],
-      "accounts": [
+        "- `position_authority` - authority that owns the token corresponding to this desired position.",
+      ];
+      discriminator: [207, 117, 95, 191, 229, 180, 226, 15];
+      accounts: [
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tokenProgramA"
+          name: "tokenProgramA";
         },
         {
-          "name": "tokenProgramB"
+          name: "tokenProgramB";
         },
         {
-          "name": "memoProgram"
-        }
-      ],
-      "args": [
+          name: "memoProgram";
+        },
+      ];
+      args: [
         {
-          "name": "remainingAccountsInfo",
-          "type": {
-            "option": {
-              "defined": {
-                "name": "remainingAccountsInfo"
-              }
-            }
-          }
-        }
-      ]
+          name: "remainingAccountsInfo";
+          type: {
+            option: {
+              defined: {
+                name: "remainingAccountsInfo";
+              };
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "collectProtocolFeesV2",
-      "docs": [
+      name: "collectProtocolFeesV2";
+      docs: [
         "Collect the protocol fees accrued in this Whirlpool",
         "This instruction works with both Token and Token-2022.",
         "",
         "### Authority",
-        "- `collect_protocol_fees_authority` - assigned authority in the WhirlpoolConfig that can collect protocol fees"
-      ],
-      "discriminator": [
-        103,
-        128,
-        222,
-        134,
-        114,
-        200,
-        22,
-        200
-      ],
-      "accounts": [
+        "- `collect_protocol_fees_authority` - assigned authority in the WhirlpoolConfig that can collect protocol fees",
+      ];
+      discriminator: [103, 128, 222, 134, 114, 200, 22, 200];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "collectProtocolFeesAuthority",
-          "signer": true
+          name: "collectProtocolFeesAuthority";
+          signer: true;
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tokenDestinationA",
-          "writable": true
+          name: "tokenDestinationA";
+          writable: true;
         },
         {
-          "name": "tokenDestinationB",
-          "writable": true
+          name: "tokenDestinationB";
+          writable: true;
         },
         {
-          "name": "tokenProgramA"
+          name: "tokenProgramA";
         },
         {
-          "name": "tokenProgramB"
+          name: "tokenProgramB";
         },
         {
-          "name": "memoProgram"
-        }
-      ],
-      "args": [
+          name: "memoProgram";
+        },
+      ];
+      args: [
         {
-          "name": "remainingAccountsInfo",
-          "type": {
-            "option": {
-              "defined": {
-                "name": "remainingAccountsInfo"
-              }
-            }
-          }
-        }
-      ]
+          name: "remainingAccountsInfo";
+          type: {
+            option: {
+              defined: {
+                name: "remainingAccountsInfo";
+              };
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "collectRewardV2",
-      "docs": [
+      name: "collectRewardV2";
+      docs: [
         "Collect rewards accrued for this position.",
         "This instruction works with both Token and Token-2022.",
         "",
         "### Authority",
-        "- `position_authority` - authority that owns the token corresponding to this desired position."
-      ],
-      "discriminator": [
-        177,
-        107,
-        37,
-        180,
-        160,
-        19,
-        49,
-        209
-      ],
-      "accounts": [
+        "- `position_authority` - authority that owns the token corresponding to this desired position.",
+      ];
+      discriminator: [177, 107, 37, 180, 160, 19, 49, 209];
+      accounts: [
         {
-          "name": "whirlpool"
+          name: "whirlpool";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "rewardOwnerAccount",
-          "writable": true
+          name: "rewardOwnerAccount";
+          writable: true;
         },
         {
-          "name": "rewardMint"
+          name: "rewardMint";
         },
         {
-          "name": "rewardVault",
-          "writable": true
+          name: "rewardVault";
+          writable: true;
         },
         {
-          "name": "rewardTokenProgram"
+          name: "rewardTokenProgram";
         },
         {
-          "name": "memoProgram"
-        }
-      ],
-      "args": [
+          name: "memoProgram";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
+          name: "rewardIndex";
+          type: "u8";
         },
         {
-          "name": "remainingAccountsInfo",
-          "type": {
-            "option": {
-              "defined": {
-                "name": "remainingAccountsInfo"
-              }
-            }
-          }
-        }
-      ]
+          name: "remainingAccountsInfo";
+          type: {
+            option: {
+              defined: {
+                name: "remainingAccountsInfo";
+              };
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "decreaseLiquidityV2",
-      "docs": [
+      name: "decreaseLiquidityV2";
+      docs: [
         "Withdraw liquidity from a position in the Whirlpool. This call also updates the position's accrued fees and rewards.",
         "This instruction works with both Token and Token-2022.",
         "",
@@ -3021,102 +2580,93 @@ export type Whirlpool = {
         "#### Special Errors",
         "- `LiquidityZero` - Provided liquidity amount is zero.",
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
-        "- `TokenMinSubceeded` - The required token to perform this operation subceeds the user defined amount."
-      ],
-      "discriminator": [
-        58,
-        127,
-        188,
-        62,
-        79,
-        82,
-        196,
-        96
-      ],
-      "accounts": [
+        "- `TokenMinSubceeded` - The required token to perform this operation subceeds the user defined amount.",
+      ];
+      discriminator: [58, 127, 188, 62, 79, 82, 196, 96];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenProgramA"
+          name: "tokenProgramA";
         },
         {
-          "name": "tokenProgramB"
+          name: "tokenProgramB";
         },
         {
-          "name": "memoProgram"
+          name: "memoProgram";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tickArrayLower",
-          "writable": true
+          name: "tickArrayLower";
+          writable: true;
         },
         {
-          "name": "tickArrayUpper",
-          "writable": true
-        }
-      ],
-      "args": [
+          name: "tickArrayUpper";
+          writable: true;
+        },
+      ];
+      args: [
         {
-          "name": "liquidityAmount",
-          "type": "u128"
+          name: "liquidityAmount";
+          type: "u128";
         },
         {
-          "name": "tokenMinA",
-          "type": "u64"
+          name: "tokenMinA";
+          type: "u64";
         },
         {
-          "name": "tokenMinB",
-          "type": "u64"
+          name: "tokenMinB";
+          type: "u64";
         },
         {
-          "name": "remainingAccountsInfo",
-          "type": {
-            "option": {
-              "defined": {
-                "name": "remainingAccountsInfo"
-              }
-            }
-          }
-        }
-      ]
+          name: "remainingAccountsInfo";
+          type: {
+            option: {
+              defined: {
+                name: "remainingAccountsInfo";
+              };
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "increaseLiquidityV2",
-      "docs": [
+      name: "increaseLiquidityV2";
+      docs: [
         "Add liquidity to a position in the Whirlpool. This call also updates the position's accrued fees and rewards.",
         "This instruction works with both Token and Token-2022.",
         "",
@@ -3131,102 +2681,93 @@ export type Whirlpool = {
         "#### Special Errors",
         "- `LiquidityZero` - Provided liquidity amount is zero.",
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
-        "- `TokenMaxExceeded` - The required token to perform this operation exceeds the user defined amount."
-      ],
-      "discriminator": [
-        133,
-        29,
-        89,
-        223,
-        69,
-        238,
-        176,
-        10
-      ],
-      "accounts": [
+        "- `TokenMaxExceeded` - The required token to perform this operation exceeds the user defined amount.",
+      ];
+      discriminator: [133, 29, 89, 223, 69, 238, 176, 10];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenProgramA"
+          name: "tokenProgramA";
         },
         {
-          "name": "tokenProgramB"
+          name: "tokenProgramB";
         },
         {
-          "name": "memoProgram"
+          name: "memoProgram";
         },
         {
-          "name": "positionAuthority",
-          "signer": true
+          name: "positionAuthority";
+          signer: true;
         },
         {
-          "name": "position",
-          "writable": true
+          name: "position";
+          writable: true;
         },
         {
-          "name": "positionTokenAccount"
+          name: "positionTokenAccount";
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tickArrayLower",
-          "writable": true
+          name: "tickArrayLower";
+          writable: true;
         },
         {
-          "name": "tickArrayUpper",
-          "writable": true
-        }
-      ],
-      "args": [
+          name: "tickArrayUpper";
+          writable: true;
+        },
+      ];
+      args: [
         {
-          "name": "liquidityAmount",
-          "type": "u128"
+          name: "liquidityAmount";
+          type: "u128";
         },
         {
-          "name": "tokenMaxA",
-          "type": "u64"
+          name: "tokenMaxA";
+          type: "u64";
         },
         {
-          "name": "tokenMaxB",
-          "type": "u64"
+          name: "tokenMaxB";
+          type: "u64";
         },
         {
-          "name": "remainingAccountsInfo",
-          "type": {
-            "option": {
-              "defined": {
-                "name": "remainingAccountsInfo"
-              }
-            }
-          }
-        }
-      ]
+          name: "remainingAccountsInfo";
+          type: {
+            option: {
+              defined: {
+                name: "remainingAccountsInfo";
+              };
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "initializePoolV2",
-      "docs": [
+      name: "initializePoolV2";
+      docs: [
         "Initializes a Whirlpool account.",
         "This instruction works with both Token and Token-2022.",
         "Fee rate is set to the default values on the config and supplied fee_tier.",
@@ -3239,88 +2780,79 @@ export type Whirlpool = {
         "#### Special Errors",
         "`InvalidTokenMintOrder` - The order of mints have to be ordered by",
         "`SqrtPriceOutOfBounds` - provided initial_sqrt_price is not between 2^-64 to 2^64",
-        ""
-      ],
-      "discriminator": [
-        207,
-        45,
-        87,
-        242,
-        27,
-        63,
-        204,
-        67
-      ],
-      "accounts": [
+        "",
+      ];
+      discriminator: [207, 45, 87, 242, 27, 63, 204, 67];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "tokenBadgeA"
+          name: "tokenBadgeA";
         },
         {
-          "name": "tokenBadgeB"
+          name: "tokenBadgeB";
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true,
-          "signer": true
+          name: "tokenVaultA";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true,
-          "signer": true
+          name: "tokenVaultB";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "feeTier"
+          name: "feeTier";
         },
         {
-          "name": "tokenProgramA"
+          name: "tokenProgramA";
         },
         {
-          "name": "tokenProgramB"
+          name: "tokenProgramB";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
-        }
-      ],
-      "args": [
+          name: "rent";
+        },
+      ];
+      args: [
         {
-          "name": "tickSpacing",
-          "type": "u16"
+          name: "tickSpacing";
+          type: "u16";
         },
         {
-          "name": "initialSqrtPrice",
-          "type": "u128"
-        }
-      ]
+          name: "initialSqrtPrice";
+          type: "u128";
+        },
+      ];
     },
     {
-      "name": "initializeRewardV2",
-      "docs": [
+      name: "initializeRewardV2";
+      docs: [
         "Initialize reward for a Whirlpool. A pool can only support up to a set number of rewards.",
         "This instruction works with both Token and Token-2022.",
         "",
         "### Authority",
-        "- \"reward_authority\" - assigned authority by the reward_super_authority for the specified",
+        '- "reward_authority" - assigned authority by the reward_super_authority for the specified',
         "reward-index in this Whirlpool",
         "",
         "### Parameters",
@@ -3329,68 +2861,59 @@ export type Whirlpool = {
         "#### Special Errors",
         "- `InvalidRewardIndex` - If the provided reward index doesn't match the lowest uninitialized",
         "index in this pool, or exceeds NUM_REWARDS, or",
-        "all reward slots for this pool has been initialized."
-      ],
-      "discriminator": [
-        91,
-        1,
-        77,
-        50,
-        235,
-        229,
-        133,
-        49
-      ],
-      "accounts": [
+        "all reward slots for this pool has been initialized.",
+      ];
+      discriminator: [91, 1, 77, 50, 235, 229, 133, 49];
+      accounts: [
         {
-          "name": "rewardAuthority",
-          "signer": true
+          name: "rewardAuthority";
+          signer: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "rewardMint"
+          name: "rewardMint";
         },
         {
-          "name": "rewardTokenBadge"
+          name: "rewardTokenBadge";
         },
         {
-          "name": "rewardVault",
-          "writable": true,
-          "signer": true
+          name: "rewardVault";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "rewardTokenProgram"
+          name: "rewardTokenProgram";
         },
         {
-          "name": "systemProgram"
+          name: "systemProgram";
         },
         {
-          "name": "rent"
-        }
-      ],
-      "args": [
+          name: "rent";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
-        }
-      ]
+          name: "rewardIndex";
+          type: "u8";
+        },
+      ];
     },
     {
-      "name": "setRewardEmissionsV2",
-      "docs": [
+      name: "setRewardEmissionsV2";
+      docs: [
         "Set the reward emissions for a reward in a Whirlpool.",
         "This instruction works with both Token and Token-2022.",
         "",
         "### Authority",
-        "- \"reward_authority\" - assigned authority by the reward_super_authority for the specified",
+        '- "reward_authority" - assigned authority by the reward_super_authority for the specified',
         "reward-index in this Whirlpool",
         "",
         "### Parameters",
@@ -3403,50 +2926,41 @@ export type Whirlpool = {
         "- `InvalidTimestamp` - Provided timestamp is not in order with the previous timestamp.",
         "- `InvalidRewardIndex` - If the provided reward index doesn't match the lowest uninitialized",
         "index in this pool, or exceeds NUM_REWARDS, or",
-        "all reward slots for this pool has been initialized."
-      ],
-      "discriminator": [
-        114,
-        228,
-        72,
-        32,
-        193,
-        48,
-        160,
-        102
-      ],
-      "accounts": [
+        "all reward slots for this pool has been initialized.",
+      ];
+      discriminator: [114, 228, 72, 32, 193, 48, 160, 102];
+      accounts: [
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "rewardAuthority",
-          "signer": true
+          name: "rewardAuthority";
+          signer: true;
         },
         {
-          "name": "rewardVault"
-        }
-      ],
-      "args": [
+          name: "rewardVault";
+        },
+      ];
+      args: [
         {
-          "name": "rewardIndex",
-          "type": "u8"
+          name: "rewardIndex";
+          type: "u8";
         },
         {
-          "name": "emissionsPerSecondX64",
-          "type": "u128"
-        }
-      ]
+          name: "emissionsPerSecondX64";
+          type: "u128";
+        },
+      ];
     },
     {
-      "name": "swapV2",
-      "docs": [
+      name: "swapV2";
+      docs: [
         "Perform a swap in this Whirlpool",
         "This instruction works with both Token and Token-2022.",
         "",
         "### Authority",
-        "- \"token_authority\" - The authority to withdraw tokens from the input token account.",
+        '- "token_authority" - The authority to withdraw tokens from the input token account.',
         "",
         "### Parameters",
         "- `amount` - The amount of input or output token to swap from (depending on amount_specified_is_input).",
@@ -3463,116 +2977,107 @@ export type Whirlpool = {
         "- `TickArraySequenceInvalidIndex` - The swap loop attempted to access an invalid array index during the query of the next initialized tick.",
         "- `TickArrayIndexOutofBounds` - The swap loop attempted to access an invalid array index during tick crossing.",
         "- `LiquidityOverflow` - Liquidity value overflowed 128bits during tick crossing.",
-        "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0."
-      ],
-      "discriminator": [
-        43,
-        4,
-        237,
-        11,
-        26,
-        201,
-        30,
-        98
-      ],
-      "accounts": [
+        "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0.",
+      ];
+      discriminator: [43, 4, 237, 11, 26, 201, 30, 98];
+      accounts: [
         {
-          "name": "tokenProgramA"
+          name: "tokenProgramA";
         },
         {
-          "name": "tokenProgramB"
+          name: "tokenProgramB";
         },
         {
-          "name": "memoProgram"
+          name: "memoProgram";
         },
         {
-          "name": "tokenAuthority",
-          "signer": true
+          name: "tokenAuthority";
+          signer: true;
         },
         {
-          "name": "whirlpool",
-          "writable": true
+          name: "whirlpool";
+          writable: true;
         },
         {
-          "name": "tokenMintA"
+          name: "tokenMintA";
         },
         {
-          "name": "tokenMintB"
+          name: "tokenMintB";
         },
         {
-          "name": "tokenOwnerAccountA",
-          "writable": true
+          name: "tokenOwnerAccountA";
+          writable: true;
         },
         {
-          "name": "tokenVaultA",
-          "writable": true
+          name: "tokenVaultA";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountB",
-          "writable": true
+          name: "tokenOwnerAccountB";
+          writable: true;
         },
         {
-          "name": "tokenVaultB",
-          "writable": true
+          name: "tokenVaultB";
+          writable: true;
         },
         {
-          "name": "tickArray0",
-          "writable": true
+          name: "tickArray0";
+          writable: true;
         },
         {
-          "name": "tickArray1",
-          "writable": true
+          name: "tickArray1";
+          writable: true;
         },
         {
-          "name": "tickArray2",
-          "writable": true
+          name: "tickArray2";
+          writable: true;
         },
         {
-          "name": "oracle",
-          "writable": true
-        }
-      ],
-      "args": [
+          name: "oracle";
+          writable: true;
+        },
+      ];
+      args: [
         {
-          "name": "amount",
-          "type": "u64"
+          name: "amount";
+          type: "u64";
         },
         {
-          "name": "otherAmountThreshold",
-          "type": "u64"
+          name: "otherAmountThreshold";
+          type: "u64";
         },
         {
-          "name": "sqrtPriceLimit",
-          "type": "u128"
+          name: "sqrtPriceLimit";
+          type: "u128";
         },
         {
-          "name": "amountSpecifiedIsInput",
-          "type": "bool"
+          name: "amountSpecifiedIsInput";
+          type: "bool";
         },
         {
-          "name": "aToB",
-          "type": "bool"
+          name: "aToB";
+          type: "bool";
         },
         {
-          "name": "remainingAccountsInfo",
-          "type": {
-            "option": {
-              "defined": {
-                "name": "remainingAccountsInfo"
-              }
-            }
-          }
-        }
-      ]
+          name: "remainingAccountsInfo";
+          type: {
+            option: {
+              defined: {
+                name: "remainingAccountsInfo";
+              };
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "twoHopSwapV2",
-      "docs": [
+      name: "twoHopSwapV2";
+      docs: [
         "Perform a two-hop swap in this Whirlpool",
         "This instruction works with both Token and Token-2022.",
         "",
         "### Authority",
-        "- \"token_authority\" - The authority to withdraw tokens from the input token account.",
+        '- "token_authority" - The authority to withdraw tokens from the input token account.',
         "",
         "### Parameters",
         "- `amount` - The amount of input or output token to swap from (depending on amount_specified_is_input).",
@@ -3593,2053 +3098,1802 @@ export type Whirlpool = {
         "- `LiquidityOverflow` - Liquidity value overflowed 128bits during tick crossing.",
         "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0.",
         "- `InvalidIntermediaryMint` - Error if the intermediary mint between hop one and two do not equal.",
-        "- `DuplicateTwoHopPool` - Error if whirlpool one & two are the same pool."
-      ],
-      "discriminator": [
-        186,
-        143,
-        209,
-        29,
-        254,
-        2,
-        194,
-        117
-      ],
-      "accounts": [
+        "- `DuplicateTwoHopPool` - Error if whirlpool one & two are the same pool.",
+      ];
+      discriminator: [186, 143, 209, 29, 254, 2, 194, 117];
+      accounts: [
         {
-          "name": "whirlpoolOne",
-          "writable": true
+          name: "whirlpoolOne";
+          writable: true;
         },
         {
-          "name": "whirlpoolTwo",
-          "writable": true
+          name: "whirlpoolTwo";
+          writable: true;
         },
         {
-          "name": "tokenMintInput"
+          name: "tokenMintInput";
         },
         {
-          "name": "tokenMintIntermediate"
+          name: "tokenMintIntermediate";
         },
         {
-          "name": "tokenMintOutput"
+          name: "tokenMintOutput";
         },
         {
-          "name": "tokenProgramInput"
+          name: "tokenProgramInput";
         },
         {
-          "name": "tokenProgramIntermediate"
+          name: "tokenProgramIntermediate";
         },
         {
-          "name": "tokenProgramOutput"
+          name: "tokenProgramOutput";
         },
         {
-          "name": "tokenOwnerAccountInput",
-          "writable": true
+          name: "tokenOwnerAccountInput";
+          writable: true;
         },
         {
-          "name": "tokenVaultOneInput",
-          "writable": true
+          name: "tokenVaultOneInput";
+          writable: true;
         },
         {
-          "name": "tokenVaultOneIntermediate",
-          "writable": true
+          name: "tokenVaultOneIntermediate";
+          writable: true;
         },
         {
-          "name": "tokenVaultTwoIntermediate",
-          "writable": true
+          name: "tokenVaultTwoIntermediate";
+          writable: true;
         },
         {
-          "name": "tokenVaultTwoOutput",
-          "writable": true
+          name: "tokenVaultTwoOutput";
+          writable: true;
         },
         {
-          "name": "tokenOwnerAccountOutput",
-          "writable": true
+          name: "tokenOwnerAccountOutput";
+          writable: true;
         },
         {
-          "name": "tokenAuthority",
-          "signer": true
+          name: "tokenAuthority";
+          signer: true;
         },
         {
-          "name": "tickArrayOne0",
-          "writable": true
+          name: "tickArrayOne0";
+          writable: true;
         },
         {
-          "name": "tickArrayOne1",
-          "writable": true
+          name: "tickArrayOne1";
+          writable: true;
         },
         {
-          "name": "tickArrayOne2",
-          "writable": true
+          name: "tickArrayOne2";
+          writable: true;
         },
         {
-          "name": "tickArrayTwo0",
-          "writable": true
+          name: "tickArrayTwo0";
+          writable: true;
         },
         {
-          "name": "tickArrayTwo1",
-          "writable": true
+          name: "tickArrayTwo1";
+          writable: true;
         },
         {
-          "name": "tickArrayTwo2",
-          "writable": true
+          name: "tickArrayTwo2";
+          writable: true;
         },
         {
-          "name": "oracleOne",
-          "writable": true
+          name: "oracleOne";
+          writable: true;
         },
         {
-          "name": "oracleTwo",
-          "writable": true
+          name: "oracleTwo";
+          writable: true;
         },
         {
-          "name": "memoProgram"
-        }
-      ],
-      "args": [
+          name: "memoProgram";
+        },
+      ];
+      args: [
         {
-          "name": "amount",
-          "type": "u64"
+          name: "amount";
+          type: "u64";
         },
         {
-          "name": "otherAmountThreshold",
-          "type": "u64"
+          name: "otherAmountThreshold";
+          type: "u64";
         },
         {
-          "name": "amountSpecifiedIsInput",
-          "type": "bool"
+          name: "amountSpecifiedIsInput";
+          type: "bool";
         },
         {
-          "name": "aToBOne",
-          "type": "bool"
+          name: "aToBOne";
+          type: "bool";
         },
         {
-          "name": "aToBTwo",
-          "type": "bool"
+          name: "aToBTwo";
+          type: "bool";
         },
         {
-          "name": "sqrtPriceLimitOne",
-          "type": "u128"
+          name: "sqrtPriceLimitOne";
+          type: "u128";
         },
         {
-          "name": "sqrtPriceLimitTwo",
-          "type": "u128"
+          name: "sqrtPriceLimitTwo";
+          type: "u128";
         },
         {
-          "name": "remainingAccountsInfo",
-          "type": {
-            "option": {
-              "defined": {
-                "name": "remainingAccountsInfo"
-              }
-            }
-          }
-        }
-      ]
+          name: "remainingAccountsInfo";
+          type: {
+            option: {
+              defined: {
+                name: "remainingAccountsInfo";
+              };
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "initializeConfigExtension",
-      "docs": [
+      name: "initializeConfigExtension";
+      docs: [
         "Initializes a WhirlpoolConfigExtension account that hosts info & authorities.",
         "",
         "### Authority",
-        "- \"fee_authority\" - Set authority in the WhirlpoolConfig"
-      ],
-      "discriminator": [
-        55,
-        9,
-        53,
-        9,
-        114,
-        57,
-        209,
-        52
-      ],
-      "accounts": [
+        '- "fee_authority" - Set authority in the WhirlpoolConfig',
+      ];
+      discriminator: [55, 9, 53, 9, 114, 57, 209, 52];
+      accounts: [
         {
-          "name": "config"
+          name: "config";
         },
         {
-          "name": "configExtension",
-          "writable": true
+          name: "configExtension";
+          writable: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "feeAuthority",
-          "signer": true
+          name: "feeAuthority";
+          signer: true;
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": []
+          name: "systemProgram";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setConfigExtensionAuthority",
-      "docs": [
+      name: "setConfigExtensionAuthority";
+      docs: [
         "Sets the config extension authority for a WhirlpoolsConfigExtension.",
         "Only the current config extension authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"config_extension_authority\" - Set authority in the WhirlpoolConfigExtension"
-      ],
-      "discriminator": [
-        44,
-        94,
-        241,
-        116,
-        24,
-        188,
-        60,
-        143
-      ],
-      "accounts": [
+        '- "config_extension_authority" - Set authority in the WhirlpoolConfigExtension',
+      ];
+      discriminator: [44, 94, 241, 116, 24, 188, 60, 143];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpoolsConfigExtension",
-          "writable": true
+          name: "whirlpoolsConfigExtension";
+          writable: true;
         },
         {
-          "name": "configExtensionAuthority",
-          "signer": true
+          name: "configExtensionAuthority";
+          signer: true;
         },
         {
-          "name": "newConfigExtensionAuthority"
-        }
-      ],
-      "args": []
+          name: "newConfigExtensionAuthority";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setTokenBadgeAuthority",
-      "docs": [
+      name: "setTokenBadgeAuthority";
+      docs: [
         "Sets the token badge authority for a WhirlpoolsConfigExtension.",
         "Only the config extension authority has permission to invoke this instruction.",
         "",
         "### Authority",
-        "- \"config_extension_authority\" - Set authority in the WhirlpoolConfigExtension"
-      ],
-      "discriminator": [
-        207,
-        202,
-        4,
-        32,
-        205,
-        79,
-        13,
-        178
-      ],
-      "accounts": [
+        '- "config_extension_authority" - Set authority in the WhirlpoolConfigExtension',
+      ];
+      discriminator: [207, 202, 4, 32, 205, 79, 13, 178];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpoolsConfigExtension",
-          "writable": true
+          name: "whirlpoolsConfigExtension";
+          writable: true;
         },
         {
-          "name": "configExtensionAuthority",
-          "signer": true
+          name: "configExtensionAuthority";
+          signer: true;
         },
         {
-          "name": "newTokenBadgeAuthority"
-        }
-      ],
-      "args": []
+          name: "newTokenBadgeAuthority";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "initializeTokenBadge",
-      "docs": [
+      name: "initializeTokenBadge";
+      docs: [
         "Initialize a TokenBadge account.",
         "",
         "### Authority",
-        "- \"token_badge_authority\" - Set authority in the WhirlpoolConfigExtension",
+        '- "token_badge_authority" - Set authority in the WhirlpoolConfigExtension',
         "",
         "### Special Errors",
-        "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled."
-      ],
-      "discriminator": [
-        253,
-        77,
-        205,
-        95,
-        27,
-        224,
-        89,
-        223
-      ],
-      "accounts": [
+        "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled.",
+      ];
+      discriminator: [253, 77, 205, 95, 27, 224, 89, 223];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpoolsConfigExtension"
+          name: "whirlpoolsConfigExtension";
         },
         {
-          "name": "tokenBadgeAuthority",
-          "signer": true
+          name: "tokenBadgeAuthority";
+          signer: true;
         },
         {
-          "name": "tokenMint"
+          name: "tokenMint";
         },
         {
-          "name": "tokenBadge",
-          "writable": true
+          name: "tokenBadge";
+          writable: true;
         },
         {
-          "name": "funder",
-          "writable": true,
-          "signer": true
+          name: "funder";
+          writable: true;
+          signer: true;
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": []
+          name: "systemProgram";
+        },
+      ];
+      args: [];
     },
     {
-      "name": "deleteTokenBadge",
-      "docs": [
+      name: "deleteTokenBadge";
+      docs: [
         "Delete a TokenBadge account.",
         "",
         "### Authority",
-        "- \"token_badge_authority\" - Set authority in the WhirlpoolConfigExtension",
+        '- "token_badge_authority" - Set authority in the WhirlpoolConfigExtension',
         "",
         "### Special Errors",
-        "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled."
-      ],
-      "discriminator": [
-        53,
-        146,
-        68,
-        8,
-        18,
-        117,
-        17,
-        185
-      ],
-      "accounts": [
+        "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled.",
+      ];
+      discriminator: [53, 146, 68, 8, 18, 117, 17, 185];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpoolsConfigExtension"
+          name: "whirlpoolsConfigExtension";
         },
         {
-          "name": "tokenBadgeAuthority",
-          "signer": true
+          name: "tokenBadgeAuthority";
+          signer: true;
         },
         {
-          "name": "tokenMint"
+          name: "tokenMint";
         },
         {
-          "name": "tokenBadge",
-          "writable": true
+          name: "tokenBadge";
+          writable: true;
         },
         {
-          "name": "receiver",
-          "writable": true
-        }
-      ],
-      "args": []
+          name: "receiver";
+          writable: true;
+        },
+      ];
+      args: [];
     },
     {
-      "name": "setTokenBadgeAttribute",
-      "docs": [
+      name: "setTokenBadgeAttribute";
+      docs: [
         "Set an attribute on a TokenBadge account.",
         "",
         "### Authority",
-        "- \"token_badge_authority\" - Set authority in the WhirlpoolConfigExtension",
+        '- "token_badge_authority" - Set authority in the WhirlpoolConfigExtension',
         "",
         "### Parameters",
         "- `attribute` - The attribute to set on the TokenBadge account.",
         "",
         "#### Special Errors",
-        "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled."
-      ],
-      "discriminator": [
-        224,
-        88,
-        65,
-        33,
-        138,
-        147,
-        246,
-        137
-      ],
-      "accounts": [
+        "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled.",
+      ];
+      discriminator: [224, 88, 65, 33, 138, 147, 246, 137];
+      accounts: [
         {
-          "name": "whirlpoolsConfig"
+          name: "whirlpoolsConfig";
         },
         {
-          "name": "whirlpoolsConfigExtension"
+          name: "whirlpoolsConfigExtension";
         },
         {
-          "name": "tokenBadgeAuthority",
-          "signer": true
+          name: "tokenBadgeAuthority";
+          signer: true;
         },
         {
-          "name": "tokenMint"
+          name: "tokenMint";
         },
         {
-          "name": "tokenBadge",
-          "writable": true
-        }
-      ],
-      "args": [
+          name: "tokenBadge";
+          writable: true;
+        },
+      ];
+      args: [
         {
-          "name": "attribute",
-          "type": {
-            "defined": {
-              "name": "tokenBadgeAttribute"
-            }
-          }
-        }
-      ]
+          name: "attribute";
+          type: {
+            defined: {
+              name: "tokenBadgeAttribute";
+            };
+          };
+        },
+      ];
     },
     {
-      "name": "idlInclude",
-      "discriminator": [
-        223,
-        253,
-        121,
-        121,
-        60,
-        193,
-        129,
-        31
-      ],
-      "accounts": [
+      name: "idlInclude";
+      discriminator: [223, 253, 121, 121, 60, 193, 129, 31];
+      accounts: [
         {
-          "name": "tickArray"
+          name: "tickArray";
         },
         {
-          "name": "systemProgram"
-        }
-      ],
-      "args": []
-    }
-  ],
-  "accounts": [
-    {
-      "name": "adaptiveFeeTier",
-      "discriminator": [
-        147,
-        16,
-        144,
-        116,
-        47,
-        146,
-        149,
-        46
-      ]
-    },
-    {
-      "name": "whirlpoolsConfig",
-      "discriminator": [
-        157,
-        20,
-        49,
-        224,
-        217,
-        87,
-        193,
-        254
-      ]
-    },
-    {
-      "name": "whirlpoolsConfigExtension",
-      "discriminator": [
-        2,
-        99,
-        215,
-        163,
-        240,
-        26,
-        153,
-        58
-      ]
-    },
-    {
-      "name": "dynamicTickArray",
-      "discriminator": [
-        17,
-        216,
-        246,
-        142,
-        225,
-        199,
-        218,
-        56
-      ]
-    },
-    {
-      "name": "feeTier",
-      "discriminator": [
-        56,
-        75,
-        159,
-        76,
-        142,
-        68,
-        190,
-        105
-      ]
-    },
-    {
-      "name": "tickArray",
-      "discriminator": [
-        69,
-        97,
-        189,
-        190,
-        110,
-        7,
-        66,
-        187
-      ]
-    },
-    {
-      "name": "lockConfig",
-      "discriminator": [
-        106,
-        47,
-        238,
-        159,
-        124,
-        12,
-        160,
-        192
-      ]
-    },
-    {
-      "name": "oracle",
-      "discriminator": [
-        139,
-        194,
-        131,
-        179,
-        140,
-        179,
-        229,
-        244
-      ]
-    },
-    {
-      "name": "position",
-      "discriminator": [
-        170,
-        188,
-        143,
-        228,
-        122,
-        64,
-        247,
-        208
-      ]
-    },
-    {
-      "name": "positionBundle",
-      "discriminator": [
-        129,
-        169,
-        175,
-        65,
-        185,
-        95,
-        32,
-        100
-      ]
-    },
-    {
-      "name": "tokenBadge",
-      "discriminator": [
-        116,
-        219,
-        204,
-        229,
-        249,
-        116,
-        255,
-        150
-      ]
-    },
-    {
-      "name": "whirlpool",
-      "discriminator": [
-        63,
-        149,
-        209,
-        12,
-        225,
-        128,
-        99,
-        9
-      ]
-    }
-  ],
-  "events": [
-    {
-      "name": "liquidityDecreased",
-      "discriminator": [
-        166,
-        1,
-        36,
-        71,
-        112,
-        202,
-        181,
-        171
-      ]
-    },
-    {
-      "name": "liquidityIncreased",
-      "discriminator": [
-        30,
-        7,
-        144,
-        181,
-        102,
-        254,
-        155,
-        161
-      ]
-    },
-    {
-      "name": "poolInitialized",
-      "discriminator": [
-        100,
-        118,
-        173,
-        87,
-        12,
-        198,
-        254,
-        229
-      ]
-    },
-    {
-      "name": "traded",
-      "discriminator": [
-        225,
-        202,
-        73,
-        175,
-        147,
-        43,
-        160,
-        150
-      ]
-    }
-  ],
-  "errors": [
+          name: "systemProgram";
+        },
+      ];
+      args: [];
+    },
+  ];
+  accounts: [
+    {
+      name: "adaptiveFeeTier";
+      discriminator: [147, 16, 144, 116, 47, 146, 149, 46];
+    },
+    {
+      name: "whirlpoolsConfig";
+      discriminator: [157, 20, 49, 224, 217, 87, 193, 254];
+    },
+    {
+      name: "whirlpoolsConfigExtension";
+      discriminator: [2, 99, 215, 163, 240, 26, 153, 58];
+    },
+    {
+      name: "dynamicTickArray";
+      discriminator: [17, 216, 246, 142, 225, 199, 218, 56];
+    },
+    {
+      name: "feeTier";
+      discriminator: [56, 75, 159, 76, 142, 68, 190, 105];
+    },
+    {
+      name: "tickArray";
+      discriminator: [69, 97, 189, 190, 110, 7, 66, 187];
+    },
+    {
+      name: "lockConfig";
+      discriminator: [106, 47, 238, 159, 124, 12, 160, 192];
+    },
+    {
+      name: "oracle";
+      discriminator: [139, 194, 131, 179, 140, 179, 229, 244];
+    },
     {
-      "code": 6000,
-      "name": "invalidEnum",
-      "msg": "Enum value could not be converted"
+      name: "position";
+      discriminator: [170, 188, 143, 228, 122, 64, 247, 208];
     },
     {
-      "code": 6001,
-      "name": "invalidStartTick",
-      "msg": "Invalid start tick index provided."
+      name: "positionBundle";
+      discriminator: [129, 169, 175, 65, 185, 95, 32, 100];
     },
     {
-      "code": 6002,
-      "name": "tickArrayExistInPool",
-      "msg": "Tick-array already exists in this whirlpool"
+      name: "tokenBadge";
+      discriminator: [116, 219, 204, 229, 249, 116, 255, 150];
     },
     {
-      "code": 6003,
-      "name": "tickArrayIndexOutofBounds",
-      "msg": "Attempt to search for a tick-array failed"
+      name: "whirlpool";
+      discriminator: [63, 149, 209, 12, 225, 128, 99, 9];
     },
+  ];
+  events: [
     {
-      "code": 6004,
-      "name": "invalidTickSpacing",
-      "msg": "Tick-spacing is not supported"
+      name: "liquidityDecreased";
+      discriminator: [166, 1, 36, 71, 112, 202, 181, 171];
     },
     {
-      "code": 6005,
-      "name": "closePositionNotEmpty",
-      "msg": "Position is not empty It cannot be closed"
+      name: "liquidityIncreased";
+      discriminator: [30, 7, 144, 181, 102, 254, 155, 161];
     },
     {
-      "code": 6006,
-      "name": "divideByZero",
-      "msg": "Unable to divide by zero"
+      name: "poolInitialized";
+      discriminator: [100, 118, 173, 87, 12, 198, 254, 229];
     },
     {
-      "code": 6007,
-      "name": "numberCastError",
-      "msg": "Unable to cast number into BigInt"
+      name: "traded";
+      discriminator: [225, 202, 73, 175, 147, 43, 160, 150];
     },
+  ];
+  errors: [
     {
-      "code": 6008,
-      "name": "numberDownCastError",
-      "msg": "Unable to down cast number"
+      code: 6000;
+      name: "invalidEnum";
+      msg: "Enum value could not be converted";
     },
     {
-      "code": 6009,
-      "name": "tickNotFound",
-      "msg": "Tick not found within tick array"
+      code: 6001;
+      name: "invalidStartTick";
+      msg: "Invalid start tick index provided.";
     },
     {
-      "code": 6010,
-      "name": "invalidTickIndex",
-      "msg": "Provided tick index is either out of bounds or uninitializable"
+      code: 6002;
+      name: "tickArrayExistInPool";
+      msg: "Tick-array already exists in this whirlpool";
     },
     {
-      "code": 6011,
-      "name": "sqrtPriceOutOfBounds",
-      "msg": "Provided sqrt price out of bounds"
+      code: 6003;
+      name: "tickArrayIndexOutofBounds";
+      msg: "Attempt to search for a tick-array failed";
     },
     {
-      "code": 6012,
-      "name": "liquidityZero",
-      "msg": "Liquidity amount must be greater than zero"
+      code: 6004;
+      name: "invalidTickSpacing";
+      msg: "Tick-spacing is not supported";
     },
     {
-      "code": 6013,
-      "name": "liquidityTooHigh",
-      "msg": "Liquidity amount must be less than i64::MAX"
+      code: 6005;
+      name: "closePositionNotEmpty";
+      msg: "Position is not empty It cannot be closed";
     },
     {
-      "code": 6014,
-      "name": "liquidityOverflow",
-      "msg": "Liquidity overflow"
+      code: 6006;
+      name: "divideByZero";
+      msg: "Unable to divide by zero";
     },
     {
-      "code": 6015,
-      "name": "liquidityUnderflow",
-      "msg": "Liquidity underflow"
+      code: 6007;
+      name: "numberCastError";
+      msg: "Unable to cast number into BigInt";
     },
     {
-      "code": 6016,
-      "name": "liquidityNetError",
-      "msg": "Tick liquidity net underflowed or overflowed"
+      code: 6008;
+      name: "numberDownCastError";
+      msg: "Unable to down cast number";
     },
     {
-      "code": 6017,
-      "name": "tokenMaxExceeded",
-      "msg": "Exceeded token max"
+      code: 6009;
+      name: "tickNotFound";
+      msg: "Tick not found within tick array";
     },
     {
-      "code": 6018,
-      "name": "tokenMinSubceeded",
-      "msg": "Did not meet token min"
+      code: 6010;
+      name: "invalidTickIndex";
+      msg: "Provided tick index is either out of bounds or uninitializable";
     },
     {
-      "code": 6019,
-      "name": "missingOrInvalidDelegate",
-      "msg": "Position token account has a missing or invalid delegate"
+      code: 6011;
+      name: "sqrtPriceOutOfBounds";
+      msg: "Provided sqrt price out of bounds";
     },
     {
-      "code": 6020,
-      "name": "invalidPositionTokenAmount",
-      "msg": "Position token amount must be 1"
+      code: 6012;
+      name: "liquidityZero";
+      msg: "Liquidity amount must be greater than zero";
     },
     {
-      "code": 6021,
-      "name": "invalidTimestampConversion",
-      "msg": "Timestamp should be convertible from i64 to u64"
+      code: 6013;
+      name: "liquidityTooHigh";
+      msg: "Liquidity amount must be less than i64::MAX";
     },
     {
-      "code": 6022,
-      "name": "invalidTimestamp",
-      "msg": "Timestamp should be greater than the last updated timestamp"
+      code: 6014;
+      name: "liquidityOverflow";
+      msg: "Liquidity overflow";
     },
     {
-      "code": 6023,
-      "name": "invalidTickArraySequence",
-      "msg": "Invalid tick array sequence provided for instruction."
+      code: 6015;
+      name: "liquidityUnderflow";
+      msg: "Liquidity underflow";
     },
     {
-      "code": 6024,
-      "name": "invalidTokenMintOrder",
-      "msg": "Token Mint in wrong order"
+      code: 6016;
+      name: "liquidityNetError";
+      msg: "Tick liquidity net underflowed or overflowed";
     },
     {
-      "code": 6025,
-      "name": "rewardNotInitialized",
-      "msg": "Reward not initialized"
+      code: 6017;
+      name: "tokenMaxExceeded";
+      msg: "Exceeded token max";
     },
     {
-      "code": 6026,
-      "name": "invalidRewardIndex",
-      "msg": "Invalid reward index"
+      code: 6018;
+      name: "tokenMinSubceeded";
+      msg: "Did not meet token min";
     },
     {
-      "code": 6027,
-      "name": "rewardVaultAmountInsufficient",
-      "msg": "Reward vault requires amount to support emissions for at least one day"
+      code: 6019;
+      name: "missingOrInvalidDelegate";
+      msg: "Position token account has a missing or invalid delegate";
     },
     {
-      "code": 6028,
-      "name": "feeRateMaxExceeded",
-      "msg": "Exceeded max fee rate"
+      code: 6020;
+      name: "invalidPositionTokenAmount";
+      msg: "Position token amount must be 1";
     },
     {
-      "code": 6029,
-      "name": "protocolFeeRateMaxExceeded",
-      "msg": "Exceeded max protocol fee rate"
+      code: 6021;
+      name: "invalidTimestampConversion";
+      msg: "Timestamp should be convertible from i64 to u64";
     },
     {
-      "code": 6030,
-      "name": "multiplicationShiftRightOverflow",
-      "msg": "Multiplication with shift right overflow"
+      code: 6022;
+      name: "invalidTimestamp";
+      msg: "Timestamp should be greater than the last updated timestamp";
     },
     {
-      "code": 6031,
-      "name": "mulDivOverflow",
-      "msg": "Muldiv overflow"
+      code: 6023;
+      name: "invalidTickArraySequence";
+      msg: "Invalid tick array sequence provided for instruction.";
     },
     {
-      "code": 6032,
-      "name": "mulDivInvalidInput",
-      "msg": "Invalid div_u256 input"
+      code: 6024;
+      name: "invalidTokenMintOrder";
+      msg: "Token Mint in wrong order";
     },
     {
-      "code": 6033,
-      "name": "multiplicationOverflow",
-      "msg": "Multiplication overflow"
+      code: 6025;
+      name: "rewardNotInitialized";
+      msg: "Reward not initialized";
     },
     {
-      "code": 6034,
-      "name": "invalidSqrtPriceLimitDirection",
-      "msg": "Provided SqrtPriceLimit not in the same direction as the swap."
+      code: 6026;
+      name: "invalidRewardIndex";
+      msg: "Invalid reward index";
     },
     {
-      "code": 6035,
-      "name": "zeroTradableAmount",
-      "msg": "There are no tradable amount to swap."
+      code: 6027;
+      name: "rewardVaultAmountInsufficient";
+      msg: "Reward vault requires amount to support emissions for at least one day";
     },
     {
-      "code": 6036,
-      "name": "amountOutBelowMinimum",
-      "msg": "Amount out below minimum threshold"
+      code: 6028;
+      name: "feeRateMaxExceeded";
+      msg: "Exceeded max fee rate";
     },
     {
-      "code": 6037,
-      "name": "amountInAboveMaximum",
-      "msg": "Amount in above maximum threshold"
+      code: 6029;
+      name: "protocolFeeRateMaxExceeded";
+      msg: "Exceeded max protocol fee rate";
     },
     {
-      "code": 6038,
-      "name": "tickArraySequenceInvalidIndex",
-      "msg": "Invalid index for tick array sequence"
+      code: 6030;
+      name: "multiplicationShiftRightOverflow";
+      msg: "Multiplication with shift right overflow";
     },
     {
-      "code": 6039,
-      "name": "amountCalcOverflow",
-      "msg": "Amount calculated overflows"
+      code: 6031;
+      name: "mulDivOverflow";
+      msg: "Muldiv overflow";
     },
     {
-      "code": 6040,
-      "name": "amountRemainingOverflow",
-      "msg": "Amount remaining overflows"
+      code: 6032;
+      name: "mulDivInvalidInput";
+      msg: "Invalid div_u256 input";
     },
     {
-      "code": 6041,
-      "name": "invalidIntermediaryMint",
-      "msg": "Invalid intermediary mint"
+      code: 6033;
+      name: "multiplicationOverflow";
+      msg: "Multiplication overflow";
     },
     {
-      "code": 6042,
-      "name": "duplicateTwoHopPool",
-      "msg": "Duplicate two hop pool"
+      code: 6034;
+      name: "invalidSqrtPriceLimitDirection";
+      msg: "Provided SqrtPriceLimit not in the same direction as the swap.";
     },
     {
-      "code": 6043,
-      "name": "invalidBundleIndex",
-      "msg": "Bundle index is out of bounds"
+      code: 6035;
+      name: "zeroTradableAmount";
+      msg: "There are no tradable amount to swap.";
     },
     {
-      "code": 6044,
-      "name": "bundledPositionAlreadyOpened",
-      "msg": "Position has already been opened"
+      code: 6036;
+      name: "amountOutBelowMinimum";
+      msg: "Amount out below minimum threshold";
     },
     {
-      "code": 6045,
-      "name": "bundledPositionAlreadyClosed",
-      "msg": "Position has already been closed"
+      code: 6037;
+      name: "amountInAboveMaximum";
+      msg: "Amount in above maximum threshold";
     },
     {
-      "code": 6046,
-      "name": "positionBundleNotDeletable",
-      "msg": "Unable to delete PositionBundle with open positions"
+      code: 6038;
+      name: "tickArraySequenceInvalidIndex";
+      msg: "Invalid index for tick array sequence";
     },
     {
-      "code": 6047,
-      "name": "unsupportedTokenMint",
-      "msg": "Token mint has unsupported attributes"
+      code: 6039;
+      name: "amountCalcOverflow";
+      msg: "Amount calculated overflows";
     },
     {
-      "code": 6048,
-      "name": "remainingAccountsInvalidSlice",
-      "msg": "Invalid remaining accounts"
+      code: 6040;
+      name: "amountRemainingOverflow";
+      msg: "Amount remaining overflows";
     },
     {
-      "code": 6049,
-      "name": "remainingAccountsInsufficient",
-      "msg": "Insufficient remaining accounts"
+      code: 6041;
+      name: "invalidIntermediaryMint";
+      msg: "Invalid intermediary mint";
     },
     {
-      "code": 6050,
-      "name": "noExtraAccountsForTransferHook",
-      "msg": "Unable to call transfer hook without extra accounts"
+      code: 6042;
+      name: "duplicateTwoHopPool";
+      msg: "Duplicate two hop pool";
     },
     {
-      "code": 6051,
-      "name": "intermediateTokenAmountMismatch",
-      "msg": "Output and input amount mismatch"
+      code: 6043;
+      name: "invalidBundleIndex";
+      msg: "Bundle index is out of bounds";
     },
     {
-      "code": 6052,
-      "name": "transferFeeCalculationError",
-      "msg": "Transfer fee calculation failed"
+      code: 6044;
+      name: "bundledPositionAlreadyOpened";
+      msg: "Position has already been opened";
     },
     {
-      "code": 6053,
-      "name": "remainingAccountsDuplicatedAccountsType",
-      "msg": "Same accounts type is provided more than once"
+      code: 6045;
+      name: "bundledPositionAlreadyClosed";
+      msg: "Position has already been closed";
     },
     {
-      "code": 6054,
-      "name": "fullRangeOnlyPool",
-      "msg": "This whirlpool only supports full-range positions"
+      code: 6046;
+      name: "positionBundleNotDeletable";
+      msg: "Unable to delete PositionBundle with open positions";
     },
     {
-      "code": 6055,
-      "name": "tooManySupplementalTickArrays",
-      "msg": "Too many supplemental tick arrays provided"
+      code: 6047;
+      name: "unsupportedTokenMint";
+      msg: "Token mint has unsupported attributes";
     },
     {
-      "code": 6056,
-      "name": "differentWhirlpoolTickArrayAccount",
-      "msg": "TickArray account for different whirlpool provided"
+      code: 6048;
+      name: "remainingAccountsInvalidSlice";
+      msg: "Invalid remaining accounts";
     },
     {
-      "code": 6057,
-      "name": "partialFillError",
-      "msg": "Trade resulted in partial fill"
+      code: 6049;
+      name: "remainingAccountsInsufficient";
+      msg: "Insufficient remaining accounts";
     },
     {
-      "code": 6058,
-      "name": "positionNotLockable",
-      "msg": "Position is not lockable"
+      code: 6050;
+      name: "noExtraAccountsForTransferHook";
+      msg: "Unable to call transfer hook without extra accounts";
     },
     {
-      "code": 6059,
-      "name": "operationNotAllowedOnLockedPosition",
-      "msg": "Operation not allowed on locked position"
+      code: 6051;
+      name: "intermediateTokenAmountMismatch";
+      msg: "Output and input amount mismatch";
     },
     {
-      "code": 6060,
-      "name": "sameTickRangeNotAllowed",
-      "msg": "Cannot reset position range with same tick range"
+      code: 6052;
+      name: "transferFeeCalculationError";
+      msg: "Transfer fee calculation failed";
     },
     {
-      "code": 6061,
-      "name": "invalidAdaptiveFeeConstants",
-      "msg": "Invalid adaptive fee constants"
+      code: 6053;
+      name: "remainingAccountsDuplicatedAccountsType";
+      msg: "Same accounts type is provided more than once";
     },
     {
-      "code": 6062,
-      "name": "invalidFeeTierIndex",
-      "msg": "Invalid fee tier index"
+      code: 6054;
+      name: "fullRangeOnlyPool";
+      msg: "This whirlpool only supports full-range positions";
     },
     {
-      "code": 6063,
-      "name": "invalidTradeEnableTimestamp",
-      "msg": "Invalid trade enable timestamp"
+      code: 6055;
+      name: "tooManySupplementalTickArrays";
+      msg: "Too many supplemental tick arrays provided";
     },
     {
-      "code": 6064,
-      "name": "tradeIsNotEnabled",
-      "msg": "Trade is not enabled yet"
+      code: 6056;
+      name: "differentWhirlpoolTickArrayAccount";
+      msg: "TickArray account for different whirlpool provided";
     },
     {
-      "code": 6065,
-      "name": "rentCalculationError",
-      "msg": "Rent calculation error"
+      code: 6057;
+      name: "partialFillError";
+      msg: "Trade resulted in partial fill";
     },
     {
-      "code": 6066,
-      "name": "featureIsNotEnabled",
-      "msg": "Feature is not enabled"
+      code: 6058;
+      name: "positionNotLockable";
+      msg: "Position is not lockable";
     },
     {
-      "code": 6067,
-      "name": "positionWithTokenExtensionsRequired",
-      "msg": "This whirlpool only supports open_position_with_token_extensions instruction"
-    }
-  ],
-  "types": [
+      code: 6059;
+      name: "operationNotAllowedOnLockedPosition";
+      msg: "Operation not allowed on locked position";
+    },
+    {
+      code: 6060;
+      name: "sameTickRangeNotAllowed";
+      msg: "Cannot reset position range with same tick range";
+    },
+    {
+      code: 6061;
+      name: "invalidAdaptiveFeeConstants";
+      msg: "Invalid adaptive fee constants";
+    },
+    {
+      code: 6062;
+      name: "invalidFeeTierIndex";
+      msg: "Invalid fee tier index";
+    },
+    {
+      code: 6063;
+      name: "invalidTradeEnableTimestamp";
+      msg: "Invalid trade enable timestamp";
+    },
+    {
+      code: 6064;
+      name: "tradeIsNotEnabled";
+      msg: "Trade is not enabled yet";
+    },
+    {
+      code: 6065;
+      name: "rentCalculationError";
+      msg: "Rent calculation error";
+    },
+    {
+      code: 6066;
+      name: "featureIsNotEnabled";
+      msg: "Feature is not enabled";
+    },
+    {
+      code: 6067;
+      name: "positionWithTokenExtensionsRequired";
+      msg: "This whirlpool only supports open_position_with_token_extensions instruction";
+    },
+  ];
+  types: [
     {
-      "name": "configFeatureFlag",
-      "type": {
-        "kind": "enum",
-        "variants": [
+      name: "configFeatureFlag";
+      type: {
+        kind: "enum";
+        variants: [
           {
-            "name": "tokenBadge",
-            "fields": [
-              "bool"
-            ]
-          }
-        ]
-      }
+            name: "tokenBadge";
+            fields: ["bool"];
+          },
+        ];
+      };
     },
     {
-      "name": "dynamicTick",
-      "type": {
-        "kind": "enum",
-        "variants": [
+      name: "dynamicTick";
+      type: {
+        kind: "enum";
+        variants: [
           {
-            "name": "uninitialized"
+            name: "uninitialized";
           },
           {
-            "name": "initialized",
-            "fields": [
+            name: "initialized";
+            fields: [
               {
-                "defined": {
-                  "name": "dynamicTickData"
-                }
-              }
-            ]
-          }
-        ]
-      }
+                defined: {
+                  name: "dynamicTickData";
+                };
+              },
+            ];
+          },
+        ];
+      };
     },
     {
-      "name": "dynamicTickData",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "dynamicTickData";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "liquidityNet",
-            "type": "i128"
+            name: "liquidityNet";
+            type: "i128";
           },
           {
-            "name": "liquidityGross",
-            "type": "u128"
+            name: "liquidityGross";
+            type: "u128";
           },
           {
-            "name": "feeGrowthOutsideA",
-            "type": "u128"
+            name: "feeGrowthOutsideA";
+            type: "u128";
           },
           {
-            "name": "feeGrowthOutsideB",
-            "type": "u128"
+            name: "feeGrowthOutsideB";
+            type: "u128";
           },
           {
-            "name": "rewardGrowthsOutside",
-            "type": {
-              "array": [
-                "u128",
-                3
-              ]
-            }
-          }
-        ]
-      }
+            name: "rewardGrowthsOutside";
+            type: {
+              array: ["u128", 3];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "lockType",
-      "type": {
-        "kind": "enum",
-        "variants": [
+      name: "lockType";
+      type: {
+        kind: "enum";
+        variants: [
           {
-            "name": "permanent"
-          }
-        ]
-      }
+            name: "permanent";
+          },
+        ];
+      };
     },
     {
-      "name": "lockTypeLabel",
-      "type": {
-        "kind": "enum",
-        "variants": [
+      name: "lockTypeLabel";
+      type: {
+        kind: "enum";
+        variants: [
           {
-            "name": "permanent"
-          }
-        ]
-      }
+            name: "permanent";
+          },
+        ];
+      };
     },
     {
-      "name": "adaptiveFeeConstants",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "adaptiveFeeConstants";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "filterPeriod",
-            "type": "u16"
+            name: "filterPeriod";
+            type: "u16";
           },
           {
-            "name": "decayPeriod",
-            "type": "u16"
+            name: "decayPeriod";
+            type: "u16";
           },
           {
-            "name": "reductionFactor",
-            "type": "u16"
+            name: "reductionFactor";
+            type: "u16";
           },
           {
-            "name": "adaptiveFeeControlFactor",
-            "type": "u32"
+            name: "adaptiveFeeControlFactor";
+            type: "u32";
           },
           {
-            "name": "maxVolatilityAccumulator",
-            "type": "u32"
+            name: "maxVolatilityAccumulator";
+            type: "u32";
           },
           {
-            "name": "tickGroupSize",
-            "type": "u16"
+            name: "tickGroupSize";
+            type: "u16";
           },
           {
-            "name": "majorSwapThresholdTicks",
-            "type": "u16"
+            name: "majorSwapThresholdTicks";
+            type: "u16";
           },
           {
-            "name": "reserved",
-            "type": {
-              "array": [
-                "u8",
-                16
-              ]
-            }
-          }
-        ]
-      }
+            name: "reserved";
+            type: {
+              array: ["u8", 16];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "adaptiveFeeVariables",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "adaptiveFeeVariables";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "lastReferenceUpdateTimestamp",
-            "type": "u64"
+            name: "lastReferenceUpdateTimestamp";
+            type: "u64";
           },
           {
-            "name": "lastMajorSwapTimestamp",
-            "type": "u64"
+            name: "lastMajorSwapTimestamp";
+            type: "u64";
           },
           {
-            "name": "volatilityReference",
-            "type": "u32"
+            name: "volatilityReference";
+            type: "u32";
           },
           {
-            "name": "tickGroupIndexReference",
-            "type": "i32"
+            name: "tickGroupIndexReference";
+            type: "i32";
           },
           {
-            "name": "volatilityAccumulator",
-            "type": "u32"
+            name: "volatilityAccumulator";
+            type: "u32";
           },
           {
-            "name": "reserved",
-            "type": {
-              "array": [
-                "u8",
-                16
-              ]
-            }
-          }
-        ]
-      }
+            name: "reserved";
+            type: {
+              array: ["u8", 16];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "openPositionBumps",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "openPositionBumps";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "positionBump",
-            "type": "u8"
-          }
-        ]
-      }
+            name: "positionBump";
+            type: "u8";
+          },
+        ];
+      };
     },
     {
-      "name": "openPositionWithMetadataBumps",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "openPositionWithMetadataBumps";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "positionBump",
-            "type": "u8"
+            name: "positionBump";
+            type: "u8";
           },
           {
-            "name": "metadataBump",
-            "type": "u8"
-          }
-        ]
-      }
+            name: "metadataBump";
+            type: "u8";
+          },
+        ];
+      };
     },
     {
-      "name": "positionRewardInfo",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "positionRewardInfo";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "growthInsideCheckpoint",
-            "type": "u128"
+            name: "growthInsideCheckpoint";
+            type: "u128";
           },
           {
-            "name": "amountOwed",
-            "type": "u64"
-          }
-        ]
-      }
+            name: "amountOwed";
+            type: "u64";
+          },
+        ];
+      };
     },
     {
-      "name": "tick",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "tick";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "initialized",
-            "type": "bool"
+            name: "initialized";
+            type: "bool";
           },
           {
-            "name": "liquidityNet",
-            "type": "i128"
+            name: "liquidityNet";
+            type: "i128";
           },
           {
-            "name": "liquidityGross",
-            "type": "u128"
+            name: "liquidityGross";
+            type: "u128";
           },
           {
-            "name": "feeGrowthOutsideA",
-            "type": "u128"
+            name: "feeGrowthOutsideA";
+            type: "u128";
           },
           {
-            "name": "feeGrowthOutsideB",
-            "type": "u128"
+            name: "feeGrowthOutsideB";
+            type: "u128";
           },
           {
-            "name": "rewardGrowthsOutside",
-            "type": {
-              "array": [
-                "u128",
-                3
-              ]
-            }
-          }
-        ]
-      }
+            name: "rewardGrowthsOutside";
+            type: {
+              array: ["u128", 3];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "tokenBadgeAttribute",
-      "type": {
-        "kind": "enum",
-        "variants": [
+      name: "tokenBadgeAttribute";
+      type: {
+        kind: "enum";
+        variants: [
           {
-            "name": "requireNonTransferablePosition",
-            "fields": [
-              "bool"
-            ]
-          }
-        ]
-      }
+            name: "requireNonTransferablePosition";
+            fields: ["bool"];
+          },
+        ];
+      };
     },
     {
-      "name": "whirlpoolBumps",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "whirlpoolBumps";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpoolBump",
-            "type": "u8"
-          }
-        ]
-      }
+            name: "whirlpoolBump";
+            type: "u8";
+          },
+        ];
+      };
     },
     {
-      "name": "whirlpoolRewardInfo",
-      "docs": [
+      name: "whirlpoolRewardInfo";
+      docs: [
         "Stores the state relevant for tracking liquidity mining rewards at the `Whirlpool` level.",
         "These values are used in conjunction with `PositionRewardInfo`, `Tick.reward_growths_outside`,",
         "and `Whirlpool.reward_last_updated_timestamp` to determine how many rewards are earned by open",
-        "positions."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
+        "positions.",
+      ];
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "mint",
-            "docs": [
-              "Reward token mint."
-            ],
-            "type": "pubkey"
+            name: "mint";
+            docs: ["Reward token mint."];
+            type: "pubkey";
           },
           {
-            "name": "vault",
-            "docs": [
-              "Reward vault token account."
-            ],
-            "type": "pubkey"
+            name: "vault";
+            docs: ["Reward vault token account."];
+            type: "pubkey";
           },
           {
-            "name": "extension",
-            "docs": [
+            name: "extension";
+            docs: [
               "reward_infos[0]: Authority account that has permission to initialize the reward and set emissions.",
               "reward_infos[1]: used for a struct that contains fields for extending the functionality of Whirlpool.",
               "reward_infos[2]: reserved for future use.",
               "",
               "Historical notes:",
-              "Originally, this was a field named \"authority\", but it was found that there was no opportunity",
-              "to set different authorities for the three rewards. Therefore, the use of this field was changed for Whirlpool's future extensibility."
-            ],
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
+              'Originally, this was a field named "authority", but it was found that there was no opportunity',
+              "to set different authorities for the three rewards. Therefore, the use of this field was changed for Whirlpool's future extensibility.",
+            ];
+            type: {
+              array: ["u8", 32];
+            };
           },
           {
-            "name": "emissionsPerSecondX64",
-            "docs": [
-              "Q64.64 number that indicates how many tokens per second are earned per unit of liquidity."
-            ],
-            "type": "u128"
+            name: "emissionsPerSecondX64";
+            docs: [
+              "Q64.64 number that indicates how many tokens per second are earned per unit of liquidity.",
+            ];
+            type: "u128";
           },
           {
-            "name": "growthGlobalX64",
-            "docs": [
+            name: "growthGlobalX64";
+            docs: [
               "Q64.64 number that tracks the total tokens earned per unit of liquidity since the reward",
-              "emissions were turned on."
-            ],
-            "type": "u128"
-          }
-        ]
-      }
+              "emissions were turned on.",
+            ];
+            type: "u128";
+          },
+        ];
+      };
     },
     {
-      "name": "accountsType",
-      "type": {
-        "kind": "enum",
-        "variants": [
+      name: "accountsType";
+      type: {
+        kind: "enum";
+        variants: [
           {
-            "name": "transferHookA"
+            name: "transferHookA";
           },
           {
-            "name": "transferHookB"
+            name: "transferHookB";
           },
           {
-            "name": "transferHookReward"
+            name: "transferHookReward";
           },
           {
-            "name": "transferHookInput"
+            name: "transferHookInput";
           },
           {
-            "name": "transferHookIntermediate"
+            name: "transferHookIntermediate";
           },
           {
-            "name": "transferHookOutput"
+            name: "transferHookOutput";
           },
           {
-            "name": "supplementalTickArrays"
+            name: "supplementalTickArrays";
           },
           {
-            "name": "supplementalTickArraysOne"
+            name: "supplementalTickArraysOne";
           },
           {
-            "name": "supplementalTickArraysTwo"
-          }
-        ]
-      }
+            name: "supplementalTickArraysTwo";
+          },
+        ];
+      };
     },
     {
-      "name": "remainingAccountsInfo",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "remainingAccountsInfo";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "slices",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "remainingAccountsSlice"
-                }
-              }
-            }
-          }
-        ]
-      }
+            name: "slices";
+            type: {
+              vec: {
+                defined: {
+                  name: "remainingAccountsSlice";
+                };
+              };
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "remainingAccountsSlice",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "remainingAccountsSlice";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "accountsType",
-            "type": {
-              "defined": {
-                "name": "accountsType"
-              }
-            }
+            name: "accountsType";
+            type: {
+              defined: {
+                name: "accountsType";
+              };
+            };
           },
           {
-            "name": "length",
-            "type": "u8"
-          }
-        ]
-      }
+            name: "length";
+            type: "u8";
+          },
+        ];
+      };
     },
     {
-      "name": "adaptiveFeeTier",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "adaptiveFeeTier";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpoolsConfig",
-            "type": "pubkey"
+            name: "whirlpoolsConfig";
+            type: "pubkey";
           },
           {
-            "name": "feeTierIndex",
-            "type": "u16"
+            name: "feeTierIndex";
+            type: "u16";
           },
           {
-            "name": "tickSpacing",
-            "type": "u16"
+            name: "tickSpacing";
+            type: "u16";
           },
           {
-            "name": "initializePoolAuthority",
-            "type": "pubkey"
+            name: "initializePoolAuthority";
+            type: "pubkey";
           },
           {
-            "name": "delegatedFeeAuthority",
-            "type": "pubkey"
+            name: "delegatedFeeAuthority";
+            type: "pubkey";
           },
           {
-            "name": "defaultBaseFeeRate",
-            "type": "u16"
+            name: "defaultBaseFeeRate";
+            type: "u16";
           },
           {
-            "name": "filterPeriod",
-            "type": "u16"
+            name: "filterPeriod";
+            type: "u16";
           },
           {
-            "name": "decayPeriod",
-            "type": "u16"
+            name: "decayPeriod";
+            type: "u16";
           },
           {
-            "name": "reductionFactor",
-            "type": "u16"
+            name: "reductionFactor";
+            type: "u16";
           },
           {
-            "name": "adaptiveFeeControlFactor",
-            "type": "u32"
+            name: "adaptiveFeeControlFactor";
+            type: "u32";
           },
           {
-            "name": "maxVolatilityAccumulator",
-            "type": "u32"
+            name: "maxVolatilityAccumulator";
+            type: "u32";
           },
           {
-            "name": "tickGroupSize",
-            "type": "u16"
+            name: "tickGroupSize";
+            type: "u16";
           },
           {
-            "name": "majorSwapThresholdTicks",
-            "type": "u16"
-          }
-        ]
-      }
+            name: "majorSwapThresholdTicks";
+            type: "u16";
+          },
+        ];
+      };
     },
     {
-      "name": "whirlpoolsConfig",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "whirlpoolsConfig";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "feeAuthority",
-            "type": "pubkey"
+            name: "feeAuthority";
+            type: "pubkey";
           },
           {
-            "name": "collectProtocolFeesAuthority",
-            "type": "pubkey"
+            name: "collectProtocolFeesAuthority";
+            type: "pubkey";
           },
           {
-            "name": "rewardEmissionsSuperAuthority",
-            "type": "pubkey"
+            name: "rewardEmissionsSuperAuthority";
+            type: "pubkey";
           },
           {
-            "name": "defaultProtocolFeeRate",
-            "type": "u16"
+            name: "defaultProtocolFeeRate";
+            type: "u16";
           },
           {
-            "name": "featureFlags",
-            "type": "u16"
-          }
-        ]
-      }
+            name: "featureFlags";
+            type: "u16";
+          },
+        ];
+      };
     },
     {
-      "name": "whirlpoolsConfigExtension",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "whirlpoolsConfigExtension";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpoolsConfig",
-            "type": "pubkey"
+            name: "whirlpoolsConfig";
+            type: "pubkey";
           },
           {
-            "name": "configExtensionAuthority",
-            "type": "pubkey"
+            name: "configExtensionAuthority";
+            type: "pubkey";
           },
           {
-            "name": "tokenBadgeAuthority",
-            "type": "pubkey"
-          }
-        ]
-      }
+            name: "tokenBadgeAuthority";
+            type: "pubkey";
+          },
+        ];
+      };
     },
     {
-      "name": "dynamicTickArray",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "dynamicTickArray";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "startTickIndex",
-            "type": "i32"
+            name: "startTickIndex";
+            type: "i32";
           },
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "tickBitmap",
-            "type": "u128"
+            name: "tickBitmap";
+            type: "u128";
           },
           {
-            "name": "ticks",
-            "type": {
-              "array": [
+            name: "ticks";
+            type: {
+              array: [
                 {
-                  "defined": {
-                    "name": "dynamicTick"
-                  }
+                  defined: {
+                    name: "dynamicTick";
+                  };
                 },
-                88
-              ]
-            }
-          }
-        ]
-      }
+                88,
+              ];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "feeTier",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "feeTier";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpoolsConfig",
-            "type": "pubkey"
+            name: "whirlpoolsConfig";
+            type: "pubkey";
           },
           {
-            "name": "tickSpacing",
-            "type": "u16"
+            name: "tickSpacing";
+            type: "u16";
           },
           {
-            "name": "defaultFeeRate",
-            "type": "u16"
-          }
-        ]
-      }
+            name: "defaultFeeRate";
+            type: "u16";
+          },
+        ];
+      };
     },
     {
-      "name": "tickArray",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "tickArray";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "startTickIndex",
-            "type": "i32"
+            name: "startTickIndex";
+            type: "i32";
           },
           {
-            "name": "ticks",
-            "type": {
-              "array": [
+            name: "ticks";
+            type: {
+              array: [
                 {
-                  "defined": {
-                    "name": "tick"
-                  }
+                  defined: {
+                    name: "tick";
+                  };
                 },
-                88
-              ]
-            }
+                88,
+              ];
+            };
           },
           {
-            "name": "whirlpool",
-            "type": "pubkey"
-          }
-        ]
-      }
+            name: "whirlpool";
+            type: "pubkey";
+          },
+        ];
+      };
     },
     {
-      "name": "lockConfig",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "lockConfig";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "position",
-            "type": "pubkey"
+            name: "position";
+            type: "pubkey";
           },
           {
-            "name": "positionOwner",
-            "type": "pubkey"
+            name: "positionOwner";
+            type: "pubkey";
           },
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "lockedTimestamp",
-            "type": "u64"
+            name: "lockedTimestamp";
+            type: "u64";
           },
           {
-            "name": "lockType",
-            "type": {
-              "defined": {
-                "name": "lockTypeLabel"
-              }
-            }
-          }
-        ]
-      }
+            name: "lockType";
+            type: {
+              defined: {
+                name: "lockTypeLabel";
+              };
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "oracle",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "oracle";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "tradeEnableTimestamp",
-            "type": "u64"
+            name: "tradeEnableTimestamp";
+            type: "u64";
           },
           {
-            "name": "adaptiveFeeConstants",
-            "type": {
-              "defined": {
-                "name": "adaptiveFeeConstants"
-              }
-            }
+            name: "adaptiveFeeConstants";
+            type: {
+              defined: {
+                name: "adaptiveFeeConstants";
+              };
+            };
           },
           {
-            "name": "adaptiveFeeVariables",
-            "type": {
-              "defined": {
-                "name": "adaptiveFeeVariables"
-              }
-            }
+            name: "adaptiveFeeVariables";
+            type: {
+              defined: {
+                name: "adaptiveFeeVariables";
+              };
+            };
           },
           {
-            "name": "reserved",
-            "type": {
-              "array": [
-                "u8",
-                128
-              ]
-            }
-          }
-        ]
-      }
+            name: "reserved";
+            type: {
+              array: ["u8", 128];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "position",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "position";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "positionMint",
-            "type": "pubkey"
+            name: "positionMint";
+            type: "pubkey";
           },
           {
-            "name": "liquidity",
-            "type": "u128"
+            name: "liquidity";
+            type: "u128";
           },
           {
-            "name": "tickLowerIndex",
-            "type": "i32"
+            name: "tickLowerIndex";
+            type: "i32";
           },
           {
-            "name": "tickUpperIndex",
-            "type": "i32"
+            name: "tickUpperIndex";
+            type: "i32";
           },
           {
-            "name": "feeGrowthCheckpointA",
-            "type": "u128"
+            name: "feeGrowthCheckpointA";
+            type: "u128";
           },
           {
-            "name": "feeOwedA",
-            "type": "u64"
+            name: "feeOwedA";
+            type: "u64";
           },
           {
-            "name": "feeGrowthCheckpointB",
-            "type": "u128"
+            name: "feeGrowthCheckpointB";
+            type: "u128";
           },
           {
-            "name": "feeOwedB",
-            "type": "u64"
+            name: "feeOwedB";
+            type: "u64";
           },
           {
-            "name": "rewardInfos",
-            "type": {
-              "array": [
+            name: "rewardInfos";
+            type: {
+              array: [
                 {
-                  "defined": {
-                    "name": "positionRewardInfo"
-                  }
+                  defined: {
+                    name: "positionRewardInfo";
+                  };
                 },
-                3
-              ]
-            }
-          }
-        ]
-      }
+                3,
+              ];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "positionBundle",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "positionBundle";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "positionBundleMint",
-            "type": "pubkey"
+            name: "positionBundleMint";
+            type: "pubkey";
           },
           {
-            "name": "positionBitmap",
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          }
-        ]
-      }
+            name: "positionBitmap";
+            type: {
+              array: ["u8", 32];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "tokenBadge",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "tokenBadge";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpoolsConfig",
-            "type": "pubkey"
+            name: "whirlpoolsConfig";
+            type: "pubkey";
           },
           {
-            "name": "tokenMint",
-            "type": "pubkey"
+            name: "tokenMint";
+            type: "pubkey";
           },
           {
-            "name": "attributeRequireNonTransferablePosition",
-            "type": "bool"
-          }
-        ]
-      }
+            name: "attributeRequireNonTransferablePosition";
+            type: "bool";
+          },
+        ];
+      };
     },
     {
-      "name": "whirlpool",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "whirlpool";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpoolsConfig",
-            "type": "pubkey"
+            name: "whirlpoolsConfig";
+            type: "pubkey";
           },
           {
-            "name": "whirlpoolBump",
-            "type": {
-              "array": [
-                "u8",
-                1
-              ]
-            }
+            name: "whirlpoolBump";
+            type: {
+              array: ["u8", 1];
+            };
           },
           {
-            "name": "tickSpacing",
-            "type": "u16"
+            name: "tickSpacing";
+            type: "u16";
           },
           {
-            "name": "feeTierIndexSeed",
-            "type": {
-              "array": [
-                "u8",
-                2
-              ]
-            }
+            name: "feeTierIndexSeed";
+            type: {
+              array: ["u8", 2];
+            };
           },
           {
-            "name": "feeRate",
-            "type": "u16"
+            name: "feeRate";
+            type: "u16";
           },
           {
-            "name": "protocolFeeRate",
-            "type": "u16"
+            name: "protocolFeeRate";
+            type: "u16";
           },
           {
-            "name": "liquidity",
-            "type": "u128"
+            name: "liquidity";
+            type: "u128";
           },
           {
-            "name": "sqrtPrice",
-            "type": "u128"
+            name: "sqrtPrice";
+            type: "u128";
           },
           {
-            "name": "tickCurrentIndex",
-            "type": "i32"
+            name: "tickCurrentIndex";
+            type: "i32";
           },
           {
-            "name": "protocolFeeOwedA",
-            "type": "u64"
+            name: "protocolFeeOwedA";
+            type: "u64";
           },
           {
-            "name": "protocolFeeOwedB",
-            "type": "u64"
+            name: "protocolFeeOwedB";
+            type: "u64";
           },
           {
-            "name": "tokenMintA",
-            "type": "pubkey"
+            name: "tokenMintA";
+            type: "pubkey";
           },
           {
-            "name": "tokenVaultA",
-            "type": "pubkey"
+            name: "tokenVaultA";
+            type: "pubkey";
           },
           {
-            "name": "feeGrowthGlobalA",
-            "type": "u128"
+            name: "feeGrowthGlobalA";
+            type: "u128";
           },
           {
-            "name": "tokenMintB",
-            "type": "pubkey"
+            name: "tokenMintB";
+            type: "pubkey";
           },
           {
-            "name": "tokenVaultB",
-            "type": "pubkey"
+            name: "tokenVaultB";
+            type: "pubkey";
           },
           {
-            "name": "feeGrowthGlobalB",
-            "type": "u128"
+            name: "feeGrowthGlobalB";
+            type: "u128";
           },
           {
-            "name": "rewardLastUpdatedTimestamp",
-            "type": "u64"
+            name: "rewardLastUpdatedTimestamp";
+            type: "u64";
           },
           {
-            "name": "rewardInfos",
-            "type": {
-              "array": [
+            name: "rewardInfos";
+            type: {
+              array: [
                 {
-                  "defined": {
-                    "name": "whirlpoolRewardInfo"
-                  }
+                  defined: {
+                    name: "whirlpoolRewardInfo";
+                  };
                 },
-                3
-              ]
-            }
-          }
-        ]
-      }
+                3,
+              ];
+            };
+          },
+        ];
+      };
     },
     {
-      "name": "liquidityDecreased",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "liquidityDecreased";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "position",
-            "type": "pubkey"
+            name: "position";
+            type: "pubkey";
           },
           {
-            "name": "tickLowerIndex",
-            "type": "i32"
+            name: "tickLowerIndex";
+            type: "i32";
           },
           {
-            "name": "tickUpperIndex",
-            "type": "i32"
+            name: "tickUpperIndex";
+            type: "i32";
           },
           {
-            "name": "liquidity",
-            "type": "u128"
+            name: "liquidity";
+            type: "u128";
           },
           {
-            "name": "tokenAAmount",
-            "type": "u64"
+            name: "tokenAAmount";
+            type: "u64";
           },
           {
-            "name": "tokenBAmount",
-            "type": "u64"
+            name: "tokenBAmount";
+            type: "u64";
           },
           {
-            "name": "tokenATransferFee",
-            "type": "u64"
+            name: "tokenATransferFee";
+            type: "u64";
           },
           {
-            "name": "tokenBTransferFee",
-            "type": "u64"
-          }
-        ]
-      }
+            name: "tokenBTransferFee";
+            type: "u64";
+          },
+        ];
+      };
     },
     {
-      "name": "liquidityIncreased",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "liquidityIncreased";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "position",
-            "type": "pubkey"
+            name: "position";
+            type: "pubkey";
           },
           {
-            "name": "tickLowerIndex",
-            "type": "i32"
+            name: "tickLowerIndex";
+            type: "i32";
           },
           {
-            "name": "tickUpperIndex",
-            "type": "i32"
+            name: "tickUpperIndex";
+            type: "i32";
           },
           {
-            "name": "liquidity",
-            "type": "u128"
+            name: "liquidity";
+            type: "u128";
           },
           {
-            "name": "tokenAAmount",
-            "type": "u64"
+            name: "tokenAAmount";
+            type: "u64";
           },
           {
-            "name": "tokenBAmount",
-            "type": "u64"
+            name: "tokenBAmount";
+            type: "u64";
           },
           {
-            "name": "tokenATransferFee",
-            "type": "u64"
+            name: "tokenATransferFee";
+            type: "u64";
           },
           {
-            "name": "tokenBTransferFee",
-            "type": "u64"
-          }
-        ]
-      }
+            name: "tokenBTransferFee";
+            type: "u64";
+          },
+        ];
+      };
     },
     {
-      "name": "poolInitialized",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "poolInitialized";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "whirlpoolsConfig",
-            "type": "pubkey"
+            name: "whirlpoolsConfig";
+            type: "pubkey";
           },
           {
-            "name": "tokenMintA",
-            "type": "pubkey"
+            name: "tokenMintA";
+            type: "pubkey";
           },
           {
-            "name": "tokenMintB",
-            "type": "pubkey"
+            name: "tokenMintB";
+            type: "pubkey";
           },
           {
-            "name": "tickSpacing",
-            "type": "u16"
+            name: "tickSpacing";
+            type: "u16";
           },
           {
-            "name": "tokenProgramA",
-            "type": "pubkey"
+            name: "tokenProgramA";
+            type: "pubkey";
           },
           {
-            "name": "tokenProgramB",
-            "type": "pubkey"
+            name: "tokenProgramB";
+            type: "pubkey";
           },
           {
-            "name": "decimalsA",
-            "type": "u8"
+            name: "decimalsA";
+            type: "u8";
           },
           {
-            "name": "decimalsB",
-            "type": "u8"
+            name: "decimalsB";
+            type: "u8";
           },
           {
-            "name": "initialSqrtPrice",
-            "type": "u128"
-          }
-        ]
-      }
+            name: "initialSqrtPrice";
+            type: "u128";
+          },
+        ];
+      };
     },
     {
-      "name": "traded",
-      "type": {
-        "kind": "struct",
-        "fields": [
+      name: "traded";
+      type: {
+        kind: "struct";
+        fields: [
           {
-            "name": "whirlpool",
-            "type": "pubkey"
+            name: "whirlpool";
+            type: "pubkey";
           },
           {
-            "name": "aToB",
-            "type": "bool"
+            name: "aToB";
+            type: "bool";
           },
           {
-            "name": "preSqrtPrice",
-            "type": "u128"
+            name: "preSqrtPrice";
+            type: "u128";
           },
           {
-            "name": "postSqrtPrice",
-            "type": "u128"
+            name: "postSqrtPrice";
+            type: "u128";
           },
           {
-            "name": "inputAmount",
-            "type": "u64"
+            name: "inputAmount";
+            type: "u64";
           },
           {
-            "name": "outputAmount",
-            "type": "u64"
+            name: "outputAmount";
+            type: "u64";
           },
           {
-            "name": "inputTransferFee",
-            "type": "u64"
+            name: "inputTransferFee";
+            type: "u64";
           },
           {
-            "name": "outputTransferFee",
-            "type": "u64"
+            name: "outputTransferFee";
+            type: "u64";
           },
           {
-            "name": "lpFee",
-            "type": "u64"
+            name: "lpFee";
+            type: "u64";
           },
           {
-            "name": "protocolFee",
-            "type": "u64"
-          }
-        ]
-      }
-    }
-  ]
+            name: "protocolFee";
+            type: "u64";
+          },
+        ];
+      };
+    },
+  ];
 };

@@ -20,16 +20,7 @@
         "- `collect_protocol_fees_authority` - Authority authorized to collect protocol fees.",
         "- `reward_emissions_super_authority` - Authority authorized to set reward authorities in pools."
       ],
-      "discriminator": [
-        208,
-        127,
-        21,
-        1,
-        194,
-        190,
-        196,
-        70
-      ],
+      "discriminator": [208, 127, 21, 1, 194, 190, 196, 70],
       "accounts": [
         {
           "name": "config",
@@ -80,16 +71,7 @@
         "`SqrtPriceOutOfBounds` - provided initial_sqrt_price is not between 2^-64 to 2^64",
         ""
       ],
-      "discriminator": [
-        95,
-        180,
-        10,
-        172,
-        84,
-        174,
-        232,
-        40
-      ],
+      "discriminator": [95, 180, 10, 172, 84, 174, 232, 40],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -164,16 +146,7 @@
         "- `InvalidStartTick` - if the provided start tick is out of bounds or is not a multiple of",
         "TICK_ARRAY_SIZE * tick spacing."
       ],
-      "discriminator": [
-        11,
-        188,
-        193,
-        214,
-        141,
-        91,
-        149,
-        184
-      ],
+      "discriminator": [11, 188, 193, 214, 141, 91, 149, 184],
       "accounts": [
         {
           "name": "whirlpool"
@@ -213,16 +186,7 @@
         "- `InvalidStartTick` - if the provided start tick is out of bounds or is not a multiple of",
         "TICK_ARRAY_SIZE * tick spacing."
       ],
-      "discriminator": [
-        41,
-        33,
-        165,
-        200,
-        120,
-        231,
-        142,
-        50
-      ],
+      "discriminator": [41, 33, 165, 200, 120, 231, 142, 50],
       "accounts": [
         {
           "name": "whirlpool"
@@ -268,16 +232,7 @@
         "- `InvalidTickSpacing` - If the provided tick_spacing is 0.",
         "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE."
       ],
-      "discriminator": [
-        183,
-        74,
-        156,
-        160,
-        112,
-        2,
-        42,
-        30
-      ],
+      "discriminator": [183, 74, 156, 160, 112, 2, 42, 30],
       "accounts": [
         {
           "name": "config"
@@ -327,16 +282,7 @@
         "index in this pool, or exceeds NUM_REWARDS, or",
         "all reward slots for this pool has been initialized."
       ],
-      "discriminator": [
-        95,
-        135,
-        192,
-        196,
-        242,
-        129,
-        230,
-        68
-      ],
+      "discriminator": [95, 135, 192, 196, 242, 129, 230, 68],
       "accounts": [
         {
           "name": "reward_authority",
@@ -397,16 +343,7 @@
         "index in this pool, or exceeds NUM_REWARDS, or",
         "all reward slots for this pool has been initialized."
       ],
-      "discriminator": [
-        13,
-        197,
-        86,
-        168,
-        109,
-        176,
-        27,
-        244
-      ],
+      "discriminator": [13, 197, 86, 168, 109, 176, 27, 244],
       "accounts": [
         {
           "name": "whirlpool",
@@ -445,16 +382,7 @@
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
         "the tick-spacing in this pool."
       ],
-      "discriminator": [
-        135,
-        128,
-        47,
-        77,
-        15,
-        152,
-        240,
-        49
-      ],
+      "discriminator": [135, 128, 47, 77, 15, 152, 240, 49],
       "accounts": [
         {
           "name": "funder",
@@ -527,16 +455,7 @@
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
         "the tick-spacing in this pool."
       ],
-      "discriminator": [
-        242,
-        29,
-        134,
-        48,
-        58,
-        110,
-        14,
-        60
-      ],
+      "discriminator": [242, 29, 134, 48, 58, 110, 14, 60],
       "accounts": [
         {
           "name": "funder",
@@ -625,16 +544,7 @@
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
         "- `TokenMaxExceeded` - The required token to perform this operation exceeds the user defined amount."
       ],
-      "discriminator": [
-        46,
-        156,
-        243,
-        118,
-        13,
-        205,
-        251,
-        178
-      ],
+      "discriminator": [46, 156, 243, 118, 13, 205, 251, 178],
       "accounts": [
         {
           "name": "whirlpool",
@@ -712,16 +622,7 @@
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
         "- `TokenMinSubceeded` - The required token to perform this operation subceeds the user defined amount."
       ],
-      "discriminator": [
-        160,
-        38,
-        208,
-        111,
-        104,
-        91,
-        44,
-        1
-      ],
+      "discriminator": [160, 38, 208, 111, 104, 91, 44, 1],
       "accounts": [
         {
           "name": "whirlpool",
@@ -790,16 +691,7 @@
         "- `TickNotFound` - Provided tick array account does not contain the tick for this position.",
         "- `LiquidityZero` - Position has zero liquidity and therefore already has the most updated fees and reward values."
       ],
-      "discriminator": [
-        154,
-        230,
-        250,
-        13,
-        236,
-        209,
-        75,
-        223
-      ],
+      "discriminator": [154, 230, 250, 13, 236, 209, 75, 223],
       "accounts": [
         {
           "name": "whirlpool",
@@ -826,16 +718,7 @@
         "### Authority",
         "- `position_authority` - authority that owns the token corresponding to this desired position."
       ],
-      "discriminator": [
-        164,
-        152,
-        207,
-        99,
-        30,
-        186,
-        19,
-        182
-      ],
+      "discriminator": [164, 152, 207, 99, 30, 186, 19, 182],
       "accounts": [
         {
           "name": "whirlpool"
@@ -881,16 +764,7 @@
         "### Authority",
         "- `position_authority` - authority that owns the token corresponding to this desired position."
       ],
-      "discriminator": [
-        70,
-        5,
-        132,
-        87,
-        86,
-        235,
-        177,
-        34
-      ],
+      "discriminator": [70, 5, 132, 87, 86, 235, 177, 34],
       "accounts": [
         {
           "name": "whirlpool"
@@ -933,16 +807,7 @@
         "### Authority",
         "- `collect_protocol_fees_authority` - assigned authority in the WhirlpoolConfig that can collect protocol fees"
       ],
-      "discriminator": [
-        22,
-        67,
-        23,
-        98,
-        150,
-        178,
-        70,
-        220
-      ],
+      "discriminator": [22, 67, 23, 98, 150, 178, 70, 220],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -1002,16 +867,7 @@
         "- `LiquidityOverflow` - Liquidity value overflowed 128bits during tick crossing.",
         "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0."
       ],
-      "discriminator": [
-        248,
-        198,
-        158,
-        145,
-        225,
-        117,
-        135,
-        200
-      ],
+      "discriminator": [248, 198, 158, 145, 225, 117, 135, 200],
       "accounts": [
         {
           "name": "token_program"
@@ -1090,16 +946,7 @@
         "#### Special Errors",
         "- `ClosePositionNotEmpty` - The provided position account is not empty."
       ],
-      "discriminator": [
-        123,
-        134,
-        81,
-        0,
-        49,
-        68,
-        98,
-        98
-      ],
+      "discriminator": [123, 134, 81, 0, 49, 68, 98, 98],
       "accounts": [
         {
           "name": "position_authority",
@@ -1143,16 +990,7 @@
         "#### Special Errors",
         "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE."
       ],
-      "discriminator": [
-        118,
-        215,
-        214,
-        157,
-        182,
-        229,
-        208,
-        228
-      ],
+      "discriminator": [118, 215, 214, 157, 182, 229, 208, 228],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -1189,16 +1027,7 @@
         "#### Special Errors",
         "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_PROTOCOL_FEE_RATE."
       ],
-      "discriminator": [
-        107,
-        205,
-        249,
-        226,
-        151,
-        35,
-        86,
-        0
-      ],
+      "discriminator": [107, 205, 249, 226, 151, 35, 86, 0],
       "accounts": [
         {
           "name": "whirlpools_config",
@@ -1232,16 +1061,7 @@
         "#### Special Errors",
         "- `FeeRateMaxExceeded` - If the provided fee_rate exceeds MAX_FEE_RATE."
       ],
-      "discriminator": [
-        53,
-        243,
-        137,
-        65,
-        8,
-        140,
-        158,
-        6
-      ],
+      "discriminator": [53, 243, 137, 65, 8, 140, 158, 6],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -1278,16 +1098,7 @@
         "#### Special Errors",
         "- `ProtocolFeeRateMaxExceeded` - If the provided default_protocol_fee_rate exceeds MAX_PROTOCOL_FEE_RATE."
       ],
-      "discriminator": [
-        95,
-        7,
-        4,
-        50,
-        154,
-        79,
-        156,
-        131
-      ],
+      "discriminator": [95, 7, 4, 50, 154, 79, 156, 131],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -1319,16 +1130,7 @@
         "### Authority",
         "- \"fee_authority\" - Set authority that can modify pool fees in the WhirlpoolConfig"
       ],
-      "discriminator": [
-        31,
-        1,
-        50,
-        87,
-        237,
-        101,
-        97,
-        132
-      ],
+      "discriminator": [31, 1, 50, 87, 237, 101, 97, 132],
       "accounts": [
         {
           "name": "whirlpools_config",
@@ -1353,16 +1155,7 @@
         "### Authority",
         "- \"fee_authority\" - Set authority that can collect protocol fees in the WhirlpoolConfig"
       ],
-      "discriminator": [
-        34,
-        150,
-        93,
-        244,
-        139,
-        225,
-        233,
-        67
-      ],
+      "discriminator": [34, 150, 93, 244, 139, 225, 233, 67],
       "accounts": [
         {
           "name": "whirlpools_config",
@@ -1392,16 +1185,7 @@
         "index in this pool, or exceeds NUM_REWARDS, or",
         "all reward slots for this pool has been initialized."
       ],
-      "discriminator": [
-        34,
-        39,
-        183,
-        252,
-        83,
-        28,
-        85,
-        127
-      ],
+      "discriminator": [34, 39, 183, 252, 83, 28, 85, 127],
       "accounts": [
         {
           "name": "whirlpool",
@@ -1436,16 +1220,7 @@
         "index in this pool, or exceeds NUM_REWARDS, or",
         "all reward slots for this pool has been initialized."
       ],
-      "discriminator": [
-        240,
-        154,
-        201,
-        198,
-        148,
-        93,
-        56,
-        25
-      ],
+      "discriminator": [240, 154, 201, 198, 148, 93, 56, 25],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -1479,16 +1254,7 @@
         "### Authority",
         "- \"reward_emissions_super_authority\" - Set authority that can control reward authorities for all pools in this config space."
       ],
-      "discriminator": [
-        207,
-        5,
-        200,
-        209,
-        122,
-        56,
-        82,
-        183
-      ],
+      "discriminator": [207, 5, 200, 209, 122, 56, 82, 183],
       "accounts": [
         {
           "name": "whirlpools_config",
@@ -1533,16 +1299,7 @@
         "- `InvalidIntermediaryMint` - Error if the intermediary mint between hop one and two do not equal.",
         "- `DuplicateTwoHopPool` - Error if whirlpool one & two are the same pool."
       ],
-      "discriminator": [
-        195,
-        96,
-        237,
-        108,
-        68,
-        162,
-        219,
-        230
-      ],
+      "discriminator": [195, 96, 237, 108, 68, 162, 219, 230],
       "accounts": [
         {
           "name": "token_program"
@@ -1659,16 +1416,7 @@
         "Initializes a PositionBundle account that bundles several positions.",
         "A unique token will be minted to represent the position bundle in the users wallet."
       ],
-      "discriminator": [
-        117,
-        45,
-        241,
-        149,
-        24,
-        18,
-        194,
-        65
-      ],
+      "discriminator": [117, 45, 241, 149, 24, 18, 194, 65],
       "accounts": [
         {
           "name": "position_bundle",
@@ -1713,16 +1461,7 @@
         "A unique token will be minted to represent the position bundle in the users wallet.",
         "Additional Metaplex metadata is appended to identify the token."
       ],
-      "discriminator": [
-        93,
-        124,
-        16,
-        179,
-        249,
-        131,
-        115,
-        245
-      ],
+      "discriminator": [93, 124, 16, 179, 249, 131, 115, 245],
       "accounts": [
         {
           "name": "position_bundle",
@@ -1784,16 +1523,7 @@
         "### Special Errors",
         "- `PositionBundleNotDeletable` - The provided position bundle has open positions."
       ],
-      "discriminator": [
-        100,
-        25,
-        99,
-        2,
-        217,
-        239,
-        124,
-        173
-      ],
+      "discriminator": [100, 25, 99, 2, 217, 239, 124, 173],
       "accounts": [
         {
           "name": "position_bundle",
@@ -1841,16 +1571,7 @@
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
         "the tick-spacing in this pool."
       ],
-      "discriminator": [
-        169,
-        113,
-        126,
-        171,
-        213,
-        172,
-        212,
-        49
-      ],
+      "discriminator": [169, 113, 126, 171, 213, 172, 212, 49],
       "accounts": [
         {
           "name": "bundled_position",
@@ -1912,16 +1633,7 @@
         "- `InvalidBundleIndex` - If the provided bundle index is out of bounds.",
         "- `ClosePositionNotEmpty` - The provided position account is not empty."
       ],
-      "discriminator": [
-        41,
-        36,
-        216,
-        245,
-        27,
-        85,
-        103,
-        67
-      ],
+      "discriminator": [41, 36, 216, 245, 27, 85, 103, 67],
       "accounts": [
         {
           "name": "bundled_position",
@@ -1967,16 +1679,7 @@
         "- `InvalidTickIndex` - If a provided tick is out of bounds, out of order or not a multiple of",
         "the tick-spacing in this pool."
       ],
-      "discriminator": [
-        212,
-        47,
-        95,
-        92,
-        114,
-        102,
-        131,
-        250
-      ],
+      "discriminator": [212, 47, 95, 92, 114, 102, 131, 250],
       "accounts": [
         {
           "name": "funder",
@@ -2042,16 +1745,7 @@
         "#### Special Errors",
         "- `ClosePositionNotEmpty` - The provided position account is not empty."
       ],
-      "discriminator": [
-        1,
-        182,
-        135,
-        59,
-        155,
-        25,
-        99,
-        223
-      ],
+      "discriminator": [1, 182, 135, 59, 155, 25, 99, 223],
       "accounts": [
         {
           "name": "position_authority",
@@ -2091,16 +1785,7 @@
         "- `PositionAlreadyLocked` - The provided position is already locked.",
         "- `PositionNotLockable` - The provided position is not lockable (e.g. An empty position)."
       ],
-      "discriminator": [
-        227,
-        62,
-        2,
-        252,
-        247,
-        10,
-        171,
-        185
-      ],
+      "discriminator": [227, 62, 2, 252, 247, 10, 171, 185],
       "accounts": [
         {
           "name": "funder",
@@ -2164,16 +1849,7 @@
         "- `ClosePositionNotEmpty` - The provided position account is not empty.",
         "- `SameTickRangeNotAllowed` - The provided tick range is the same as the current tick range."
       ],
-      "discriminator": [
-        164,
-        123,
-        180,
-        141,
-        194,
-        100,
-        160,
-        175
-      ],
+      "discriminator": [164, 123, 180, 141, 194, 100, 160, 175],
       "accounts": [
         {
           "name": "funder",
@@ -2217,16 +1893,7 @@
         "### Authority",
         "- `position_authority` - The authority that owns the position token."
       ],
-      "discriminator": [
-        179,
-        121,
-        229,
-        46,
-        67,
-        138,
-        194,
-        138
-      ],
+      "discriminator": [179, 121, 229, 46, 67, 138, 194, 138],
       "accounts": [
         {
           "name": "position_authority",
@@ -2289,16 +1956,7 @@
         "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE.",
         "- `InvalidAdaptiveFeeConstants` - If the provided adaptive fee constants are invalid."
       ],
-      "discriminator": [
-        77,
-        99,
-        208,
-        200,
-        141,
-        123,
-        117,
-        48
-      ],
+      "discriminator": [77, 99, 208, 200, 141, 123, 117, 48],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -2387,16 +2045,7 @@
         "#### Special Errors",
         "- `FeeRateMaxExceeded` - If the provided default_fee_rate exceeds MAX_FEE_RATE."
       ],
-      "discriminator": [
-        229,
-        66,
-        84,
-        251,
-        164,
-        134,
-        183,
-        7
-      ],
+      "discriminator": [229, 66, 84, 251, 164, 134, 183, 7],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -2427,16 +2076,7 @@
         "### Authority",
         "- \"fee_authority\" - Set authority in the WhirlpoolConfig"
       ],
-      "discriminator": [
-        193,
-        234,
-        231,
-        147,
-        138,
-        57,
-        3,
-        122
-      ],
+      "discriminator": [193, 234, 231, 147, 138, 57, 3, 122],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -2465,16 +2105,7 @@
         "### Authority",
         "- \"fee_authority\" - Set authority in the WhirlpoolConfig"
       ],
-      "discriminator": [
-        125,
-        43,
-        127,
-        235,
-        149,
-        26,
-        106,
-        236
-      ],
+      "discriminator": [125, 43, 127, 235, 149, 26, 106, 236],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -2511,16 +2142,7 @@
         "- `tick_group_size` - Tick group size to define tick group index.",
         "- `major_swap_threshold_ticks` - Major swap threshold ticks to define major swap."
       ],
-      "discriminator": [
-        132,
-        185,
-        66,
-        148,
-        83,
-        88,
-        134,
-        198
-      ],
+      "discriminator": [132, 185, 66, 148, 83, 88, 134, 198],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -2581,16 +2203,7 @@
         "`UnsupportedTokenMint` - The provided token mint is not supported by the program (e.g. it has risky token extensions)",
         ""
       ],
-      "discriminator": [
-        143,
-        94,
-        96,
-        76,
-        172,
-        124,
-        119,
-        199
-      ],
+      "discriminator": [143, 94, 96, 76, 172, 124, 119, 199],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -2678,16 +2291,7 @@
         "#### Special Errors",
         "- `FeeRateMaxExceeded` - If the provided fee_rate exceeds MAX_FEE_RATE."
       ],
-      "discriminator": [
-        121,
-        121,
-        54,
-        114,
-        131,
-        230,
-        162,
-        104
-      ],
+      "discriminator": [121, 121, 54, 114, 131, 230, 162, 104],
       "accounts": [
         {
           "name": "whirlpool",
@@ -2719,16 +2323,7 @@
         "### Parameters",
         "- `feature_flag` - The feature flag that the WhirlpoolConfig will use."
       ],
-      "discriminator": [
-        71,
-        173,
-        228,
-        18,
-        67,
-        247,
-        210,
-        57
-      ],
+      "discriminator": [71, 173, 228, 18, 67, 247, 210, 57],
       "accounts": [
         {
           "name": "whirlpools_config",
@@ -2756,16 +2351,7 @@
         "Migration instruction to repurpose the reward authority space in the Whirlpool.",
         "TODO: This instruction should be removed once all pools have been migrated."
       ],
-      "discriminator": [
-        214,
-        161,
-        248,
-        79,
-        152,
-        98,
-        172,
-        231
-      ],
+      "discriminator": [214, 161, 248, 79, 152, 98, 172, 231],
       "accounts": [
         {
           "name": "whirlpool",
@@ -2783,16 +2369,7 @@
         "### Authority",
         "- `position_authority` - authority that owns the token corresponding to this desired position."
       ],
-      "discriminator": [
-        207,
-        117,
-        95,
-        191,
-        229,
-        180,
-        226,
-        15
-      ],
+      "discriminator": [207, 117, 95, 191, 229, 180, 226, 15],
       "accounts": [
         {
           "name": "whirlpool"
@@ -2862,16 +2439,7 @@
         "### Authority",
         "- `collect_protocol_fees_authority` - assigned authority in the WhirlpoolConfig that can collect protocol fees"
       ],
-      "discriminator": [
-        103,
-        128,
-        222,
-        134,
-        114,
-        200,
-        22,
-        200
-      ],
+      "discriminator": [103, 128, 222, 134, 114, 200, 22, 200],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -2938,16 +2506,7 @@
         "### Authority",
         "- `position_authority` - authority that owns the token corresponding to this desired position."
       ],
-      "discriminator": [
-        177,
-        107,
-        37,
-        180,
-        160,
-        19,
-        49,
-        209
-      ],
+      "discriminator": [177, 107, 37, 180, 160, 19, 49, 209],
       "accounts": [
         {
           "name": "whirlpool"
@@ -3017,16 +2576,7 @@
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
         "- `TokenMinSubceeded` - The required token to perform this operation subceeds the user defined amount."
       ],
-      "discriminator": [
-        58,
-        127,
-        188,
-        62,
-        79,
-        82,
-        196,
-        96
-      ],
+      "discriminator": [58, 127, 188, 62, 79, 82, 196, 96],
       "accounts": [
         {
           "name": "whirlpool",
@@ -3127,16 +2677,7 @@
         "- `LiquidityTooHigh` - Provided liquidity exceeds u128::max.",
         "- `TokenMaxExceeded` - The required token to perform this operation exceeds the user defined amount."
       ],
-      "discriminator": [
-        133,
-        29,
-        89,
-        223,
-        69,
-        238,
-        176,
-        10
-      ],
+      "discriminator": [133, 29, 89, 223, 69, 238, 176, 10],
       "accounts": [
         {
           "name": "whirlpool",
@@ -3235,16 +2776,7 @@
         "`SqrtPriceOutOfBounds` - provided initial_sqrt_price is not between 2^-64 to 2^64",
         ""
       ],
-      "discriminator": [
-        207,
-        45,
-        87,
-        242,
-        27,
-        63,
-        204,
-        67
-      ],
+      "discriminator": [207, 45, 87, 242, 27, 63, 204, 67],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -3325,16 +2857,7 @@
         "index in this pool, or exceeds NUM_REWARDS, or",
         "all reward slots for this pool has been initialized."
       ],
-      "discriminator": [
-        91,
-        1,
-        77,
-        50,
-        235,
-        229,
-        133,
-        49
-      ],
+      "discriminator": [91, 1, 77, 50, 235, 229, 133, 49],
       "accounts": [
         {
           "name": "reward_authority",
@@ -3399,16 +2922,7 @@
         "index in this pool, or exceeds NUM_REWARDS, or",
         "all reward slots for this pool has been initialized."
       ],
-      "discriminator": [
-        114,
-        228,
-        72,
-        32,
-        193,
-        48,
-        160,
-        102
-      ],
+      "discriminator": [114, 228, 72, 32, 193, 48, 160, 102],
       "accounts": [
         {
           "name": "whirlpool",
@@ -3459,16 +2973,7 @@
         "- `LiquidityOverflow` - Liquidity value overflowed 128bits during tick crossing.",
         "- `InvalidTickSpacing` - The swap pool was initialized with tick-spacing of 0."
       ],
-      "discriminator": [
-        43,
-        4,
-        237,
-        11,
-        26,
-        201,
-        30,
-        98
-      ],
+      "discriminator": [43, 4, 237, 11, 26, 201, 30, 98],
       "accounts": [
         {
           "name": "token_program_a"
@@ -3589,16 +3094,7 @@
         "- `InvalidIntermediaryMint` - Error if the intermediary mint between hop one and two do not equal.",
         "- `DuplicateTwoHopPool` - Error if whirlpool one & two are the same pool."
       ],
-      "discriminator": [
-        186,
-        143,
-        209,
-        29,
-        254,
-        2,
-        194,
-        117
-      ],
+      "discriminator": [186, 143, 209, 29, 254, 2, 194, 117],
       "accounts": [
         {
           "name": "whirlpool_one",
@@ -3739,16 +3235,7 @@
         "### Authority",
         "- \"fee_authority\" - Set authority in the WhirlpoolConfig"
       ],
-      "discriminator": [
-        55,
-        9,
-        53,
-        9,
-        114,
-        57,
-        209,
-        52
-      ],
+      "discriminator": [55, 9, 53, 9, 114, 57, 209, 52],
       "accounts": [
         {
           "name": "config"
@@ -3781,16 +3268,7 @@
         "### Authority",
         "- \"config_extension_authority\" - Set authority in the WhirlpoolConfigExtension"
       ],
-      "discriminator": [
-        44,
-        94,
-        241,
-        116,
-        24,
-        188,
-        60,
-        143
-      ],
+      "discriminator": [44, 94, 241, 116, 24, 188, 60, 143],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -3818,16 +3296,7 @@
         "### Authority",
         "- \"config_extension_authority\" - Set authority in the WhirlpoolConfigExtension"
       ],
-      "discriminator": [
-        207,
-        202,
-        4,
-        32,
-        205,
-        79,
-        13,
-        178
-      ],
+      "discriminator": [207, 202, 4, 32, 205, 79, 13, 178],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -3857,16 +3326,7 @@
         "### Special Errors",
         "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled."
       ],
-      "discriminator": [
-        253,
-        77,
-        205,
-        95,
-        27,
-        224,
-        89,
-        223
-      ],
+      "discriminator": [253, 77, 205, 95, 27, 224, 89, 223],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -3907,16 +3367,7 @@
         "### Special Errors",
         "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled."
       ],
-      "discriminator": [
-        53,
-        146,
-        68,
-        8,
-        18,
-        117,
-        17,
-        185
-      ],
+      "discriminator": [53, 146, 68, 8, 18, 117, 17, 185],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -3956,16 +3407,7 @@
         "#### Special Errors",
         "- `FeatureIsNotEnabled` - If the feature flag for token badges is not enabled."
       ],
-      "discriminator": [
-        224,
-        88,
-        65,
-        33,
-        138,
-        147,
-        246,
-        137
-      ],
+      "discriminator": [224, 88, 65, 33, 138, 147, 246, 137],
       "accounts": [
         {
           "name": "whirlpools_config"
@@ -3998,16 +3440,7 @@
     },
     {
       "name": "idl_include",
-      "discriminator": [
-        223,
-        253,
-        121,
-        121,
-        60,
-        193,
-        129,
-        31
-      ],
+      "discriminator": [223, 253, 121, 121, 60, 193, 129, 31],
       "accounts": [
         {
           "name": "tick_array"
@@ -4022,213 +3455,69 @@
   "accounts": [
     {
       "name": "AdaptiveFeeTier",
-      "discriminator": [
-        147,
-        16,
-        144,
-        116,
-        47,
-        146,
-        149,
-        46
-      ]
+      "discriminator": [147, 16, 144, 116, 47, 146, 149, 46]
     },
     {
       "name": "WhirlpoolsConfig",
-      "discriminator": [
-        157,
-        20,
-        49,
-        224,
-        217,
-        87,
-        193,
-        254
-      ]
+      "discriminator": [157, 20, 49, 224, 217, 87, 193, 254]
     },
     {
       "name": "WhirlpoolsConfigExtension",
-      "discriminator": [
-        2,
-        99,
-        215,
-        163,
-        240,
-        26,
-        153,
-        58
-      ]
+      "discriminator": [2, 99, 215, 163, 240, 26, 153, 58]
     },
     {
       "name": "DynamicTickArray",
-      "discriminator": [
-        17,
-        216,
-        246,
-        142,
-        225,
-        199,
-        218,
-        56
-      ]
+      "discriminator": [17, 216, 246, 142, 225, 199, 218, 56]
     },
     {
       "name": "FeeTier",
-      "discriminator": [
-        56,
-        75,
-        159,
-        76,
-        142,
-        68,
-        190,
-        105
-      ]
+      "discriminator": [56, 75, 159, 76, 142, 68, 190, 105]
     },
     {
       "name": "TickArray",
-      "discriminator": [
-        69,
-        97,
-        189,
-        190,
-        110,
-        7,
-        66,
-        187
-      ]
+      "discriminator": [69, 97, 189, 190, 110, 7, 66, 187]
     },
     {
       "name": "LockConfig",
-      "discriminator": [
-        106,
-        47,
-        238,
-        159,
-        124,
-        12,
-        160,
-        192
-      ]
+      "discriminator": [106, 47, 238, 159, 124, 12, 160, 192]
     },
     {
       "name": "Oracle",
-      "discriminator": [
-        139,
-        194,
-        131,
-        179,
-        140,
-        179,
-        229,
-        244
-      ]
+      "discriminator": [139, 194, 131, 179, 140, 179, 229, 244]
     },
     {
       "name": "Position",
-      "discriminator": [
-        170,
-        188,
-        143,
-        228,
-        122,
-        64,
-        247,
-        208
-      ]
+      "discriminator": [170, 188, 143, 228, 122, 64, 247, 208]
     },
     {
       "name": "PositionBundle",
-      "discriminator": [
-        129,
-        169,
-        175,
-        65,
-        185,
-        95,
-        32,
-        100
-      ]
+      "discriminator": [129, 169, 175, 65, 185, 95, 32, 100]
     },
     {
       "name": "TokenBadge",
-      "discriminator": [
-        116,
-        219,
-        204,
-        229,
-        249,
-        116,
-        255,
-        150
-      ]
+      "discriminator": [116, 219, 204, 229, 249, 116, 255, 150]
     },
     {
       "name": "Whirlpool",
-      "discriminator": [
-        63,
-        149,
-        209,
-        12,
-        225,
-        128,
-        99,
-        9
-      ]
+      "discriminator": [63, 149, 209, 12, 225, 128, 99, 9]
     }
   ],
   "events": [
     {
       "name": "LiquidityDecreased",
-      "discriminator": [
-        166,
-        1,
-        36,
-        71,
-        112,
-        202,
-        181,
-        171
-      ]
+      "discriminator": [166, 1, 36, 71, 112, 202, 181, 171]
     },
     {
       "name": "LiquidityIncreased",
-      "discriminator": [
-        30,
-        7,
-        144,
-        181,
-        102,
-        254,
-        155,
-        161
-      ]
+      "discriminator": [30, 7, 144, 181, 102, 254, 155, 161]
     },
     {
       "name": "PoolInitialized",
-      "discriminator": [
-        100,
-        118,
-        173,
-        87,
-        12,
-        198,
-        254,
-        229
-      ]
+      "discriminator": [100, 118, 173, 87, 12, 198, 254, 229]
     },
     {
       "name": "Traded",
-      "discriminator": [
-        225,
-        202,
-        73,
-        175,
-        147,
-        43,
-        160,
-        150
-      ]
+      "discriminator": [225, 202, 73, 175, 147, 43, 160, 150]
     }
   ],
   "errors": [
@@ -4581,9 +3870,7 @@
         "variants": [
           {
             "name": "TokenBadge",
-            "fields": [
-              "bool"
-            ]
+            "fields": ["bool"]
           }
         ]
       }
@@ -4633,10 +3920,7 @@
           {
             "name": "reward_growths_outside",
             "type": {
-              "array": [
-                "u128",
-                3
-              ]
+              "array": ["u128", 3]
             }
           }
         ]
@@ -4700,10 +3984,7 @@
           {
             "name": "reserved",
             "type": {
-              "array": [
-                "u8",
-                16
-              ]
+              "array": ["u8", 16]
             }
           }
         ]
@@ -4737,10 +4018,7 @@
           {
             "name": "reserved",
             "type": {
-              "array": [
-                "u8",
-                16
-              ]
+              "array": ["u8", 16]
             }
           }
         ]
@@ -4818,10 +4096,7 @@
           {
             "name": "reward_growths_outside",
             "type": {
-              "array": [
-                "u128",
-                3
-              ]
+              "array": ["u128", 3]
             }
           }
         ]
@@ -4834,9 +4109,7 @@
         "variants": [
           {
             "name": "RequireNonTransferablePosition",
-            "fields": [
-              "bool"
-            ]
+            "fields": ["bool"]
           }
         ]
       }
@@ -4866,16 +4139,12 @@
         "fields": [
           {
             "name": "mint",
-            "docs": [
-              "Reward token mint."
-            ],
+            "docs": ["Reward token mint."],
             "type": "pubkey"
           },
           {
             "name": "vault",
-            "docs": [
-              "Reward vault token account."
-            ],
+            "docs": ["Reward vault token account."],
             "type": "pubkey"
           },
           {
@@ -4890,10 +4159,7 @@
               "to set different authorities for the three rewards. Therefore, the use of this field was changed for Whirlpool's future extensibility."
             ],
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           },
           {
@@ -5241,10 +4507,7 @@
           {
             "name": "reserved",
             "type": {
-              "array": [
-                "u8",
-                128
-              ]
+              "array": ["u8", 128]
             }
           }
         ]
@@ -5319,10 +4582,7 @@
           {
             "name": "position_bitmap",
             "type": {
-              "array": [
-                "u8",
-                32
-              ]
+              "array": ["u8", 32]
             }
           }
         ]
@@ -5360,10 +4620,7 @@
           {
             "name": "whirlpool_bump",
             "type": {
-              "array": [
-                "u8",
-                1
-              ]
+              "array": ["u8", 1]
             }
           },
           {
@@ -5373,10 +4630,7 @@
           {
             "name": "fee_tier_index_seed",
             "type": {
-              "array": [
-                "u8",
-                2
-              ]
+              "array": ["u8", 2]
             }
           },
           {

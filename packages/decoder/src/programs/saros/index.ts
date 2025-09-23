@@ -40,6 +40,3 @@ export class SarosProgramEventProcessor extends ProgramEventProcessor<LiquidityB
     super(...init(connection));
   }
 }
-
-
-

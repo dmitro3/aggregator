@@ -39,9 +39,7 @@ export const cacheResult = async <U extends { id: string }>(
 
   let upserts: U[] | undefined;
 
-  if (uncache.length > 0) 
-    upserts = await upsertFn(uncache);
-  
+  if (uncache.length > 0) upserts = await upsertFn(uncache);
 
   if (upserts) {
     const pipeline = redis.pipeline();
