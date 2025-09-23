@@ -1,19 +1,32 @@
 {
-  "name": "aggregator",
+  "name": "@rhiva-ag/aggregator",
+  "version": "0.0.0",
+  "private": "true",
   "packageManager": "bun@1.2.9",
+  "exports": {
+    "./trpc": {
+      "types": "./servers/trpc/src/external.ts",
+      "import": "./servers/trpc/src/external.ts"
+    },
+    "./datasource": {
+      "types": "./servers/datasorce/src/external.ts",
+      "import": "./servers/datasorce/src/external.ts"
+    }
+  },
   "scripts": {
+    "lint": "bun x biome lint --fix",
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "format": "bunx biome format --write",
+    "format": "bun x biome format --write",
     "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
     "@tsconfig/recommended": "^1.0.10",
     "@types/bun": "latest",
-    "drizzle-kit": "^0.31.4",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.0",
+    "pm2": "^6.0.13",
     "tsup": "^8.5.0",
     "turbo": "^2.5.6"
   },

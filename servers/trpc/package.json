@@ -1,0 +1,35 @@
+{
+  "name": "@rhiva-ag-ag/trpc",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "module": "./src/external.ts",
+  "main": "./src/external.ts",
+  "types": "./src/external.ts",
+  "exports": {
+    ".": {
+      "types": "./src/external.ts",
+      "import": "./src/external.ts"
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.1.0",
+    "@fastify/websocket": "^11.2.0",
+    "@rhiva-ag/datasource": "*",
+    "@rhiva-ag/shared": "*",
+    "@trpc/server": "^11.5.1",
+    "drizzle-orm": "^0.44.5",
+    "fastify": "^5.6.1",
+    "moment": "^2.30.1",
+    "zod": "^4.1.11"
+  }
+}

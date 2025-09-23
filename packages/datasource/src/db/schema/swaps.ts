@@ -17,6 +17,7 @@ export const swaps = pgTable(
   {
     signature: text(),
     extra: jsonb().$type<Extra>().notNull(),
+    type: text({ enum: ["sell", "buy"] }).notNull(),
     pair: text()
       .references(() => pairs.id, { onDelete: "cascade" })
       .notNull(),
@@ -26,6 +27,8 @@ export const swaps = pgTable(
     fee: decimal({ mode: "number" }).notNull(),
     baseAmount: decimal({ mode: "number" }).notNull(),
     quoteAmount: decimal({ mode: "number" }).notNull(),
+    tvl: decimal({ mode: "number" }),
+    price: decimal({ mode: "number" }),
     createdAt: timestamp().defaultNow().notNull(),
   },
   (column) => [unique().on(column.signature, column.pair)],

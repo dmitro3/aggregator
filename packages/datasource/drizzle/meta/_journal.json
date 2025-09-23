@@ -15,6 +15,13 @@
       "when": 1758617920599,
       "tag": "0001_brainy_vivisector",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758624829150,
+      "tag": "0002_petite_living_lightning",
+      "breakpoints": true
     }
   ]
 }

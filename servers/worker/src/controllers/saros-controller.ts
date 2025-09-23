@@ -5,9 +5,9 @@ import Decimal from "decimal.js";
 import { inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
 import { web3, type IdlEvents } from "@coral-xyz/anchor";
-import { init } from "@rhiva/decoder/programs/saros/index";
+import { init } from "@rhiva-ag/decoder/programs/saros/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
-import type { LiquidityBook } from "@rhiva/decoder/programs/idls/types/saros";
+import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
 import {
   AccountLayout,
   getAssociatedTokenAddressSync,
@@ -20,7 +20,7 @@ import {
   upsertMint,
   type Database,
   type pairInsertSchema,
-} from "@rhiva/datasource";
+} from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
 
@@ -141,11 +141,11 @@ const upsertPair = async (
 
       const normalizeBaseTokenReserveAmount = new Decimal(
         baseTokenReserveAmount,
-      ).div(Math.pow(10, pair.baseMint.decimals));
+      ).div(10 ** pair.baseMint.decimals);
 
       const normalizeQuoteTokenReserveAmount = new Decimal(
         quoteTokenReserveAmount,
-      ).div(Math.pow(10, pair.quoteMint.decimals));
+      ).div(10 ** pair.quoteMint.decimals);
 
       let marketCap = 0;
 
@@ -216,15 +216,17 @@ export const createSarosSwapFn = async (
       return {
         signature,
         extra: {},
+        tvl: pair.extra.marketCap,
+        type: value.swapForY ? ("sell" as const) : ("buy" as const),
         pair: value.pair.toBase58(),
         fee: new Decimal(value.fee.toString())
-          .div(Math.pow(10, pair.baseMint.decimals))
+          .div(10 ** pair.baseMint.decimals)
           .toNumber(),
         baseAmount: new Decimal(baseAmount.toString())
-          .div(Math.pow(10, pair.baseMint.decimals))
+          .div(10 ** pair.baseMint.decimals)
           .toNumber(),
         quoteAmount: new Decimal(quoteAmount.toString())
-          .div(Math.pow(10, pair.quoteMint.decimals))
+          .div(10 ** pair.quoteMint.decimals)
           .toNumber(),
       };
     }),

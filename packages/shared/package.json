@@ -1,5 +1,5 @@
 {
-  "name": "@rhiva/shared",
+  "name": "@rhiva-ag/shared",
   "version": "0.0.0",
   "private": true,
   "main": "src/index.ts",
@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "build": "tsc --noEmit"
+    "check": "tsc --noEmit"
   },
   "peerDependencies": {},
   "dependencies": {

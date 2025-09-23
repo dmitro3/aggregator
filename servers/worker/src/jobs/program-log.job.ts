@@ -1,14 +1,14 @@
 import { Worker } from "bullmq";
 import { web3 } from "@coral-xyz/anchor";
-import { Pipeline, type ProgramEventType } from "@rhiva/decoder";
+import { Pipeline, type ProgramEventType } from "@rhiva-ag/decoder";
 import {
   SarosProgramEventProcessor,
   SarosProgramInstructionEventProcessor,
-} from "@rhiva/decoder/programs/saros/index";
+} from "@rhiva-ag/decoder/programs/saros/index";
 
 import { db, redis } from "../instances";
 import { createSarosSwapFn } from "../controllers/saros-controller";
-import type { LiquidityBook } from "@rhiva/decoder/programs/idls/types/saros";
+import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
 
 const connection = new web3.Connection(web3.clusterApiUrl("mainnet-beta"));
 

@@ -12,8 +12,8 @@
       "dependsOn": ["^migrate"],
       "inputs": ["$TURBO_DEFAULT$", ".env"]
     },
-    "check-types": {
-      "dependsOn": ["^check-types"]
+    "check": {
+      "dependsOn": ["^check", "^lint"]
     },
     "dev": {
       "persistent": true,

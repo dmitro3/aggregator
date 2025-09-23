@@ -1,9 +1,9 @@
 {
-  "name": "@rhiva/worker",
+  "name": "@rhiva-ag/worker",
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit",
+    "check": "tsc --noEmit",
     "dev": "bun run --watch src/index.ts"
   },
   "devDependencies": {
@@ -16,9 +16,9 @@
     "@coral-xyz/anchor": "^0.31.1",
     "@metaplex-foundation/umi": "^1.4.1",
     "@metaplex-foundation/umi-bundle-defaults": "^1.4.1",
-    "@rhiva/datasource": "*",
-    "@rhiva/decoder": "*",
-    "@rhiva/shared": "*",
+    "@rhiva-ag/datasource": "*",
+    "@rhiva-ag/decoder": "*",
+    "@rhiva-ag/shared": "*",
     "@solana-tracker/data-api": "^0.1.4",
     "@solana/spl-token": "^0.4.14",
     "assert": "^2.1.0",

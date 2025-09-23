@@ -1,7 +1,7 @@
 import pino from "pino";
 import Redis from "ioredis";
 import { web3 } from "@coral-xyz/anchor";
-import { createDB } from "@rhiva/datasource";
+import { createDB } from "@rhiva-ag/datasource";
 import { Client } from "@solana-tracker/data-api";
 
 export const redis = new Redis(process.env.REDIS_URL!, {

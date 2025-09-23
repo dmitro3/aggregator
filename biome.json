@@ -4,6 +4,10 @@
     "rules": {
       "suspicious": {
         "noExplicitAny": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "off",
+        "useNodejsImportProtocol": "off"
       }
     }
   },

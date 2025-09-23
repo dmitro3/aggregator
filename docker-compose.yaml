@@ -1,0 +1,20 @@
+services:
+  rhivaliq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
+    ports:
+      - "${PORT}:${PORT}"
+      - "8000-8005:8000-8005"
+    networks:
+      - webnet
+    env_file: .env
+    environment:
+      REDIS_URL: ${REDIS_URL}
+      SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
+      
+networks:
+  webnet:
+    driver: bridge
