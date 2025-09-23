@@ -8,6 +8,10 @@
       "inputs": ["$TURBO_DEFAULT$", ".env"],
       "outputs": ["dist/**"]
     },
+    "migrate": {
+      "dependsOn": ["^migrate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"]   
+     },
     "check-types": {
       "dependsOn": ["^check-types"]
     },

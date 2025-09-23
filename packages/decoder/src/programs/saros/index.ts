@@ -10,7 +10,7 @@ import {
   ProgramInstructionProcessor,
 } from "../../core";
 
-function init(connection: Connection, extra?: { wallet?: Wallet }) {
+export function init(connection: Connection, extra?: { wallet?: Wallet }) {
   const program = new Program<LiquidityBook>(
     LiquidityBookIDL,
     new AnchorProvider(
@@ -40,3 +40,6 @@ export class SarosProgramEventProcessor extends ProgramEventProcessor<LiquidityB
     super(...init(connection));
   }
 }
+
+
+

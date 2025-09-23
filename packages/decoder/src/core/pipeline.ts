@@ -30,7 +30,10 @@ export class Pipeline<T extends InstructionProcessor<any> | LogProcessor<any>> {
         const parsedEvents = event.process(
           parsedTransactionWithMeta.meta.logMessages,
         );
-        if (parsedEvents) event.consume(...parsedEvents);
+        if (parsedEvents)
+          event.consume(parsedEvents, {
+            signature: parsedTransactionWithMeta.transaction.signatures[0],
+          });
       }
 
     if (this.instructionPipes)
@@ -38,7 +41,10 @@ export class Pipeline<T extends InstructionProcessor<any> | LogProcessor<any>> {
         for (const instruction of this.instructionPipes) {
           const parsedInstruction = instruction.process(outerInstruction);
           if (parsedInstruction) {
-            instruction.consume(parsedInstruction);
+            instruction.consume(parsedInstruction, {
+              index,
+              signature: parsedTransactionWithMeta.transaction.signatures[0],
+            });
             break;
           }
         }
@@ -48,7 +54,12 @@ export class Pipeline<T extends InstructionProcessor<any> | LogProcessor<any>> {
             for (const instruction of this.instructionPipes) {
               const parsedInstruction = instruction.process(innerInstruction);
               if (parsedInstruction) {
-                instruction.consume(parsedInstruction, { index, inner: true });
+                instruction.consume(parsedInstruction, {
+                  index,
+                  inner: true,
+                  signature:
+                    parsedTransactionWithMeta.transaction.signatures[0],
+                });
                 break;
               }
             }

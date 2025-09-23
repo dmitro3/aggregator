@@ -3,12 +3,12 @@ import assert from "assert";
 import { format } from "util";
 import type { z } from "zod/mini";
 import { inArray } from "drizzle-orm";
-import { fetchAllDigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 import type { PublicKey, Umi } from "@metaplex-foundation/umi";
+import { fetchAllDigitalAsset } from "@metaplex-foundation/mpl-token-metadata";
 
 import { mints, type mintSelectSchema, type Database } from "../db";
 
-export const upsertMints = async (
+export const upsertMint = async (
   db: Database,
   umi: Umi,
   ...mintIds: string[]

@@ -11,10 +11,12 @@ type TInstruction<T> = Omit<
 
 type FnConsumer<T> = (
   instruction: TInstruction<T>,
-  extra?: { inner?: boolean; index: number },
+  extra: { signature: string, inner?: boolean; index: number },
 ) => Promise<void>;
 
 export abstract class InstructionProcessor<T> extends Consumer<FnConsumer<T>> {
+  type: "instruction" = "instruction";
+
   abstract process(
     instruction: web3.ParsedInstruction | web3.PartiallyDecodedInstruction,
   ): TInstruction<T | null> | null;

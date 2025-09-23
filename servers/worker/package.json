@@ -2,6 +2,10 @@
   "name": "@rhiva/worker",
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "dev": "bun run --watch src/index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
@@ -9,6 +13,20 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@rhiva/decoder": "*"
+    "@coral-xyz/anchor": "^0.31.1",
+    "@metaplex-foundation/umi": "^1.4.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.4.1",
+    "@rhiva/datasource": "*",
+    "@rhiva/decoder": "*",
+    "@rhiva/shared": "*",
+    "@solana-tracker/data-api": "^0.1.4",
+    "@solana/spl-token": "^0.4.14",
+    "assert": "^2.1.0",
+    "bullmq": "^5.58.7",
+    "decimal.js": "^10.6.0",
+    "drizzle-orm": "^0.44.5",
+    "ioredis": "^5.7.0",
+    "pino": "^9.11.0",
+    "zod": "^4.1.11"
   }
 }
