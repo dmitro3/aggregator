@@ -5,22 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1758591683420,
-      "tag": "0000_busy_gladiator",
+      "when": 1758741435298,
+      "tag": "0000_fair_green_goblin",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1758617920599,
-      "tag": "0001_brainy_vivisector",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1758624829150,
-      "tag": "0002_petite_living_lightning",
+      "when": 1758743267767,
+      "tag": "0001_naive_kingpin",
       "breakpoints": true
     }
   ]

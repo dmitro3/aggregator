@@ -1,5 +1,5 @@
-import { format } from "util";
 import moment from "moment";
+import { format } from "util";
 import {
   add,
   caseWhen,
@@ -18,9 +18,18 @@ import {
   lte,
   getTableColumns,
   eq,
+  type SQL,
 } from "drizzle-orm";
 
-export const getAggregratedPairs = async (db: Database) => {
+export const getAggregratedPairs = async (
+  db: Database,
+  extra?: {
+    where?: SQL<unknown>;
+    orderBy?: SQL<unknown>[];
+    limit?: number;
+    offset?: number;
+  },
+) => {
   const now = new Date();
   const M5 = moment().subtract(5, "minutes");
   const H1 = moment().subtract(1, "hours");
@@ -31,20 +40,22 @@ export const getAggregratedPairs = async (db: Database) => {
     db
       .select({
         pair: swaps.pair,
-        tvl: avg(swaps.tvl).mapWith(Number).as(format("%stvl", as)),
-        feeUsd: sum(swaps.feeUsd).mapWith(Number).as(format("%sfeeUsd", as)),
+        tvl: avg(swaps.tvl).mapWith(Number).as(format("%sTvl", as)),
+        feeUsd: sum(swaps.feeUsd)
+          .mapWith(Number)
+          .as(format("%sFeeUsd", as).toLocaleLowerCase()),
         buyCount: count(caseWhen(eq(swaps.type, "buy"), 1)).as(
-          format("%sbuyCount", as),
+          format("%sBuyCount", as),
         ),
         sellCount: count(caseWhen(eq(swaps.type, "sell"), 1)).as(
-          format("%ssellCount", as),
+          format("%sSellCount", as),
         ),
         baseAmountUsd: sum(swaps.baseAmountUsd)
           .mapWith(Number)
-          .as(format("%sbaseAmountUsd", as)),
+          .as(format("%sBaseAmountUsd", as)),
         quoteAmountUsd: sum(swaps.quoteAmountUsd)
           .mapWith(Number)
-          .as(format("%squoteAmountUsd", as)),
+          .as(format("%sQuoteAmountUsd", as)),
       })
       .from(swaps)
       .groupBy(swaps.pair)
@@ -61,17 +72,20 @@ export const getAggregratedPairs = async (db: Database) => {
   const baseMints = db.select().from(mints).as("baseMints");
   const quoteMints = db.select().from(mints).as("quoteMints");
 
-  const aggregrate = <T extends ReturnType<typeof HSwaps>>(column: T) => ({
-    tvl: coalesce(column.tvl, 0),
-    fees: coalesce(column.feeUsd, 0),
-    buyCount: coalesce(column.buyCount, 0),
-    sellCount: coalesce(column.sellCount, 0),
-    volume: coalesce(add(column.baseAmountUsd, column.quoteAmountUsd), 0),
-  });
+  const aggregrate = <T extends ReturnType<typeof HSwaps>>(column: T) => {
+    return {
+      tvl: coalesce(column.tvl, 0),
+      fees: coalesce(column.feeUsd, 0),
+      buyCount: coalesce(column.buyCount, 0),
+      sellCount: coalesce(column.sellCount, 0),
+      volume: coalesce(add(column.baseAmountUsd, column.quoteAmountUsd), 0),
+    };
+  };
 
-  return db
+  const query = db
     .select({
       ...getTableColumns(pairs),
+      totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee),
       baseMint: baseMints._.selectedFields,
       quoteMint: quoteMints._.selectedFields,
       M5: aggregrate(M5Swaps),
@@ -85,6 +99,15 @@ export const getAggregratedPairs = async (db: Database) => {
     .leftJoin(M5Swaps, eq(M5Swaps.pair, pairs.id))
     .leftJoin(H1Swaps, eq(H1Swaps.pair, pairs.id))
     .leftJoin(H6Swaps, eq(H6Swaps.pair, pairs.id))
-    .leftJoin(H24Swaps, eq(H24Swaps.pair, pairs.id))
-    .execute();
+    .leftJoin(H24Swaps, eq(H24Swaps.pair, pairs.id));
+
+  if (extra) {
+    if (extra.limit) query.limit(extra.limit);
+    if (extra.offset) query.offset(extra.offset);
+
+    if (extra.where) query.where(extra.where);
+    if (extra.orderBy) query.orderBy(...extra.orderBy);
+  }
+
+  return query.execute();
 };

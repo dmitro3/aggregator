@@ -14,11 +14,10 @@
     }
   },
   "scripts": {
-    "lint": "bun x biome lint --fix",
+    "prepare": "husky",
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "format": "bun x biome format --write",
-    "prepare": "husky"
+    "lint": "bun x biome lint --fix && bun x biome format --write && biome check"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",

@@ -2,7 +2,7 @@ import z from "zod";
 
 export type Value = string | number | Date | Array<Value>;
 
-type ShallowOperator<T extends Value> = {
+type WhereShallowOperator<T extends Value> = {
   eq?: T;
   like?: T;
   ilike?: T;
@@ -14,19 +14,19 @@ type ShallowOperator<T extends Value> = {
   isNotNull?: undefined;
 };
 
-export type RecursiveOperator<T> = {
+export type WhereRecursiveOperator<T> = {
   ne?: T extends Value
-    ? (ShallowOperator<T> | ArrayOperator<T>)[] | T
-    : T | RecursiveOperator<T>;
+    ? (WhereShallowOperator<T> | WhereArrayOperator<T>)[] | T
+    : T | WhereRecursiveOperator<T>;
   or?: T extends Value
-    ? (ShallowOperator<T> | ArrayOperator<T>)[] | T
-    : T | RecursiveOperator<T>;
+    ? (WhereShallowOperator<T> | WhereArrayOperator<T>)[] | T
+    : T | WhereRecursiveOperator<T>;
   and?: T extends Value
-    ? (ShallowOperator<T> | ArrayOperator<T>)[] | T
-    : T | RecursiveOperator<T>;
+    ? (WhereShallowOperator<T> | WhereArrayOperator<T>)[] | T
+    : T | WhereRecursiveOperator<T>;
 };
 
-type ArrayOperator<T extends Value> = {
+type WhereArrayOperator<T extends Value> = {
   inArray?: T[];
   notInArray?: T[];
   arrayContains?: T[];
@@ -34,13 +34,13 @@ type ArrayOperator<T extends Value> = {
 };
 
 export type Operator<T extends Value> =
-  | ShallowOperator<T>
+  | WhereShallowOperator<T>
   | {
       ne?: Omit<Operator<T>, "ne"> | T;
       or?: Omit<Operator<T>, "or">[] | T;
       and?: Omit<Operator<T>, "and">[] | T;
     }
-  | ArrayOperator<T>
+  | WhereArrayOperator<T>
   | { isNull?: undefined; isNotNull?: undefined };
 
 export type FlattenedOperator<
@@ -56,7 +56,7 @@ export type FlattenedOperator<
       : [[...P, K], T[K]];
 }[keyof T];
 
-export const operator = <T extends Value>(
+export const whereOperator = <T extends Value>(
   valueSchema: z.ZodType<T>,
 ): z.ZodType<Operator<T>> =>
   z.lazy(() =>
@@ -69,10 +69,10 @@ export const operator = <T extends Value>(
         z.enum(["isNull", "isNotNull"]),
         z.undefined().optional(),
       ),
-      z.partialRecord(z.enum(["ne"]), operator(valueSchema)),
+      z.partialRecord(z.enum(["ne"]), whereOperator(valueSchema)),
       z.partialRecord(
         z.enum(["or", "and"]),
-        z.array(operator(valueSchema).or(valueSchema)),
+        z.array(whereOperator(valueSchema).or(valueSchema)),
       ),
       z.partialRecord(
         z.enum(["inArray", "notInArray", "arrayContains", "arrayContained"]),
@@ -80,3 +80,10 @@ export const operator = <T extends Value>(
       ),
     ]),
   );
+
+export type OrderByOperator = {
+  [key: string]: "desc" | "asc";
+};
+
+export const orderByOperator = <T extends z.ZodEnum>(key: T) =>
+  z.partialRecord(key, z.enum(["desc", "asc"]));

@@ -1,13 +1,13 @@
 import z from "zod";
 import { describe, test, expect } from "bun:test";
 
-import { operator } from "../src/db/zod-query";
+import { whereOperator } from "../src/db/zod-query";
 
 describe("test zod query schema", () => {
   test("first order simple query", () => {
     const userQuerySchema = z.object({
-      name: operator(z.string()),
-      followers: operator(z.number()),
+      name: whereOperator(z.string()),
+      followers: whereOperator(z.number()),
     });
 
     const query = userQuerySchema.parse({
@@ -28,8 +28,8 @@ describe("test zod query schema", () => {
 
   test("second order query", () => {
     const userQuerySchema = z.object({
-      name: operator(z.string()),
-      followers: operator(z.number()),
+      name: whereOperator(z.string()),
+      followers: whereOperator(z.number()),
     });
 
     const value = {

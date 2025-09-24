@@ -1,6 +1,6 @@
 {
-  "id": "9ad17960-c8dd-4b9b-952d-1332c7050202",
-  "prevId": "44a2c2e3-68d2-4b17-9b54-1ac04682fe3b",
+  "id": "dc62a778-71de-4fe8-9165-42868039e399",
+  "prevId": "63c84f81-bffb-4ef7-9443-dfec2a384320",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -77,6 +77,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "extra": {
           "name": "extra",
           "type": "jsonb",
@@ -92,6 +98,42 @@
         "baseMint": {
           "name": "baseMint",
           "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "binStep": {
+          "name": "binStep",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseFee": {
+          "name": "baseFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxFee": {
+          "name": "maxFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protocolFee": {
+          "name": "protocolFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dynamicFee": {
+          "name": "dynamicFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "liquidity": {
+          "name": "liquidity",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
@@ -159,6 +201,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "pair": {
           "name": "pair",
           "type": "text",
@@ -200,6 +248,18 @@
           "type": "numeric",
           "primaryKey": false,
           "notNull": true
+        },
+        "tvl": {
+          "name": "tvl",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
         },
         "createdAt": {
           "name": "createdAt",

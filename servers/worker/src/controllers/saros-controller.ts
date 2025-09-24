@@ -36,8 +36,6 @@ const upsertPair = async (
   const [program] = init(connection);
   let allPairs = await getPairs(db, inArray(pairs.id, pairIds));
 
-  console.log(pairIds);
-
   const nonExistingPairPubKeys = pairIds
     .map((pairId) => new web3.PublicKey(pairId))
     .filter(
@@ -55,7 +53,7 @@ const upsertPair = async (
           BigInt(pair.staticFeeParameters.baseFactor) *
           BigInt(10);
 
-        await upsertMint(
+        const mints = await upsertMint(
           db,
           umi,
           pair.tokenMintX.toBase58(),
@@ -63,18 +61,18 @@ const upsertPair = async (
         );
 
         return {
+          extra: {},
+          maxFee: 0,
+          liquidity: 0,
+          dynamicFee: 0,
+          market: "saros",
+          binStep: pair.binStep,
+          baseFee: Number(baseFee),
           id: pairPubKey.toBase58(),
+          name: mints.map((mint) => mint.name).join("-"),
           baseMint: pair.tokenMintX.toBase58(),
           quoteMint: pair.tokenMintY.toBase58(),
-          extra: {
-            binStep: pair.binStep,
-            maxFee: 0,
-            dynamicFee: 0,
-            marketCap: 0,
-            baseFee: Number(baseFee),
-            protocolFee: pair.staticFeeParameters.protocolShare,
-          },
-          market: "saros",
+          protocolFee: pair.staticFeeParameters.protocolShare / 100,
         };
       }),
     );
@@ -147,18 +145,18 @@ const upsertPair = async (
         quoteTokenReserveAmount,
       ).div(10 ** pair.quoteMint.decimals);
 
-      let marketCap = 0;
+      let liquidity = 0;
 
       if (basePrice) {
-        marketCap +=
+        liquidity +=
           normalizeBaseTokenReserveAmount.toNumber() * basePrice.price;
       }
       if (quotePrice) {
-        marketCap +=
+        liquidity +=
           normalizeQuoteTokenReserveAmount.toNumber() * quotePrice.price;
       }
 
-      return { ...pair, extra: { ...pair.extra, marketCap } };
+      return { ...pair, liquidity };
     }),
   );
 
@@ -216,7 +214,7 @@ export const createSarosSwapFn = async (
       return {
         signature,
         extra: {},
-        tvl: pair.extra.marketCap,
+        tvl: pair.liquidity,
         type: value.swapForY ? ("sell" as const) : ("buy" as const),
         pair: value.pair.toBase58(),
         fee: new Decimal(value.fee.toString())

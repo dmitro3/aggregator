@@ -1,5 +1,5 @@
 {
-  "id": "44a2c2e3-68d2-4b17-9b54-1ac04682fe3b",
+  "id": "63c84f81-bffb-4ef7-9443-dfec2a384320",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -75,6 +75,12 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true
         },
         "extra": {
@@ -159,6 +165,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "pair": {
           "name": "pair",
           "type": "text",
@@ -173,33 +185,45 @@
         },
         "baseAmountUsd": {
           "name": "baseAmountUsd",
-          "type": "integer",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
         "quoteAmountUsd": {
           "name": "quoteAmountUsd",
-          "type": "integer",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
         "fee": {
           "name": "fee",
-          "type": "bigint",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
         "baseAmount": {
           "name": "baseAmount",
-          "type": "bigint",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
         },
         "quoteAmount": {
           "name": "quoteAmount",
-          "type": "bigint",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": true
+        },
+        "tvl": {
+          "name": "tvl",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
         },
         "createdAt": {
           "name": "createdAt",

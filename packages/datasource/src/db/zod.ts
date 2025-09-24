@@ -1,6 +1,7 @@
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { mints, pairs, swaps } from "./schema";
 import z from "zod";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+
+import { mints, pairs, swaps } from "./schema";
 
 export const metadataSchema = z.object({
   name: z.string().optional(),

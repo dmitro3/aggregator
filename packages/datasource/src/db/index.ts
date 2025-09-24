@@ -4,6 +4,8 @@ import * as schema from "./schema";
 
 export * from "./zod";
 export * from "./schema";
+export * from "./zod-query";
+export * from "./drizzle-query";
 export * from "./custom-drizzle";
 
 export const createDB = (url: string) => drizzle(url, { schema });
