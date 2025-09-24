@@ -36,6 +36,7 @@
       },
       "devDependencies": {
         "@types/bn.js": "^5.2.0",
+        "@types/bun": "^1.2.22",
         "@types/mime-types": "^3.0.1",
       },
       "peerDependencies": {
@@ -61,6 +62,7 @@
     },
     "servers/trpc": {
       "name": "@rhiva-ag-ag/trpc",
+      "version": "0.0.0",
       "dependencies": {
         "@fastify/cors": "^11.1.0",
         "@fastify/websocket": "^11.2.0",
