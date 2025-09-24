@@ -15,6 +15,13 @@
       "when": 1758743267767,
       "tag": "0001_naive_kingpin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758744300362,
+      "tag": "0002_aberrant_gargoyle",
+      "breakpoints": true
     }
   ]
 }

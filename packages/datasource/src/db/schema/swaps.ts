@@ -1,6 +1,5 @@
 import {
   decimal,
-  integer,
   jsonb,
   pgTable,
   text,
@@ -21,7 +20,7 @@ export const swaps = pgTable(
     pair: text()
       .references(() => pairs.id, { onDelete: "cascade" })
       .notNull(),
-    feeUsd: integer().notNull(),
+    feeUsd: decimal({ mode: "number" }).notNull(),
     baseAmountUsd: decimal({ mode: "number" }).notNull(),
     quoteAmountUsd: decimal({ mode: "number" }).notNull(),
     fee: decimal({ mode: "number" }).notNull(),

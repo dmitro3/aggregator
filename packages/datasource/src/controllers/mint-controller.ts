@@ -64,7 +64,12 @@ export const upsertMint = async (
   let createdMints: z.infer<typeof mintSelectSchema>[] = [];
 
   if (values.length > 0) {
-    createdMints = await db.insert(mints).values(values).returning().execute();
+    createdMints = await db
+      .insert(mints)
+      .values(values)
+      .returning()
+      .onConflictDoUpdate({ target: [mints.id], set: { extra: mints.extra } })
+      .execute();
   }
 
   return [...existingMints, ...createdMints];

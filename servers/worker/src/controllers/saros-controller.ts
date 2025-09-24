@@ -49,9 +49,9 @@ const upsertPair = async (
         const pair = await program.account.pair.fetch(pairPubKey);
 
         const baseFee =
-          BigInt(pair.binStep) *
-          BigInt(pair.staticFeeParameters.baseFactor) *
-          BigInt(10);
+          Number(
+            BigInt(pair.binStep) * BigInt(pair.staticFeeParameters.baseFactor),
+          ) / 1_000_000;
 
         const mints = await upsertMint(
           db,
@@ -72,7 +72,7 @@ const upsertPair = async (
           name: mints.map((mint) => mint.name).join("-"),
           baseMint: pair.tokenMintX.toBase58(),
           quoteMint: pair.tokenMintY.toBase58(),
-          protocolFee: pair.staticFeeParameters.protocolShare / 100,
+          protocolFee: pair.staticFeeParameters.protocolShare / 1_000_000,
         };
       }),
     );
