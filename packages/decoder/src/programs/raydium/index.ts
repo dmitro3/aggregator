@@ -10,7 +10,7 @@ import {
   ProgramInstructionProcessor,
 } from "../../core";
 
-function init(connection: Connection, extra?: { wallet?: Wallet }) {
+export function init(connection: Connection, extra?: { wallet?: Wallet }) {
   const program = new Program<AmmV3>(
     AmmV3IDL,
     new AnchorProvider(

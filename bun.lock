@@ -3,9 +3,6 @@
   "workspaces": {
     "": {
       "name": "aggregator",
-      "dependencies": {
-        "@rhiva-ag/aggregator": ".",
-      },
       "devDependencies": {
         "@biomejs/biome": "2.2.4",
         "@tsconfig/recommended": "^1.0.10",
@@ -286,8 +283,6 @@
     "@pm2/pm2-version-check": ["@pm2/pm2-version-check@1.0.4", "", { "dependencies": { "debug": "^4.3.1" } }, "sha512-SXsM27SGH3yTWKc2fKR4SYNxsmnvuBQ9dd6QHtEWmiZ/VqaOYPAIlS8+vMcn27YLtAEBGvNRSh3TPNvtjZgfqA=="],
 
     "@rhiva-ag-ag/trpc": ["@rhiva-ag-ag/trpc@workspace:servers/trpc"],
-
-    "@rhiva-ag/aggregator": ["@rhiva-ag/aggregator@file:", { "devDependencies": { "@biomejs/biome": "2.2.4", "@tsconfig/recommended": "^1.0.10", "@types/bun": "latest", "husky": "^9.1.7", "lint-staged": "^16.2.0", "pm2": "^6.0.13", "tsup": "^8.5.0", "turbo": "^2.5.6" }, "peerDependencies": { "typescript": "^5" } }],
 
     "@rhiva-ag/datasource": ["@rhiva-ag/datasource@workspace:packages/datasource"],
 
