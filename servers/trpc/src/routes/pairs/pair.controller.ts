@@ -74,11 +74,14 @@ export const getAggregratedPairs = async (
 
   const aggregrate = <T extends ReturnType<typeof HSwaps>>(column: T) => {
     return {
-      tvl: coalesce(column.tvl, 0),
-      fees: coalesce(column.feeUsd, 0),
-      buyCount: coalesce(column.buyCount, 0),
-      sellCount: coalesce(column.sellCount, 0),
-      volume: coalesce(add(column.baseAmountUsd, column.quoteAmountUsd), 0),
+      tvl: coalesce(column.tvl, 0).mapWith(Number),
+      fees: coalesce(column.feeUsd, 0).mapWith(Number),
+      buyCount: coalesce(column.buyCount, 0).mapWith(Number),
+      sellCount: coalesce(column.sellCount, 0).mapWith(Number),
+      volume: coalesce(
+        add(column.baseAmountUsd, column.quoteAmountUsd),
+        0,
+      ).mapWith(Number),
     };
   };
 
