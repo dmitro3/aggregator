@@ -4,8 +4,8 @@ import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
-import { web3, type IdlEvents } from "@coral-xyz/anchor";
-import { init } from "@rhiva-ag/decoder/programs/saros/index";
+import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
+import { getDynamicFee, init } from "@rhiva-ag/decoder/programs/saros/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
 import {
@@ -23,6 +23,30 @@ import {
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
+
+export const transformSarosPairAccount = (
+  pair: IdlAccounts<LiquidityBook>["pair"],
+): Omit<z.infer<typeof pairInsertSchema>, "id" | "name"> => {
+  const baseFee =
+    BigInt(pair.binStep) * BigInt(pair.staticFeeParameters.baseFactor);
+
+  const dynamicFee = Number(getDynamicFee(pair)) / 10_000;
+  const protocolFee =
+    (dynamicFee * pair.staticFeeParameters.protocolShare) / 100;
+
+  return {
+    dynamicFee,
+    protocolFee,
+    extra: {},
+    maxFee: 0,
+    liquidity: 0,
+    market: "saros",
+    binStep: pair.binStep,
+    baseFee: Number(baseFee) / 1_000_000,
+    baseMint: pair.tokenMintX.toBase58(),
+    quoteMint: pair.tokenMintY.toBase58(),
+  };
+};
 
 const upsertPair = async (
   db: Database,
@@ -44,37 +68,42 @@ const upsertPair = async (
     );
 
   if (nonExistingPairPubKeys.length > 0) {
-    const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
-      nonExistingPairPubKeys.map(async (pairPubKey) => {
-        const pair = await program.account.pair.fetch(pairPubKey);
+    const pairAccounts = await program.account.pair.fetchMultiple(
+      nonExistingPairPubKeys,
+    );
 
-        const baseFee =
-          BigInt(pair.binStep) *
-          BigInt(pair.staticFeeParameters.baseFactor) *
-          BigInt(10);
-
-        const mints = await upsertMint(
-          db,
-          umi,
+    const mints = await upsertMint(
+      db,
+      umi,
+      ...pairAccounts
+        .filter((pair) => !!pair)
+        .flatMap((pair) => [
           pair.tokenMintX.toBase58(),
           pair.tokenMintY.toBase58(),
-        );
+        ]),
+    );
 
-        return {
-          extra: {},
-          maxFee: 0,
-          liquidity: 0,
-          dynamicFee: 0,
-          market: "saros",
-          binStep: pair.binStep,
-          baseFee: Number(baseFee),
-          id: pairPubKey.toBase58(),
-          name: mints.map((mint) => mint.name).join("-"),
-          baseMint: pair.tokenMintX.toBase58(),
-          quoteMint: pair.tokenMintY.toBase58(),
-          protocolFee: pair.staticFeeParameters.protocolShare / 100,
-        };
-      }),
+    const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
+      pairAccounts
+        .map((pair, index) => {
+          if (pair) {
+            const pairPubKey = nonExistingPairPubKeys[index];
+            const pairMints = mints.filter(
+              (mint) =>
+                pair.tokenMintX.equals(new web3.PublicKey(mint.id)) ||
+                pair.tokenMintY.equals(new web3.PublicKey(mint.id)),
+            );
+
+            return {
+              id: pairPubKey.toBase58(),
+              name: pairMints.map((mint) => mint.name).join("-"),
+              ...transformSarosPairAccount(pair),
+            };
+          }
+
+          return null;
+        })
+        .filter((pair) => !!pair),
     );
 
     const createdPairs = await db
