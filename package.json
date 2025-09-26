@@ -2,6 +2,7 @@
   "name": "@rhiva-ag/aggregator",
   "version": "0.0.0",
   "private": "true",
+  "type": "module",
   "packageManager": "bun@1.2.9",
   "exports": {
     "./trpc": {
@@ -9,8 +10,8 @@
       "import": "./servers/trpc/src/external.ts"
     },
     "./datasource": {
-      "types": "./servers/datasorce/src/external.ts",
-      "import": "./servers/datasorce/src/external.ts"
+      "types": "./servers/datasource/src/external.ts",
+      "import": "./servers/datasource/src/external.ts"
     }
   },
   "scripts": {
