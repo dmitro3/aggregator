@@ -69,7 +69,7 @@ const upsertPair = async (
           binStep: pair.binStep,
           baseFee: Number(baseFee),
           id: pairPubKey.toBase58(),
-          name: mints.map((mint) => mint.name).join("-"),
+          name: mints.map((mint) => mint.symbol).join("-"),
           baseMint: pair.tokenMintX.toBase58(),
           quoteMint: pair.tokenMintY.toBase58(),
           protocolFee: pair.staticFeeParameters.protocolShare / 1_000_000,

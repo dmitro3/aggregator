@@ -20,6 +20,8 @@ import {
   eq,
   type SQL,
 } from "drizzle-orm";
+import type { z } from "zod/mini";
+import type { pairAggregateSchema } from "./pair.schema";
 
 export const getAggregratedPairs = async (
   db: Database,
@@ -88,9 +90,11 @@ export const getAggregratedPairs = async (
   const query = db
     .select({
       ...getTableColumns(pairs),
-      totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee),
       baseMint: baseMints._.selectedFields,
       quoteMint: quoteMints._.selectedFields,
+      totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee).mapWith(
+        Number,
+      ),
       M5: aggregrate(M5Swaps),
       H1: aggregrate(H1Swaps),
       H6: aggregrate(H6Swaps),
@@ -112,5 +116,5 @@ export const getAggregratedPairs = async (
     if (extra.orderBy) query.orderBy(...extra.orderBy);
   }
 
-  return query.execute();
+  return query.execute() as unknown as z.infer<typeof pairAggregateSchema>;
 };

@@ -44,8 +44,8 @@ export const pairAggregateSchema = pairSelectSchema.extend({
   totalFee: z.number(),
   baseMint: mintSelectSchema,
   quoteMint: mintSelectSchema,
-  M5: swapAggregateSchema.nullable(),
-  H1: swapAggregateSchema.nullable(),
-  H6: swapAggregateSchema.nullable(),
-  H24: swapAggregateSchema.nullable(),
+  M5: swapAggregateSchema,
+  H1: swapAggregateSchema,
+  H6: swapAggregateSchema,
+  H24: swapAggregateSchema,
 });

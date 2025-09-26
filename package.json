@@ -25,16 +25,17 @@
     "@tsconfig/recommended": "^1.0.10",
     "@types/bun": "latest",
     "husky": "^9.1.7",
-    "lint-staged": "^16.2.0",
+    "lint-staged": "^16.2.1",
     "pm2": "^6.0.13",
     "tsup": "^8.5.0",
-    "turbo": "^2.5.6"
+    "turbo": "^2.5.8"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.2"
   },
   "workspaces": [
     "packages/*",
-    "servers/*"
+    "servers/*",
+    "apps/lens"
   ]
 }

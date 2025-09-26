@@ -1,9 +1,16 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+  "vcs": {
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["**", "!**/.next"]
+  },
   "linter": {
     "rules": {
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "off",
+        "noUnknownAtRules": "off"
       },
       "style": {
         "noNonNullAssertion": "off",
@@ -17,7 +24,13 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double"
+      "quoteStyle": "double",
+      "attributePosition": "multiline"
+    }
+  },
+  "html": {
+    "formatter": {
+      "attributePosition": "multiline"
     }
   },
   "assist": {

@@ -1,0 +1,22 @@
+@unocss all;
+
+.dollar::before {
+  content: "$ ";
+}
+
+th {
+  padding: 0 8px 0 0;
+  font-weight: normal;
+}
+
+th:last-child {
+  padding: 0;
+}
+
+td {
+  padding: 4px 24px 0 0;
+}
+
+td:last-child {
+  padding: 4px 0;
+}
