@@ -58,7 +58,7 @@ const upsertMeteoraPair = async (
           BigInt(lbPair.parameters.protocolShare / 10000) * baseFeeRate;
 
         const volatilityFee = calculateVolatilityFee(lbPair);
-        const totalFeeRate = Number(baseFeeRate) + volatilityFee;
+        const _totalFeeRate = Number(baseFeeRate) + volatilityFee;
 
         const mints = await upsertMint(
           db,
@@ -185,7 +185,7 @@ const upsertMeteoraPair = async (
 
 // Calculate Meteora's dynamic volatility fee
 function calculateVolatilityFee(lbPair: any): number {
-  const { volatilityAccumulator, volatilityReference } = lbPair.vParameters;
+  const { volatilityAccumulator, _volatilityReference } = lbPair.vParameters;
 
   const { variableFeeControl, maxVolatilityAccumulator } = lbPair.parameters;
 

@@ -8,10 +8,7 @@ import { web3, type IdlEvents } from "@coral-xyz/anchor";
 import { init } from "@rhiva-ag/decoder/programs/raydium/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import type { AmmV3 } from "@rhiva-ag/decoder/programs/idls/types/raydium";
-import {
-  AccountLayout,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
+import { AccountLayout } from "@solana/spl-token";
 import {
   createSwap,
   getPairs,
