@@ -14,8 +14,8 @@ import {
   MeteoraProgramInstructionEventProcessor,
 } from "@rhiva-ag/decoder/programs/meteora/index";
 import {
-  OrcaProgramEventProcessor,
-  OrcaProgramInstructionEventProcessor,
+  WhirlpoolProgramEventProcessor,
+  WhirlpoolProgramInstructionEventProcessor,
 } from "@rhiva-ag/decoder/programs/orca/index";
 
 import { db, redis } from "../instances";
@@ -113,8 +113,8 @@ const pipeline = new Pipeline([
       meteoraEventConsumer([instruction.parsed], extra);
     },
   ),
-  new OrcaProgramEventProcessor(connection).addConsumer(orcaEventConsumer),
-  new OrcaProgramInstructionEventProcessor(connection).addConsumer(
+  new WhirlpoolProgramEventProcessor(connection).addConsumer(orcaEventConsumer),
+  new WhirlpoolProgramInstructionEventProcessor(connection).addConsumer(
     async (instruction, extra) => {
       orcaEventConsumer([instruction.parsed], extra);
     },
