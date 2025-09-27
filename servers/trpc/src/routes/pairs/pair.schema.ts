@@ -1,5 +1,10 @@
 import z from "zod";
-import { orderByOperator, whereOperator } from "@rhiva-ag/datasource";
+import {
+  mintSelectSchema,
+  orderByOperator,
+  pairSelectSchema,
+  whereOperator,
+} from "@rhiva-ag/datasource";
 
 export const pairFilterSchema = z.object({
   name: whereOperator(z.string()),
@@ -26,3 +31,21 @@ export const pairOrderBySchema = orderByOperator(
     "protocolfee",
   ]),
 );
+
+const swapAggregateSchema = z.object({
+  tvl: z.number(),
+  fees: z.number(),
+  buyCount: z.number(),
+  sellCount: z.number(),
+  volume: z.number(),
+});
+
+export const pairAggregateSchema = pairSelectSchema.extend({
+  totalFee: z.number(),
+  baseMint: mintSelectSchema,
+  quoteMint: mintSelectSchema,
+  M5: swapAggregateSchema,
+  H1: swapAggregateSchema,
+  H6: swapAggregateSchema,
+  H24: swapAggregateSchema,
+});

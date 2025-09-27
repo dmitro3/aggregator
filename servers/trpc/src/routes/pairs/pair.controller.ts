@@ -20,6 +20,8 @@ import {
   eq,
   type SQL,
 } from "drizzle-orm";
+import type { z } from "zod/mini";
+import type { pairAggregateSchema } from "./pair.schema";
 
 export const getAggregratedPairs = async (
   db: Database,
@@ -74,20 +76,25 @@ export const getAggregratedPairs = async (
 
   const aggregrate = <T extends ReturnType<typeof HSwaps>>(column: T) => {
     return {
-      tvl: coalesce(column.tvl, 0),
-      fees: coalesce(column.feeUsd, 0),
-      buyCount: coalesce(column.buyCount, 0),
-      sellCount: coalesce(column.sellCount, 0),
-      volume: coalesce(add(column.baseAmountUsd, column.quoteAmountUsd), 0),
+      tvl: coalesce(column.tvl, 0).mapWith(Number),
+      fees: coalesce(column.feeUsd, 0).mapWith(Number),
+      buyCount: coalesce(column.buyCount, 0).mapWith(Number),
+      sellCount: coalesce(column.sellCount, 0).mapWith(Number),
+      volume: coalesce(
+        add(column.baseAmountUsd, column.quoteAmountUsd),
+        0,
+      ).mapWith(Number),
     };
   };
 
   const query = db
     .select({
       ...getTableColumns(pairs),
-      totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee),
       baseMint: baseMints._.selectedFields,
       quoteMint: quoteMints._.selectedFields,
+      totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee).mapWith(
+        Number,
+      ),
       M5: aggregrate(M5Swaps),
       H1: aggregrate(H1Swaps),
       H6: aggregrate(H6Swaps),
@@ -109,5 +116,5 @@ export const getAggregratedPairs = async (
     if (extra.orderBy) query.orderBy(...extra.orderBy);
   }
 
-  return query.execute();
+  return query.execute() as unknown as z.infer<typeof pairAggregateSchema>;
 };
