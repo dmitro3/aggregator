@@ -13,11 +13,11 @@ import {
   createSwap,
   getPairs,
   pairs,
-  type swapInsertSchema,
+  rewardMints,
   upsertMint,
   type Database,
   type pairInsertSchema,
-  rewardMints,
+  type swapInsertSchema,
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
