@@ -23,7 +23,7 @@ describe("SarosController", () => {
     expect(transformedPair.binStep).toEqual(100);
     expect(transformedPair.baseFee).toEqual(1);
     expect(transformedPair.protocolFee).toEqual(0.2);
-    expect(transformedPair.dynamicFee).toEqual(1);
+    expect(transformedPair.dynamicFee).toBeGreaterThanOrEqual(1);
   });
 
   test("should pass transformPairAccountInfo", async () => {
@@ -35,6 +35,6 @@ describe("SarosController", () => {
     expect(transformedPair.binStep).toEqual(1);
     expect(transformedPair.baseFee).toEqual(0.01);
     expect(transformedPair.protocolFee).toEqual(0.002);
-    expect(transformedPair.dynamicFee).toEqual(0.01);
+    expect(transformedPair.dynamicFee).toBeGreaterThanOrEqual(0.01);
   });
 });

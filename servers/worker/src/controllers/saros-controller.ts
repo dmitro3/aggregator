@@ -4,9 +4,9 @@ import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
-import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
-import { getDynamicFee, init } from "@rhiva-ag/decoder/programs/saros/index";
+import { init } from "@rhiva-ag/decoder/programs/saros/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
 import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
 import {
   AccountLayout,
@@ -24,27 +24,38 @@ import {
 
 import { cacheResult, getMultiplePrices } from "../utils";
 
-export const transformSarosPairAccount = (
-  pair: IdlAccounts<LiquidityBook>["pair"],
-): Omit<z.infer<typeof pairInsertSchema>, "id" | "name"> => {
-  const baseFee =
-    BigInt(pair.binStep) * BigInt(pair.staticFeeParameters.baseFactor);
+export const transformSarosPairAccount = ({
+  binStep,
+  staticFeeParameters,
+  dynamicFeeParameters,
+  tokenMintX,
+  tokenMintY,
+}: IdlAccounts<LiquidityBook>["pair"]): Omit<
+  z.infer<typeof pairInsertSchema>,
+  "id" | "name"
+> => {
+  const baseFee = (staticFeeParameters.baseFactor * binStep) / 1e6;
+  const variableFee =
+    staticFeeParameters.variableFeeControl > 0
+      ? (Math.pow(dynamicFeeParameters.volatilityAccumulator * binStep, 2) *
+          staticFeeParameters.variableFeeControl) /
+        1e6
+      : 0;
 
-  const dynamicFee = Number(getDynamicFee(pair)) / 10_000;
-  const protocolFee =
-    (dynamicFee * pair.staticFeeParameters.protocolShare) / 100;
+  const dynamicFee = Math.max(baseFee, variableFee);
+  const protocolFee = dynamicFee * (staticFeeParameters.protocolShare / 1e4);
 
   return {
+    baseFee,
     dynamicFee,
     protocolFee,
     extra: {},
-    maxFee: 0,
     liquidity: 0,
     market: "saros",
-    binStep: pair.binStep,
-    baseFee: Number(baseFee) / 1_000_000,
-    baseMint: pair.tokenMintX.toBase58(),
-    quoteMint: pair.tokenMintY.toBase58(),
+    maxFee: baseFee,
+    binStep: binStep,
+    baseMint: tokenMintX.toBase58(),
+    quoteMint: tokenMintY.toBase58(),
   };
 };
 
@@ -72,39 +83,38 @@ const upsertPair = async (
       nonExistingPairPubKeys,
     );
 
+    const pairAccountsWithPubKeys = pairAccounts
+      .map((pairAccount, index) => {
+        const pubkey = nonExistingPairPubKeys[index];
+        if (pairAccount) return { pubkey, ...pairAccount };
+
+        return null;
+      })
+      .filter((pairAccount) => !!pairAccount);
+
     const mints = await upsertMint(
       db,
       umi,
-      ...pairAccounts
-        .filter((pair) => !!pair)
-        .flatMap((pair) => [
-          pair.tokenMintX.toBase58(),
-          pair.tokenMintY.toBase58(),
-        ]),
+      ...pairAccountsWithPubKeys.flatMap((pair) => [
+        pair.tokenMintX.toBase58(),
+        pair.tokenMintY.toBase58(),
+      ]),
     );
 
-    const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
-      pairAccounts
-        .map((pair, index) => {
-          if (pair) {
-            const pairPubKey = nonExistingPairPubKeys[index];
-            const pairMints = mints.filter(
-              (mint) =>
-                pair.tokenMintX.equals(new web3.PublicKey(mint.id)) ||
-                pair.tokenMintY.equals(new web3.PublicKey(mint.id)),
-            );
+    const values: z.infer<typeof pairInsertSchema>[] =
+      pairAccountsWithPubKeys.map((pairAccount) => {
+        const pairMints = mints.filter(
+          (mint) =>
+            pairAccount.tokenMintX.equals(new web3.PublicKey(mint.id)) ||
+            pairAccount.tokenMintY.equals(new web3.PublicKey(mint.id)),
+        );
 
-            return {
-              id: pairPubKey.toBase58(),
-              name: pairMints.map((mint) => mint.name).join("-"),
-              ...transformSarosPairAccount(pair),
-            };
-          }
-
-          return null;
-        })
-        .filter((pair) => !!pair),
-    );
+        return {
+          id: pairAccount.pubkey.toBase58(),
+          name: pairMints.map((mint) => mint.symbol).join("/"),
+          ...transformSarosPairAccount(pairAccount),
+        };
+      });
 
     const createdPairs = await db
       .insert(pairs)

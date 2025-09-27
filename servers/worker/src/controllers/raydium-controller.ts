@@ -3,12 +3,12 @@ import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { inArray } from "drizzle-orm";
+import { AccountLayout } from "@solana/spl-token";
 import type { Umi } from "@metaplex-foundation/umi";
-import { web3, type IdlEvents } from "@coral-xyz/anchor";
 import { init } from "@rhiva-ag/decoder/programs/raydium/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
 import type { AmmV3 } from "@rhiva-ag/decoder/programs/idls/types/raydium";
-import { AccountLayout } from "@solana/spl-token";
 import {
   createSwap,
   getPairs,
@@ -20,6 +20,29 @@ import {
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
+
+// clmm pool have a constant feeRate
+// clmm pool don't have dynamicFee
+export const transformRaydiumPairAccount = (
+  poolState: IdlAccounts<AmmV3>["poolState"],
+  ammConfig: IdlAccounts<AmmV3>["ammConfig"],
+) => {
+  const baseFee = (ammConfig.tradeFeeRate * ammConfig.tickSpacing) / 1e4;
+  const protocolFee = baseFee * (ammConfig.protocolFeeRate / 1e6);
+  ammConfig.tickSpacing;
+  return {
+    extra: {},
+    baseFee,
+    protocolFee,
+    maxFee: baseFee,
+    liquidity: 0,
+    dynamicFee: 0,
+    market: "raydium" as const,
+    binStep: poolState.tickSpacing,
+    baseMint: poolState.tokenMint0.toBase58(),
+    quoteMint: poolState.tokenMint1.toBase58(),
+  };
+};
 
 const upsertRaydiumPair = async (
   db: Database,
@@ -42,40 +65,59 @@ const upsertRaydiumPair = async (
     );
 
   if (nonExistingPairPubKeys.length > 0) {
-    const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
-      nonExistingPairPubKeys.map(async (pairPubKey) => {
-        // Fetch Pool State
-        const poolState = await program.account.poolState.fetch(pairPubKey);
-        const ammConfig = await program.account.ammConfig.fetch(
-          poolState.ammConfig,
-        );
-        const tradeFeeRate = ammConfig.tradeFeeRate / 10000;
-        const protocolFeeRate =
-          (ammConfig.protocolFeeRate / 10000) * tradeFeeRate;
-
-        const mints = await upsertMint(
-          db,
-          umi,
-          poolState.tokenMint0.toBase58(),
-          poolState.tokenMint1.toBase58(),
-        );
-
-        return {
-          extra: {},
-          maxFee: tradeFeeRate * 10000,
-          liquidity: 0,
-          dynamicFee: 0,
-          market: "raydium",
-          binStep: poolState.tickSpacing,
-          baseFee: tradeFeeRate * 10000,
-          id: pairPubKey.toBase58(),
-          name: mints.map((mint) => mint.name).join("-"),
-          baseMint: poolState.tokenMint0.toBase58(),
-          quoteMint: poolState.tokenMint1.toBase58(),
-          protocolFee: protocolFeeRate * 10000,
-        };
-      }),
+    const poolStates = await program.account.poolState.fetchMultiple(
+      nonExistingPairPubKeys,
     );
+    const poolStatesWithPubkeys = poolStates
+      .map((poolState, index) => {
+        const pubkey = nonExistingPairPubKeys[index];
+        if (poolState)
+          return {
+            pubkey,
+            ...poolState,
+          };
+
+        return null;
+      })
+      .filter((poolState) => !!poolState);
+
+    const ammConfigPubkeys = poolStatesWithPubkeys.map(
+      (poolState) => poolState.ammConfig,
+    );
+
+    const ammConfigs =
+      await program.account.ammConfig.fetchMultiple(ammConfigPubkeys);
+
+    const mints = await upsertMint(
+      db,
+      umi,
+      ...poolStates
+        .filter((pool) => !!pool)
+        .flatMap((pool) => [
+          pool.tokenMint0.toBase58(),
+          pool.tokenMint1.toBase58(),
+        ]),
+    );
+
+    const values: z.infer<typeof pairInsertSchema>[] = poolStatesWithPubkeys
+      .map((poolState, index) => {
+        const ammConfig = ammConfigs[index];
+        const poolMints = mints.filter(
+          (mint) =>
+            poolState.tokenMint0.equals(new web3.PublicKey(mint.id)) ||
+            poolState.tokenMint1.equals(new web3.PublicKey(mint.id)),
+        );
+
+        if (poolState && ammConfig)
+          return {
+            id: poolState.pubkey.toBase58(),
+            name: poolMints.map((mint) => mint.symbol).join("/"),
+            ...transformRaydiumPairAccount(poolState, ammConfig),
+          };
+
+        return null;
+      })
+      .filter((pair) => !!pair);
 
     const createdPairs = await db
       .insert(pairs)

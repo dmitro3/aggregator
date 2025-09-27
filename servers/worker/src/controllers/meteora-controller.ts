@@ -4,9 +4,9 @@ import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
-import { web3, type IdlEvents } from "@coral-xyz/anchor";
 import { init } from "@rhiva-ag/decoder/programs/meteora/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
 import type { LbClmm } from "@rhiva-ag/decoder/programs/idls/types/meteora";
 import {
   AccountLayout,
@@ -23,6 +23,41 @@ import {
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
+
+export const transformMeteoraPairAccount = ({
+  binStep,
+  parameters,
+  vParameters,
+  tokenXMint,
+  tokenYMint,
+}: IdlAccounts<LbClmm>["lbPair"]): Omit<
+  z.infer<typeof pairInsertSchema>,
+  "id" | "name"
+> => {
+  const baseFee = (parameters.baseFactor * binStep) / 1e6;
+  const variableFee =
+    parameters.variableFeeControl > 0
+      ? (Math.pow(vParameters.volatilityAccumulator * binStep, 2) *
+          parameters.variableFeeControl) /
+        1e11
+      : 0;
+
+  const dynamicFee = Math.max(baseFee, variableFee);
+  const protocolFee = dynamicFee * (parameters.protocolShare / 1e4);
+
+  return {
+    baseFee,
+    dynamicFee,
+    protocolFee,
+    extra: {},
+    liquidity: 0,
+    maxFee: 10,
+    market: "meteora",
+    binStep: binStep,
+    baseMint: tokenXMint.toBase58(),
+    quoteMint: tokenYMint.toBase58(),
+  };
+};
 
 const upsertMeteoraPair = async (
   db: Database,
@@ -45,41 +80,38 @@ const upsertMeteoraPair = async (
     );
 
   if (nonExistingPairPubKeys.length > 0) {
+    const lbPairs = await program.account.lbPair.fetchMultiple(
+      nonExistingPairPubKeys,
+    );
+    const lbPairsWithPubkeys = lbPairs
+      .map((lbPair, index) => {
+        const pubkey = nonExistingPairPubKeys[index];
+        if (lbPair) return { pubkey, ...lbPair };
+        return null;
+      })
+      .filter((lbPair) => !!lbPair);
+
+    const mints = await upsertMint(
+      db,
+      umi,
+      ...lbPairsWithPubkeys.flatMap((lbPair) => [
+        lbPair.tokenXMint.toBase58(),
+        lbPair.tokenYMint.toBase58(),
+      ]),
+    );
+
     const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
-      nonExistingPairPubKeys.map(async (pairPubKey) => {
-        const lbPair = await program.account.lbPair.fetch(pairPubKey);
-
-        const baseFeeRate =
-          BigInt(lbPair.parameters.baseFactor) *
-          BigInt(lbPair.binStep) *
-          BigInt(10 ** lbPair.parameters.baseFeePowerFactor);
-
-        const protocolFeeRate =
-          BigInt(lbPair.parameters.protocolShare / 10000) * baseFeeRate;
-
-        const volatilityFee = calculateVolatilityFee(lbPair);
-        const _totalFeeRate = Number(baseFeeRate) + volatilityFee;
-
-        const mints = await upsertMint(
-          db,
-          umi,
-          lbPair.tokenXMint.toBase58(),
-          lbPair.tokenYMint.toBase58(),
+      lbPairsWithPubkeys.map(async (lbPair) => {
+        const poolMints = mints.filter(
+          (mint) =>
+            lbPair.tokenXMint.equals(new web3.PublicKey(mint.id)) ||
+            lbPair.tokenYMint.equals(new web3.PublicKey(mint.id)),
         );
 
         return {
-          extra: {},
-          maxFee: Number(baseFeeRate) * 10000,
-          liquidity: 0,
-          dynamicFee: Number(volatilityFee) * 10000,
-          market: "meteora",
-          binStep: lbPair.binStep,
-          baseFee: Number(baseFeeRate) * 10000,
-          id: pairPubKey.toBase58(),
-          name: mints.map((mint) => mint.name).join("-"),
-          baseMint: lbPair.tokenXMint.toBase58(),
-          quoteMint: lbPair.tokenYMint.toBase58(),
-          protocolFee: Number(protocolFeeRate) * 10000,
+          id: lbPair.pubkey.toBase58(),
+          name: poolMints.map((mint) => mint.symbol).join("/"),
+          ...transformMeteoraPairAccount(lbPair),
         };
       }),
     );
@@ -182,26 +214,6 @@ const upsertMeteoraPair = async (
 
   return allPairs;
 };
-
-// Calculate Meteora's dynamic volatility fee
-function calculateVolatilityFee(lbPair: any): number {
-  const { volatilityAccumulator, _volatilityReference } = lbPair.vParameters;
-
-  const { variableFeeControl, maxVolatilityAccumulator } = lbPair.parameters;
-
-  // Meteora's volatile fee calculation
-  // volatile_fee = (volatility_accumulator^2 * variable_fee_control) / (MAX_VOLATILITY_ACCUMULATOR^2)
-  const volatilityFactor = Math.min(
-    volatilityAccumulator,
-    maxVolatilityAccumulator,
-  );
-  const volatilityRatio = volatilityFactor / maxVolatilityAccumulator;
-  const volatileFee =
-    (volatilityRatio * volatilityRatio * variableFeeControl) /
-    maxVolatilityAccumulator ** 2;
-
-  return volatileFee;
-}
 
 export const createMeteoraSwapFn = async (
   db: Database,
