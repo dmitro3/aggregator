@@ -2,11 +2,11 @@ import assert from "assert";
 import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
-import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
 import { init } from "@rhiva-ag/decoder/programs/orca/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
+import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
 import type { Whirlpool } from "@rhiva-ag/decoder/programs/idls/types/orca";
 import {
   AccountLayout,
@@ -16,30 +16,60 @@ import {
   createSwap,
   getPairs,
   pairs,
-  updateJSON,
+  type swapInsertSchema,
   upsertMint,
   type Database,
   type pairInsertSchema,
+  rewardMints,
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
 
 export const transformOrcaPairAccount = (
   whirlpool: IdlAccounts<Whirlpool>["whirlpool"],
-) => {
+  oracle?: IdlAccounts<Whirlpool>["oracle"],
+): Omit<z.infer<typeof pairInsertSchema>, "id" | "name"> & {
+  rewardMints: string[];
+} => {
+  let dynamicFee = 0;
   const baseFee = whirlpool.feeRate / 1e6;
-  const protocolFee = baseFee * (whirlpool.protocolFeeRate / 1e6);
+  const protocolFee = baseFee * (whirlpool.protocolFeeRate / 1e4);
+
+  if (oracle) {
+    const variableFee =
+      oracle.adaptiveFeeConstants.adaptiveFeeControlFactor > 0
+        ? (Math.pow(
+            oracle.adaptiveFeeVariables.volatilityAccumulator *
+              whirlpool.tickSpacing,
+            2,
+          ) *
+            oracle.adaptiveFeeConstants.adaptiveFeeControlFactor) /
+          1e6
+        : 0;
+
+    dynamicFee = Math.max(baseFee, variableFee);
+  }
+
   return {
     extra: {},
     baseFee,
     protocolFee,
-    maxFee: baseFee,
+    maxFee: 10,
     liquidity: 0,
-    dynamicFee: 0,
+    dynamicFee,
+    baseReserveAmount: 0,
+    quoteReserveAmount: 0,
+    baseReserveAmountUsd: 0,
+    quoteReserveAmountUsd: 0,
     market: "orca" as const,
     binStep: whirlpool.tickSpacing,
     baseMint: whirlpool.tokenMintA.toBase58(),
     quoteMint: whirlpool.tokenMintB.toBase58(),
+    rewardMints: whirlpool.rewardInfos
+      .filter(
+        (rewardInfo) => !rewardInfo.mint.equals(web3.SystemProgram.programId),
+      )
+      .map((rewardInfo) => rewardInfo.mint.toBase58()),
   };
 };
 
@@ -67,63 +97,100 @@ const upsertOrcaPair = async (
     const whirlpools = await program.account.whirlpool.fetchMultiple(
       nonExistingPairPubKeys,
     );
+
     const whirlpoolsWithPubkeys = whirlpools
       .map((whirlpool, index) => {
         const pubkey = nonExistingPairPubKeys[index];
-        if (whirlpool)
-          return {
-            pubkey,
-            ...whirlpool,
-          };
-
+        if (whirlpool) {
+          const feeTierIndex = whirlpool?.feeTierIndexSeed[0];
+          whirlpool?.feeTierIndexSeed[1] * 256;
+          if (whirlpool.tickSpacing === feeTierIndex)
+            return { pubkey, oracle: null, ...whirlpool };
+          const [pda] = web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("oracle"), pubkey.encode()],
+            program.programId,
+          );
+          return { pubkey, oracle: pda, ...whirlpool };
+        }
         return null;
       })
       .filter((whirlpool) => !!whirlpool);
 
-    const whirlpoolsConfigPubkeys = whirlpoolsWithPubkeys.map(
-      (whirlpool) => whirlpool.whirlpoolsConfig,
+    const whirlPoolsWithOraclePubkeys = whirlpoolsWithPubkeys.filter(
+      (whirlpool) => !!whirlpool.oracle,
     );
-
-    const _whirlpoolsConfig =
-      await program.account.whirlpoolsConfig.fetchMultiple(
-        whirlpoolsConfigPubkeys,
+    let oracles: (IdlAccounts<Whirlpool>["oracle"] | null)[] = [];
+    if (whirlPoolsWithOraclePubkeys.length > 0)
+      oracles = await program.account.oracle.fetchMultiple(
+        whirlPoolsWithOraclePubkeys.map((whirlpool) => whirlpool.oracle),
       );
+
+    const oraclesWithWhirlpool = oracles
+      .map((oracle, index) => {
+        const whirlpool = whirlPoolsWithOraclePubkeys[index];
+        if (oracle) return { ...oracle, pubkey: whirlpool.oracle };
+
+        return null;
+      })
+      .filter((oracle) => !!oracle);
 
     const mints = await upsertMint(
       db,
       umi,
-      ...whirlpools
-        .filter((whirlpool) => !!whirlpool)
-        .flatMap((whirlpool) => [
-          whirlpool.tokenMintA.toBase58(),
-          whirlpool.tokenMintB.toBase58(),
-        ]),
+      ...whirlpoolsWithPubkeys.flatMap((whirlpool) => [
+        whirlpool.tokenMintA.toBase58(),
+        whirlpool.tokenMintB.toBase58(),
+        ...whirlpool.rewardInfos
+          .filter(
+            (rewardInfo) =>
+              !rewardInfo.mint.equals(web3.SystemProgram.programId),
+          )
+          .map((reward) => reward.mint.toBase58()),
+      ]),
     );
 
-    const values: z.infer<typeof pairInsertSchema>[] = whirlpoolsWithPubkeys
-      .map((whirlpool) => {
-        const poolMints = mints.filter(
-          (mint) =>
-            whirlpool.tokenMintA.equals(new web3.PublicKey(mint.id)) ||
-            whirlpool.tokenMintB.equals(new web3.PublicKey(mint.id)),
-        );
+    const values: (z.infer<typeof pairInsertSchema> & {
+      rewardMints: string[];
+    })[] = whirlpoolsWithPubkeys.map((whirlpool) => {
+      const poolMints = mints.filter(
+        (mint) =>
+          whirlpool.tokenMintA.equals(new web3.PublicKey(mint.id)) ||
+          whirlpool.tokenMintB.equals(new web3.PublicKey(mint.id)),
+      );
 
-        if (whirlpool)
-          return {
-            id: whirlpool.pubkey.toBase58(),
-            name: poolMints.map((mint) => mint.symbol).join("/"),
-            ...transformOrcaPairAccount(whirlpool),
-          };
+      const oracle = oraclesWithWhirlpool.find((oracle) =>
+        whirlpool.oracle ? oracle.whirlpool.equals(whirlpool.oracle) : false,
+      );
 
-        return null;
-      })
-      .filter((pair) => !!pair);
+      return {
+        id: whirlpool.pubkey.toBase58(),
+        name: poolMints.map((mint) => mint.symbol).join("/"),
+        ...transformOrcaPairAccount(whirlpool, oracle),
+      };
+    });
 
     const createdPairs = await db
       .insert(pairs)
       .values(values)
       .returning({ id: pairs.id })
+      .onConflictDoUpdate({
+        target: [pairs.id],
+        set: { dynamicFee: pairs.dynamicFee, protocolFee: pairs.protocolFee },
+      })
       .execute();
+
+    const rewards = values
+      .filter((value) => value.rewardMints.length > 0)
+      .flatMap((value) =>
+        value.rewardMints.map((mint) => ({ mint, pair: value.id })),
+      );
+
+    if (rewards.length > 0)
+      await db
+        .insert(rewardMints)
+        .values(rewards)
+        .onConflictDoNothing({ target: [rewardMints.pair, rewardMints.mint] })
+        .execute();
 
     allPairs.push(
       ...(await getPairs(
@@ -149,7 +216,7 @@ const upsertOrcaPair = async (
         (mint) => new web3.PublicKey(mint.id),
       );
 
-      const whirlpoolMintVaults = await Promise.all(
+      const poolMintVaults = await Promise.all(
         mints.map((mint) =>
           getAssociatedTokenAddressSync(
             new web3.PublicKey(mint.id),
@@ -160,15 +227,15 @@ const upsertOrcaPair = async (
         ),
       );
 
-      const whirlpoolMintVaultAccountInfos =
-        await connection.getMultipleAccountsInfo(whirlpoolMintVaults);
+      const poolMintVaultAccounttInfos =
+        await connection.getMultipleAccountsInfo(poolMintVaults);
 
       let baseTokenReserveAmount = BigInt(0);
       let quoteTokenReserveAmount = BigInt(0);
 
-      for (const whirlpoolMintVault of whirlpoolMintVaultAccountInfos) {
-        if (whirlpoolMintVault) {
-          const account = AccountLayout.decode(whirlpoolMintVault.data);
+      for (const poolMintVault of poolMintVaultAccounttInfos) {
+        if (poolMintVault) {
+          const account = AccountLayout.decode(poolMintVault.data);
           if (account.mint.equals(baseMint))
             baseTokenReserveAmount += account.amount;
           if (account.mint.equals(quoteMint))
@@ -176,27 +243,35 @@ const upsertOrcaPair = async (
         }
       }
 
-      const token0Price = prices[pair.baseMint.id];
-      const token1Price = prices[pair.quoteMint.id];
+      const basePrice = prices[pair.baseMint.id];
+      const quotePrice = prices[pair.quoteMint.id];
 
-      const normalizedToken0Amount = new Decimal(
-        baseTokenReserveAmount.toString(),
-      ).div(10 ** pair.baseMint.decimals);
+      const baseReserveAmount = new Decimal(baseTokenReserveAmount)
+        .div(Math.pow(10, pair.baseMint.decimals))
+        .toNumber();
 
-      const normalizedToken1Amount = new Decimal(
-        quoteTokenReserveAmount.toString(),
-      ).div(10 ** pair.quoteMint.decimals);
+      const quoteReserveAmount = new Decimal(quoteTokenReserveAmount)
+        .div(Math.pow(10, pair.quoteMint.decimals))
+        .toNumber();
 
-      let liquidity = 0;
+      let baseReserveAmountUsd = 0,
+        quoteReserveAmountUsd = 0;
 
-      if (token0Price) {
-        liquidity += normalizedToken0Amount.toNumber() * token0Price.price;
+      if (basePrice) {
+        baseReserveAmountUsd = baseReserveAmount * basePrice.price;
       }
-      if (token1Price) {
-        liquidity += normalizedToken1Amount.toNumber() * token1Price.price;
+      if (quotePrice) {
+        quoteReserveAmountUsd = quoteReserveAmount * quotePrice.price;
       }
 
-      return { ...pair, liquidity };
+      return {
+        ...pair,
+        baseReserveAmount,
+        quoteReserveAmount,
+        baseReserveAmountUsd,
+        quoteReserveAmountUsd,
+        liquidity: baseReserveAmountUsd + quoteReserveAmountUsd,
+      };
     }),
   );
 
@@ -205,10 +280,14 @@ const upsertOrcaPair = async (
       db
         .update(pairs)
         .set({
-          extra: updateJSON(pairs.extra, {
-            marketCap: pair.extra.marketCap,
-          }),
+          liquidity: pair.liquidity,
+          baseReserveAmount: pair.baseReserveAmount,
+          quoteReserveAmount: pair.quoteReserveAmount,
+          baseReserveAmountUsd: pair.baseReserveAmountUsd,
+          quoteReserveAmountUsd: pair.quoteReserveAmountUsd,
         })
+        .where(eq(pairs.id, pair.id))
+
         .execute(),
     ),
   );
@@ -238,47 +317,53 @@ export const createOrcaSwapFn = async (
     db,
     pairs,
     getMultiplePrices,
-    ...swapEvents.map((swapEvent) => {
-      const pair = pairs.find((pair) =>
-        swapEvent.whirlpool.equals(new web3.PublicKey(pair.id)),
-      );
-      assert(
-        pair,
-        format(
-          "pair %s not created for swap %s",
-          swapEvent.whirlpool.toBase58(),
+    ...swapEvents.map(
+      (
+        swapEvent,
+      ): Omit<
+        z.infer<typeof swapInsertSchema>,
+        "baseAmountUsd" | "quoteAmountUsd" | "feeUsd"
+      > => {
+        const pair = pairs.find((pair) =>
+          swapEvent.whirlpool.equals(new web3.PublicKey(pair.id)),
+        );
+        assert(
+          pair,
+          format(
+            "pair %s not created for swap %s",
+            swapEvent.whirlpool.toBase58(),
+            signature,
+          ),
+        );
+
+        const baseAmount = swapEvent.aToB
+          ? swapEvent.inputAmount
+          : swapEvent.outputAmount;
+        const quoteAmount = swapEvent.aToB
+          ? swapEvent.outputAmount
+          : swapEvent.inputAmount;
+
+        const feeDecimals = swapEvent.aToB
+          ? pair.baseMint.decimals
+          : pair.quoteMint.decimals;
+
+        return {
           signature,
-        ),
-      );
-
-      // In Orca Whirlpools, aToB indicates swap direction:
-      // true: A -> B (selling token A for token B)
-      // false: B -> A (selling token B for token A)
-      const isAToB = swapEvent.aToB;
-
-      const baseAmount = isAToB
-        ? swapEvent.inputAmount
-        : swapEvent.outputAmount;
-      const quoteAmount = isAToB
-        ? swapEvent.outputAmount
-        : swapEvent.inputAmount;
-
-      return {
-        signature,
-        extra: {},
-        tvl: pair.liquidity,
-        type: isAToB ? ("sell" as const) : ("buy" as const),
-        pair: swapEvent.whirlpool.toBase58(),
-        fee: new Decimal(swapEvent.lpFee.toString())
-          .div(10 ** pair.baseMint.decimals)
-          .toNumber(),
-        baseAmount: new Decimal(baseAmount.toString())
-          .div(10 ** pair.baseMint.decimals)
-          .toNumber(),
-        quoteAmount: new Decimal(quoteAmount.toString())
-          .div(10 ** pair.quoteMint.decimals)
-          .toNumber(),
-      };
-    }),
+          extra: {},
+          tvl: pair.liquidity,
+          type: swapEvent.aToB ? "sell" : "buy",
+          pair: swapEvent.whirlpool.toBase58(),
+          fee: new Decimal(swapEvent.lpFee.toString())
+            .div(Math.pow(10, feeDecimals))
+            .toNumber(),
+          baseAmount: new Decimal(baseAmount.toString())
+            .div(Math.pow(10, pair.baseMint.decimals))
+            .toNumber(),
+          quoteAmount: new Decimal(quoteAmount.toString())
+            .div(Math.pow(10, pair.quoteMint.decimals))
+            .toNumber(),
+        };
+      },
+    ),
   );
 };

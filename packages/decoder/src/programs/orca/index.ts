@@ -23,19 +23,19 @@ export function init(connection: Connection, extra?: { wallet?: Wallet }) {
   return [program, { name: "whirlpool" }] as const;
 }
 
-export abstract class WhirlpoolProgramInstructionProcessor extends ProgramInstructionProcessor<Whirlpool> {
+export class WhirlpoolProgramInstructionProcessor extends ProgramInstructionProcessor<Whirlpool> {
   constructor(connection: Connection) {
     super(...init(connection));
   }
 }
 
-export abstract class WhirlpoolProgramInstructionEventProcessor extends ProgramInstructionEventProcessor<Whirlpool> {
+export class WhirlpoolProgramInstructionEventProcessor extends ProgramInstructionEventProcessor<Whirlpool> {
   constructor(connection: Connection) {
     super(...init(connection));
   }
 }
 
-export abstract class WhirlpoolProgramEventProcessor extends ProgramEventProcessor<Whirlpool> {
+export class WhirlpoolProgramEventProcessor extends ProgramEventProcessor<Whirlpool> {
   constructor(connection: Connection) {
     super(...init(connection));
   }

@@ -16,7 +16,7 @@ describe("SarosController", () => {
 
   test("should pass transformPairAccountInfo", async () => {
     const pair = await program.account.pair.fetch(
-      "7LxJjKPdpQ4tRrpDTQgBdxyjG7Ve4GUE6ZMo8W98qn5Z",
+      "E3fgKeShQeUfXcbzWS71J674fQQ8kEkt5thrYA57MWfi",
     );
 
     const transformedPair = transformSarosPairAccount(pair);

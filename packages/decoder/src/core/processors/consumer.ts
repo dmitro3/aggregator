@@ -10,7 +10,9 @@ export class Consumer<T extends (...args: any) => any> {
     return this;
   };
 
-  consume(...args: Parameters<T>) {
-    for (const consumer of this.consumers) consumer(...args);
+  async consume(...args: Parameters<T>) {
+    return Promise.all(
+      this.consumers.map(async (consumer) => await consumer(...args)),
+    );
   }
 }

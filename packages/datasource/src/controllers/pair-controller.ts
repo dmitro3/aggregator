@@ -21,6 +21,21 @@ export const getPairs = <T extends SQL>(db: Database, where?: T) =>
             tokenProgram: true,
           },
         },
+        rewardMints: {
+          with: {
+            mint: {
+              columns: {
+                id: true,
+                decimals: true,
+                tokenProgram: true,
+              },
+            },
+          },
+          columns: {
+            mint: false,
+            pair: false,
+          },
+        },
       },
       columns: {
         baseMint: false,

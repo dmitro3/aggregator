@@ -23,19 +23,19 @@ export function init(connection: Connection, extra?: { wallet?: Wallet }) {
   return [program, { name: "meteora-clmm" }] as const;
 }
 
-export abstract class MeteoraProgramInstructionProcessor extends ProgramInstructionProcessor<LbClmm> {
+export class MeteoraProgramInstructionProcessor extends ProgramInstructionProcessor<LbClmm> {
   constructor(connection: Connection) {
     super(...init(connection));
   }
 }
 
-export abstract class MeteoraProgramInstructionEventProcessor extends ProgramInstructionEventProcessor<LbClmm> {
+export class MeteoraProgramInstructionEventProcessor extends ProgramInstructionEventProcessor<LbClmm> {
   constructor(connection: Connection) {
     super(...init(connection));
   }
 }
 
-export abstract class MeteoraProgramEventProcessor extends ProgramEventProcessor<LbClmm> {
+export class MeteoraProgramEventProcessor extends ProgramEventProcessor<LbClmm> {
   constructor(connection: Connection) {
     super(...init(connection));
   }

@@ -12,7 +12,7 @@ type TInstruction<T> = Omit<
 type FnConsumer<T> = (
   instruction: TInstruction<T>,
   extra: { signature: string; inner?: boolean; index: number },
-) => Promise<void>;
+) => Promise<unknown>;
 
 export abstract class InstructionProcessor<T> extends Consumer<FnConsumer<T>> {
   type: "instruction" = "instruction";

@@ -16,8 +16,9 @@ describe("Raydium Controller", () => {
 
   test("should pass transformRaydiumPairAccount", async () => {
     const poolState = await program.account.poolState.fetch(
-      "3ucNos4NbumPLZNWztqGHNFFgkHeRMBQAVemeeomsUxv",
+      "3G2itp6ERsvSs2UhfYMTEdX21uxVdKc71ipGQG8oGtom",
     );
+
     const ammConfig = await program.account.ammConfig.fetch(
       poolState.ammConfig,
     );

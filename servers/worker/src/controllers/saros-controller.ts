@@ -2,7 +2,7 @@ import assert from "assert";
 import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
 import { init } from "@rhiva-ag/decoder/programs/saros/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -16,9 +16,9 @@ import {
   createSwap,
   getPairs,
   pairs,
-  updateJSON,
   upsertMint,
   type Database,
+  type swapInsertSchema,
   type pairInsertSchema,
 } from "@rhiva-ag/datasource";
 
@@ -54,6 +54,10 @@ export const transformSarosPairAccount = ({
     market: "saros",
     maxFee: baseFee,
     binStep: binStep,
+    baseReserveAmount: 0,
+    quoteReserveAmount: 0,
+    baseReserveAmountUsd: 0,
+    quoteReserveAmountUsd: 0,
     baseMint: tokenMintX.toBase58(),
     quoteMint: tokenMintY.toBase58(),
   };
@@ -82,7 +86,6 @@ const upsertPair = async (
     const pairAccounts = await program.account.pair.fetchMultiple(
       nonExistingPairPubKeys,
     );
-
     const pairAccountsWithPubKeys = pairAccounts
       .map((pairAccount, index) => {
         const pubkey = nonExistingPairPubKeys[index];
@@ -120,6 +123,10 @@ const upsertPair = async (
       .insert(pairs)
       .values(values)
       .returning({ id: pairs.id })
+      .onConflictDoUpdate({
+        target: [pairs.id],
+        set: { dynamicFee: pairs.dynamicFee, protocolFee: pairs.protocolFee },
+      })
       .execute();
 
     allPairs.push(
@@ -176,26 +183,32 @@ const upsertPair = async (
       const basePrice = prices[pair.baseMint.id];
       const quotePrice = prices[pair.quoteMint.id];
 
-      const normalizeBaseTokenReserveAmount = new Decimal(
-        baseTokenReserveAmount,
-      ).div(10 ** pair.baseMint.decimals);
+      const baseReserveAmount = new Decimal(baseTokenReserveAmount)
+        .div(Math.pow(10, pair.baseMint.decimals))
+        .toNumber();
 
-      const normalizeQuoteTokenReserveAmount = new Decimal(
-        quoteTokenReserveAmount,
-      ).div(10 ** pair.quoteMint.decimals);
+      const quoteReserveAmount = new Decimal(quoteTokenReserveAmount)
+        .div(Math.pow(10, pair.quoteMint.decimals))
+        .toNumber();
 
-      let liquidity = 0;
+      let baseReserveAmountUsd = 0,
+        quoteReserveAmountUsd = 0;
 
       if (basePrice) {
-        liquidity +=
-          normalizeBaseTokenReserveAmount.toNumber() * basePrice.price;
+        baseReserveAmountUsd = baseReserveAmount * basePrice.price;
       }
       if (quotePrice) {
-        liquidity +=
-          normalizeQuoteTokenReserveAmount.toNumber() * quotePrice.price;
+        quoteReserveAmountUsd = quoteReserveAmount * quotePrice.price;
       }
 
-      return { ...pair, liquidity };
+      return {
+        ...pair,
+        baseReserveAmount,
+        quoteReserveAmount,
+        baseReserveAmountUsd,
+        quoteReserveAmountUsd,
+        liquidity: baseReserveAmountUsd + quoteReserveAmountUsd,
+      };
     }),
   );
 
@@ -204,10 +217,13 @@ const upsertPair = async (
       db
         .update(pairs)
         .set({
-          extra: updateJSON(pairs.extra, {
-            marketCap: pair.extra.marketCap,
-          }),
+          liquidity: pair.liquidity,
+          baseReserveAmount: pair.baseReserveAmount,
+          quoteReserveAmount: pair.quoteReserveAmount,
+          baseReserveAmountUsd: pair.baseReserveAmountUsd,
+          quoteReserveAmountUsd: pair.quoteReserveAmountUsd,
         })
+        .where(eq(pairs.id, pair.id))
         .execute(),
     ),
   );
@@ -225,6 +241,7 @@ export const createSarosSwapFn = async (
 
   const umi = createUmi(connection.rpcEndpoint);
   const pairIds = values.map((value) => value.pair.toBase58());
+
   const pairs = await cacheResult(
     async (pairIds) =>
       upsertPair(db, connection, umi, getMultiplePrices, ...pairIds),
@@ -235,37 +252,47 @@ export const createSarosSwapFn = async (
     db,
     pairs,
     getMultiplePrices,
-    ...values.map((value) => {
-      const pair = pairs.find((pair) =>
-        value.pair.equals(new web3.PublicKey(pair.id)),
-      );
-      assert(
-        pair,
-        format(
-          "pair %s not created for swap %s",
-          value.pair.toBase58(),
-          signature,
-        ),
-      );
-      const baseAmount = value.swapForY ? value.amountOut : value.amountIn;
-      const quoteAmount = value.swapForY ? value.amountIn : value.amountOut;
+    ...values.map(
+      (
+        value,
+      ): Omit<
+        z.infer<typeof swapInsertSchema>,
+        "baseAmountUsd" | "quoteAmountUsd" | "feeUsd"
+      > => {
+        const pair = pairs.find((pair) =>
+          value.pair.equals(new web3.PublicKey(pair.id)),
+        );
+        assert(
+          pair,
+          format(
+            "pair %s not created for swap %s",
+            value.pair.toBase58(),
+            signature,
+          ),
+        );
+        const baseAmount = value.swapForY ? value.amountIn : value.amountOut;
+        const quoteAmount = value.swapForY ? value.amountOut : value.amountIn;
+        const feeDecimals = value.swapForY
+          ? pair.baseMint.decimals
+          : pair.quoteMint.decimals;
 
-      return {
-        signature,
-        extra: {},
-        tvl: pair.liquidity,
-        type: value.swapForY ? ("sell" as const) : ("buy" as const),
-        pair: value.pair.toBase58(),
-        fee: new Decimal(value.fee.toString())
-          .div(10 ** pair.baseMint.decimals)
-          .toNumber(),
-        baseAmount: new Decimal(baseAmount.toString())
-          .div(10 ** pair.baseMint.decimals)
-          .toNumber(),
-        quoteAmount: new Decimal(quoteAmount.toString())
-          .div(10 ** pair.quoteMint.decimals)
-          .toNumber(),
-      };
-    }),
+        return {
+          signature,
+          extra: {},
+          tvl: pair.liquidity,
+          type: value.swapForY ? "sell" : "buy",
+          pair: value.pair.toBase58(),
+          fee: new Decimal(value.fee.toString())
+            .div(Math.pow(10, feeDecimals))
+            .toNumber(),
+          baseAmount: new Decimal(baseAmount.toString())
+            .div(Math.pow(10, pair.baseMint.decimals))
+            .toNumber(),
+          quoteAmount: new Decimal(quoteAmount.toString())
+            .div(Math.pow(10, pair.quoteMint.decimals))
+            .toNumber(),
+        };
+      },
+    ),
   );
 };

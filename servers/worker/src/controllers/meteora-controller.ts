@@ -2,7 +2,7 @@ import assert from "assert";
 import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
 import { init } from "@rhiva-ag/decoder/programs/meteora/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -16,7 +16,8 @@ import {
   createSwap,
   getPairs,
   pairs,
-  updateJSON,
+  rewardMints,
+  type swapInsertSchema,
   upsertMint,
   type Database,
   type pairInsertSchema,
@@ -30,10 +31,11 @@ export const transformMeteoraPairAccount = ({
   vParameters,
   tokenXMint,
   tokenYMint,
+  rewardInfos,
 }: IdlAccounts<LbClmm>["lbPair"]): Omit<
   z.infer<typeof pairInsertSchema>,
   "id" | "name"
-> => {
+> & { rewardMints: string[] } => {
   const baseFee = (parameters.baseFactor * binStep) / 1e6;
   const variableFee =
     parameters.variableFeeControl > 0
@@ -54,8 +56,17 @@ export const transformMeteoraPairAccount = ({
     maxFee: 10,
     market: "meteora",
     binStep: binStep,
+    baseReserveAmount: 0,
+    quoteReserveAmount: 0,
+    baseReserveAmountUsd: 0,
+    quoteReserveAmountUsd: 0,
     baseMint: tokenXMint.toBase58(),
     quoteMint: tokenYMint.toBase58(),
+    rewardMints: rewardInfos
+      .filter(
+        (rewardInfo) => !rewardInfo.mint.equals(web3.SystemProgram.programId),
+      )
+      .map((rewardInfo) => rewardInfo.mint.toBase58()),
   };
 };
 
@@ -97,10 +108,18 @@ const upsertMeteoraPair = async (
       ...lbPairsWithPubkeys.flatMap((lbPair) => [
         lbPair.tokenXMint.toBase58(),
         lbPair.tokenYMint.toBase58(),
+        ...lbPair.rewardInfos
+          .filter(
+            (rewardInfo) =>
+              !rewardInfo.mint.equals(web3.SystemProgram.programId),
+          )
+          .map((reward) => reward.mint.toBase58()),
       ]),
     );
 
-    const values: z.infer<typeof pairInsertSchema>[] = await Promise.all(
+    const values: (z.infer<typeof pairInsertSchema> & {
+      rewardMints: string[];
+    })[] = await Promise.all(
       lbPairsWithPubkeys.map(async (lbPair) => {
         const poolMints = mints.filter(
           (mint) =>
@@ -121,6 +140,19 @@ const upsertMeteoraPair = async (
       .values(values)
       .returning({ id: pairs.id })
       .execute();
+
+    const rewards = values
+      .filter((value) => value.rewardMints.length > 0)
+      .flatMap((value) =>
+        value.rewardMints.map((mint) => ({ mint, pair: value.id })),
+      );
+
+    if (rewards.length > 0)
+      await db
+        .insert(rewardMints)
+        .values(rewards)
+        .onConflictDoNothing({ target: [rewardMints.pair, rewardMints.mint] })
+        .execute();
 
     allPairs.push(
       ...(await getPairs(
@@ -157,13 +189,13 @@ const upsertMeteoraPair = async (
         ),
       );
 
-      const poolMintVaultAccountInfos =
+      const poolMintVaultAccounttInfos =
         await connection.getMultipleAccountsInfo(poolMintVaults);
 
       let baseTokenReserveAmount = BigInt(0);
       let quoteTokenReserveAmount = BigInt(0);
 
-      for (const poolMintVault of poolMintVaultAccountInfos) {
+      for (const poolMintVault of poolMintVaultAccounttInfos) {
         if (poolMintVault) {
           const account = AccountLayout.decode(poolMintVault.data);
           if (account.mint.equals(baseMint))
@@ -176,26 +208,32 @@ const upsertMeteoraPair = async (
       const basePrice = prices[pair.baseMint.id];
       const quotePrice = prices[pair.quoteMint.id];
 
-      const normalizeBaseTokenReserveAmount = new Decimal(
-        baseTokenReserveAmount,
-      ).div(10 ** pair.baseMint.decimals);
+      const baseReserveAmount = new Decimal(baseTokenReserveAmount)
+        .div(Math.pow(10, pair.baseMint.decimals))
+        .toNumber();
 
-      const normalizeQuoteTokenReserveAmount = new Decimal(
-        quoteTokenReserveAmount,
-      ).div(10 ** pair.quoteMint.decimals);
+      const quoteReserveAmount = new Decimal(quoteTokenReserveAmount)
+        .div(Math.pow(10, pair.quoteMint.decimals))
+        .toNumber();
 
-      let liquidity = 0;
+      let baseReserveAmountUsd = 0,
+        quoteReserveAmountUsd = 0;
 
       if (basePrice) {
-        liquidity +=
-          normalizeBaseTokenReserveAmount.toNumber() * basePrice.price;
+        baseReserveAmountUsd = baseReserveAmount * basePrice.price;
       }
       if (quotePrice) {
-        liquidity +=
-          normalizeQuoteTokenReserveAmount.toNumber() * quotePrice.price;
+        quoteReserveAmountUsd = quoteReserveAmount * quotePrice.price;
       }
 
-      return { ...pair, liquidity };
+      return {
+        ...pair,
+        baseReserveAmount,
+        quoteReserveAmount,
+        baseReserveAmountUsd,
+        quoteReserveAmountUsd,
+        liquidity: baseReserveAmountUsd + quoteReserveAmountUsd,
+      };
     }),
   );
 
@@ -204,10 +242,13 @@ const upsertMeteoraPair = async (
       db
         .update(pairs)
         .set({
-          extra: updateJSON(pairs.extra, {
-            marketCap: pair.extra.marketCap,
-          }),
+          liquidity: pair.liquidity,
+          baseReserveAmount: pair.baseReserveAmount,
+          quoteReserveAmount: pair.quoteReserveAmount,
+          baseReserveAmountUsd: pair.baseReserveAmountUsd,
+          quoteReserveAmountUsd: pair.quoteReserveAmountUsd,
         })
+        .where(eq(pairs.id, pair.id))
         .execute(),
     ),
   );
@@ -237,40 +278,52 @@ export const createMeteoraSwapFn = async (
     db,
     pairs,
     getMultiplePrices,
-    ...swapEvents.map((swapEvent) => {
-      const pair = pairs.find((pair) =>
-        swapEvent.lbPair.equals(new web3.PublicKey(pair.id)),
-      );
-      assert(
-        pair,
-        format(
-          "pair %s not created for swap %s",
-          swapEvent.lbPair.toBase58(),
+    ...swapEvents.map(
+      (
+        swapEvent,
+      ): Omit<
+        z.infer<typeof swapInsertSchema>,
+        "baseAmountUsd" | "quoteAmountUsd" | "feeUsd"
+      > => {
+        const pair = pairs.find((pair) =>
+          swapEvent.lbPair.equals(new web3.PublicKey(pair.id)),
+        );
+        assert(
+          pair,
+          format(
+            "pair %s not created for swap %s",
+            swapEvent.lbPair.toBase58(),
+            signature,
+          ),
+        );
+
+        const baseAmount = swapEvent.swapForY
+          ? swapEvent.amountIn
+          : swapEvent.amountOut;
+        const quoteAmount = swapEvent.swapForY
+          ? swapEvent.amountOut
+          : swapEvent.amountIn;
+        const feeDecimals = swapEvent.swapForY
+          ? pair.baseMint.decimals
+          : pair.quoteMint.decimals;
+
+        return {
           signature,
-        ),
-      );
-
-      const isSwapForY = swapEvent.swapForY;
-
-      const baseAmount = isSwapForY ? swapEvent.amountIn : swapEvent.amountOut;
-      const quoteAmount = isSwapForY ? swapEvent.amountOut : swapEvent.amountIn;
-
-      return {
-        signature,
-        extra: {},
-        tvl: pair.liquidity,
-        type: isSwapForY ? ("sell" as const) : ("buy" as const),
-        pair: swapEvent.lbPair.toBase58(),
-        fee: new Decimal(swapEvent.fee.toString())
-          .div(10 ** pair.baseMint.decimals)
-          .toNumber(),
-        baseAmount: new Decimal(baseAmount.toString())
-          .div(10 ** pair.baseMint.decimals)
-          .toNumber(),
-        quoteAmount: new Decimal(quoteAmount.toString())
-          .div(10 ** pair.quoteMint.decimals)
-          .toNumber(),
-      };
-    }),
+          extra: {},
+          tvl: pair.liquidity,
+          type: swapEvent.swapForY ? "sell" : "buy",
+          pair: swapEvent.lbPair.toBase58(),
+          fee: new Decimal(swapEvent.fee.toString())
+            .div(Math.pow(10, feeDecimals))
+            .toNumber(),
+          baseAmount: new Decimal(baseAmount.toString())
+            .div(Math.pow(10, pair.baseMint.decimals))
+            .toNumber(),
+          quoteAmount: new Decimal(quoteAmount.toString())
+            .div(Math.pow(10, pair.quoteMint.decimals))
+            .toNumber(),
+        };
+      },
+    ),
   );
 };
