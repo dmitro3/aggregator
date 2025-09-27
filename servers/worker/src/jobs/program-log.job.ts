@@ -13,6 +13,10 @@ import {
   MeteoraProgramEventProcessor,
   MeteoraProgramInstructionEventProcessor,
 } from "@rhiva-ag/decoder/programs/meteora/index";
+import {
+  OrcaProgramEventProcessor,
+  OrcaProgramInstructionEventProcessor,
+} from "@rhiva-ag/decoder/programs/orca/index";
 
 import { db, redis } from "../instances";
 import { createSarosSwapFn } from "../controllers/saros-controller";
@@ -21,6 +25,8 @@ import { createRaydiumV3SwapFn } from "../controllers/raydium-controller";
 import type { AmmV3 } from "@rhiva-ag/decoder/programs/idls/types/raydium";
 import type { LbClmm } from "@rhiva-ag/decoder/programs/idls/types/meteora";
 import { createMeteoraSwapFn } from "../controllers/meteora-controller";
+import { createOrcaSwapFn } from "../controllers/orca-controller";
+import type { Whirlpool } from "@rhiva-ag/decoder/programs/idls/types/orca";
 
 const connection = new web3.Connection(web3.clusterApiUrl("mainnet-beta"));
 
@@ -69,6 +75,21 @@ const meteoraEventConsumer = async (
     );
 };
 
+const orcaEventConsumer = async (
+  events: ProgramEventType<Whirlpool>[],
+  { signature }: { signature: string },
+) => {
+  const swapEvents = events.filter((event) => event.name === "traded");
+
+  if (swapEvents.length > 0)
+    createOrcaSwapFn(
+      db,
+      connection,
+      signature,
+      ...swapEvents.map((event) => event.data),
+    );
+};
+
 const pipeline = new Pipeline([
   new SarosProgramEventProcessor(connection).addConsumer(sarosEventConsumer),
   new SarosProgramInstructionEventProcessor(connection).addConsumer(
@@ -90,6 +111,12 @@ const pipeline = new Pipeline([
   new MeteoraProgramInstructionEventProcessor(connection).addConsumer(
     async (instruction, extra) => {
       meteoraEventConsumer([instruction.parsed], extra);
+    },
+  ),
+  new OrcaProgramEventProcessor(connection).addConsumer(orcaEventConsumer),
+  new OrcaProgramInstructionEventProcessor(connection).addConsumer(
+    async (instruction, extra) => {
+      orcaEventConsumer([instruction.parsed], extra);
     },
   ),
 ]);
