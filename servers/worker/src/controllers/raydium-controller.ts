@@ -3,67 +3,62 @@ import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { eq, inArray } from "drizzle-orm";
+import { AccountLayout } from "@solana/spl-token";
 import type { Umi } from "@metaplex-foundation/umi";
-import { init } from "@rhiva-ag/decoder/programs/saros/index";
+import { init } from "@rhiva-ag/decoder/programs/raydium/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
-import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
-import {
-  AccountLayout,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
+import type { AmmV3 } from "@rhiva-ag/decoder/programs/idls/types/raydium";
 import {
   createSwap,
   getPairs,
   pairs,
+  rewardMints,
   upsertMint,
   type Database,
-  type swapInsertSchema,
   type pairInsertSchema,
+  type swapInsertSchema,
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
 
-export const transformSarosPairAccount = ({
-  binStep,
-  staticFeeParameters,
-  dynamicFeeParameters,
-  tokenMintX,
-  tokenMintY,
-}: IdlAccounts<LiquidityBook>["pair"]): Omit<
-  z.infer<typeof pairInsertSchema>,
-  "id" | "name"
-> => {
-  const baseFee = (staticFeeParameters.baseFactor * binStep) / 1e6;
-  const variableFee =
-    staticFeeParameters.variableFeeControl > 0
-      ? (Math.pow(dynamicFeeParameters.volatilityAccumulator * binStep, 2) *
-          staticFeeParameters.variableFeeControl) /
-        1e6
-      : 0;
-
-  const dynamicFee = Math.max(baseFee, variableFee);
-  const protocolFee = dynamicFee * (staticFeeParameters.protocolShare / 1e4);
+export const transformRaydiumPairAccount = (
+  poolState: IdlAccounts<AmmV3>["poolState"],
+  ammConfig: IdlAccounts<AmmV3>["ammConfig"],
+): Omit<z.infer<typeof pairInsertSchema>, "id" | "name"> & {
+  rewardMints: string[];
+} => {
+  const baseFee = (ammConfig.tradeFeeRate * ammConfig.tickSpacing) / 1e4;
+  const protocolFee = baseFee * (ammConfig.protocolFeeRate / 1e6);
 
   return {
+    extra: {
+      tokenVault0: poolState.tokenVault0.toBase58(),
+      tokenVault1: poolState.tokenVault1.toBase58(),
+    },
     baseFee,
-    dynamicFee,
     protocolFee,
-    extra: {},
-    liquidity: 0,
-    market: "saros",
     maxFee: baseFee,
-    binStep: binStep,
+    liquidity: 0,
+    dynamicFee: 0,
     baseReserveAmount: 0,
     quoteReserveAmount: 0,
     baseReserveAmountUsd: 0,
     quoteReserveAmountUsd: 0,
-    baseMint: tokenMintX.toBase58(),
-    quoteMint: tokenMintY.toBase58(),
+    market: "raydium" as const,
+    binStep: poolState.tickSpacing,
+    baseMint: poolState.tokenMint0.toBase58(),
+    quoteMint: poolState.tokenMint1.toBase58(),
+    rewardMints: poolState.rewardInfos
+      .filter(
+        (rewardInfo) =>
+          !rewardInfo.tokenMint.equals(web3.SystemProgram.programId),
+      )
+      .map((rewardInfo) => rewardInfo.tokenMint.toBase58()),
   };
 };
 
-const upsertPair = async (
+const upsertRaydiumPair = async (
   db: Database,
   connection: web3.Connection,
   umi: Umi,
@@ -73,6 +68,7 @@ const upsertPair = async (
   ...pairIds: string[]
 ) => {
   const [program] = init(connection);
+
   let allPairs = await getPairs(db, inArray(pairs.id, pairIds));
 
   const nonExistingPairPubKeys = pairIds
@@ -83,41 +79,67 @@ const upsertPair = async (
     );
 
   if (nonExistingPairPubKeys.length > 0) {
-    const pairAccounts = await program.account.pair.fetchMultiple(
+    const poolStates = await program.account.poolState.fetchMultiple(
       nonExistingPairPubKeys,
     );
-    const pairAccountsWithPubKeys = pairAccounts
-      .map((pairAccount, index) => {
+    const poolStatesWithPubkeys = poolStates
+      .map((poolState, index) => {
         const pubkey = nonExistingPairPubKeys[index];
-        if (pairAccount) return { pubkey, ...pairAccount };
+        if (poolState)
+          return {
+            pubkey,
+            ...poolState,
+          };
 
         return null;
       })
-      .filter((pairAccount) => !!pairAccount);
+      .filter((poolState) => !!poolState);
+
+    const ammConfigPubkeys = poolStatesWithPubkeys.map(
+      (poolState) => poolState.ammConfig,
+    );
+
+    const ammConfigs =
+      await program.account.ammConfig.fetchMultiple(ammConfigPubkeys);
 
     const mints = await upsertMint(
       db,
       umi,
-      ...pairAccountsWithPubKeys.flatMap((pair) => [
-        pair.tokenMintX.toBase58(),
-        pair.tokenMintY.toBase58(),
-      ]),
+      ...poolStates
+        .filter((pool) => !!pool)
+        .flatMap((pool) => [
+          pool.tokenMint0.toBase58(),
+          pool.tokenMint1.toBase58(),
+          ...pool.rewardInfos
+            .filter(
+              (rewardInfo) =>
+                !rewardInfo.tokenMint.equals(web3.SystemProgram.programId),
+            )
+            .map((reward) => reward.tokenMint.toBase58()),
+        ]),
     );
 
-    const values: z.infer<typeof pairInsertSchema>[] =
-      pairAccountsWithPubKeys.map((pairAccount) => {
-        const pairMints = mints.filter(
+    const values: (z.infer<typeof pairInsertSchema> & {
+      rewardMints: string[];
+    })[] = poolStatesWithPubkeys
+      .map((poolState, index) => {
+        const ammConfig = ammConfigs[index];
+        const poolMints = mints.filter(
           (mint) =>
-            pairAccount.tokenMintX.equals(new web3.PublicKey(mint.id)) ||
-            pairAccount.tokenMintY.equals(new web3.PublicKey(mint.id)),
+            poolState.tokenMint0.equals(new web3.PublicKey(mint.id)) ||
+            poolState.tokenMint1.equals(new web3.PublicKey(mint.id)),
         );
 
-        return {
-          id: pairAccount.pubkey.toBase58(),
-          name: pairMints.map((mint) => mint.symbol).join("/"),
-          ...transformSarosPairAccount(pairAccount),
-        };
-      });
+        if (poolState && ammConfig)
+          return {
+            id: poolState.pubkey.toBase58(),
+            name: poolMints.map((mint) => mint.symbol).join("/"),
+            ...transformRaydiumPairAccount(poolState, ammConfig),
+          };
+
+        return null;
+      })
+      .filter((pair) => !!pair);
 
     const createdPairs = await db
       .insert(pairs)
@@ -128,6 +150,19 @@ const upsertPair = async (
         set: { dynamicFee: pairs.dynamicFee, protocolFee: pairs.protocolFee },
       })
       .execute();
+
+    const rewards = values
+      .filter((value) => value.rewardMints.length > 0)
+      .flatMap((value) =>
+        value.rewardMints.map((mint) => ({ mint, pair: value.id })),
+      );
+
+    if (rewards.length > 0)
+      await db
+        .insert(rewardMints)
+        .values(rewards)
+        .onConflictDoNothing({ target: [rewardMints.pair, rewardMints.mint] })
+        .execute();
 
     allPairs.push(
       ...(await getPairs(
@@ -146,26 +181,17 @@ const upsertPair = async (
 
   allPairs = await Promise.all(
     allPairs.map(async (pair) => {
-      const pairPubKey = new web3.PublicKey(pair.id);
       const mints = [pair.baseMint, pair.quoteMint];
 
       const [baseMint, quoteMint] = mints.map(
         (mint) => new web3.PublicKey(mint.id),
       );
 
-      const poolMintVaults = await Promise.all(
-        mints.map((mint) =>
-          getAssociatedTokenAddressSync(
-            new web3.PublicKey(mint.id),
-            pairPubKey,
-            true,
-            new web3.PublicKey(mint.tokenProgram),
-          ),
-        ),
-      );
-
       const poolMintVaultAccounttInfos =
-        await connection.getMultipleAccountsInfo(poolMintVaults);
+        await connection.getMultipleAccountsInfo([
+          new web3.PublicKey(pair.extra.tokenVault0 as string),
+          new web3.PublicKey(pair.extra.tokenVault1 as string),
+        ]);
 
       let baseTokenReserveAmount = BigInt(0);
       let quoteTokenReserveAmount = BigInt(0);
@@ -194,12 +220,10 @@ const upsertPair = async (
       let baseReserveAmountUsd = 0,
         quoteReserveAmountUsd = 0;
 
-      if (basePrice) {
-        baseReserveAmountUsd = baseReserveAmount * basePrice.price;
-      }
-      if (quotePrice) {
+      if (basePrice) baseReserveAmountUsd = baseReserveAmount * basePrice.price;
+
+      if (quotePrice)
         quoteReserveAmountUsd = quoteReserveAmount * quotePrice.price;
-      }
 
       return {
         ...pair,
@@ -231,20 +255,21 @@ const upsertPair = async (
   return allPairs;
 };
 
-export const createSarosSwapFn = async (
+export const createRaydiumV3SwapFn = async (
   db: Database,
   connection: web3.Connection,
   signature: string,
-  ...values: IdlEvents<LiquidityBook>["binSwapEvent"][]
+  ...swapEvents: IdlEvents<AmmV3>["swapEvent"][]
 ) => {
-  assert(values.length > 0, "expect values > 0");
+  assert(swapEvents.length > 0, "expect swapEvents > 0");
 
   const umi = createUmi(connection.rpcEndpoint);
-  const pairIds = values.map((value) => value.pair.toBase58());
+
+  const pairIds = swapEvents.map((swapEvent) => swapEvent.poolState.toBase58());
 
   const pairs = await cacheResult(
     async (pairIds) =>
-      upsertPair(db, connection, umi, getMultiplePrices, ...pairIds),
+      upsertRaydiumPair(db, connection, umi, getMultiplePrices, ...pairIds),
     ...pairIds,
   );
 
@@ -252,27 +277,32 @@ export const createSarosSwapFn = async (
     db,
     pairs,
     getMultiplePrices,
-    ...values.map(
+    ...swapEvents.map(
       (
-        value,
+        swapEvent,
       ): Omit<
         z.infer<typeof swapInsertSchema>,
         "baseAmountUsd" | "quoteAmountUsd" | "feeUsd"
       > => {
         const pair = pairs.find((pair) =>
-          value.pair.equals(new web3.PublicKey(pair.id)),
+          swapEvent.poolState.equals(new web3.PublicKey(pair.id)),
         );
         assert(
           pair,
           format(
             "pair %s not created for swap %s",
-            value.pair.toBase58(),
+            swapEvent.poolState.toBase58(),
             signature,
           ),
         );
-        const baseAmount = value.swapForY ? value.amountIn : value.amountOut;
-        const quoteAmount = value.swapForY ? value.amountOut : value.amountIn;
-        const feeDecimals = value.swapForY
+
+        const baseAmount = swapEvent.zeroForOne
+          ? swapEvent.amount1
+          : swapEvent.amount0;
+        const quoteAmount = swapEvent.zeroForOne
+          ? swapEvent.amount0
+          : swapEvent.amount1;
+        const feeDecimals = swapEvent.zeroForOne
           ? pair.baseMint.decimals
           : pair.quoteMint.decimals;
 
@@ -280,9 +310,9 @@ export const createSarosSwapFn = async (
           signature,
           extra: {},
           tvl: pair.liquidity,
-          type: value.swapForY ? "sell" : "buy",
-          pair: value.pair.toBase58(),
-          fee: new Decimal(value.fee.toString())
+          pair: swapEvent.poolState.toBase58(),
+          type: swapEvent.zeroForOne ? "sell" : "buy",
+          fee: new Decimal(swapEvent.transferFee0.toString())
             .div(Math.pow(10, feeDecimals))
             .toNumber(),
           baseAmount: new Decimal(baseAmount.toString())

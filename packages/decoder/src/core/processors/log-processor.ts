@@ -1,7 +1,7 @@
 import { Consumer } from "./consumer";
 
 export abstract class LogProcessor<T> extends Consumer<
-  (events: T[], extra: { signature: string }) => Promise<void>
+  (events: T[], extra: { signature: string }) => Promise<unknown>
 > {
   type: "log" = "log";
 

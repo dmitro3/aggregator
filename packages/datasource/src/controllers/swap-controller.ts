@@ -43,11 +43,5 @@ export const createSwap = async (
         };
       }),
     )
-    .onConflictDoUpdate({
-      target: [swaps.signature, swaps.pair],
-      set: {
-        baseAmountUsd: swaps.baseAmountUsd,
-        quoteAmountUsd: swaps.quoteAmountUsd,
-      },
-    });
+    .returning();
 };

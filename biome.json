@@ -14,7 +14,8 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "useNodejsImportProtocol": "off"
+        "useNodejsImportProtocol": "off",
+        "useExponentiationOperator": "off"
       }
     }
   },

@@ -4,10 +4,10 @@ import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { eq, inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
-import { init } from "@rhiva-ag/decoder/programs/saros/index";
+import { init } from "@rhiva-ag/decoder/programs/meteora/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
-import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
+import type { LbClmm } from "@rhiva-ag/decoder/programs/idls/types/meteora";
 import {
   AccountLayout,
   getAssociatedTokenAddressSync,
@@ -16,34 +16,36 @@ import {
   createSwap,
   getPairs,
   pairs,
+  rewardMints,
   upsertMint,
   type Database,
-  type swapInsertSchema,
   type pairInsertSchema,
+  type swapInsertSchema,
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
 
-export const transformSarosPairAccount = ({
+export const transformMeteoraPairAccount = ({
   binStep,
-  staticFeeParameters,
-  dynamicFeeParameters,
-  tokenMintX,
-  tokenMintY,
-}: IdlAccounts<LiquidityBook>["pair"]): Omit<
+  parameters,
+  vParameters,
+  tokenXMint,
+  tokenYMint,
+  rewardInfos,
+}: IdlAccounts<LbClmm>["lbPair"]): Omit<
   z.infer<typeof pairInsertSchema>,
   "id" | "name"
-> => {
-  const baseFee = (staticFeeParameters.baseFactor * binStep) / 1e6;
+> & { rewardMints: string[] } => {
+  const baseFee = (parameters.baseFactor * binStep) / 1e6;
   const variableFee =
-    staticFeeParameters.variableFeeControl > 0
-      ? (Math.pow(dynamicFeeParameters.volatilityAccumulator * binStep, 2) *
-          staticFeeParameters.variableFeeControl) /
-        1e6
+    parameters.variableFeeControl > 0
+      ? (Math.pow(vParameters.volatilityAccumulator * binStep, 2) *
+          parameters.variableFeeControl) /
+        1e11
       : 0;
 
   const dynamicFee = Math.max(baseFee, variableFee);
-  const protocolFee = dynamicFee * (staticFeeParameters.protocolShare / 1e4);
+  const protocolFee = dynamicFee * (parameters.protocolShare / 1e4);
 
   return {
     baseFee,
@@ -51,19 +53,24 @@ export const transformSarosPairAccount = ({
     protocolFee,
     extra: {},
     liquidity: 0,
-    market: "saros",
-    maxFee: baseFee,
+    maxFee: 10,
+    market: "meteora",
     binStep: binStep,
     baseReserveAmount: 0,
     quoteReserveAmount: 0,
     baseReserveAmountUsd: 0,
     quoteReserveAmountUsd: 0,
-    baseMint: tokenMintX.toBase58(),
-    quoteMint: tokenMintY.toBase58(),
+    baseMint: tokenXMint.toBase58(),
+    quoteMint: tokenYMint.toBase58(),
+    rewardMints: rewardInfos
+      .filter(
+        (rewardInfo) => !rewardInfo.mint.equals(web3.SystemProgram.programId),
+      )
+      .map((rewardInfo) => rewardInfo.mint.toBase58()),
   };
 };
 
-const upsertPair = async (
+const upsertMeteoraPair = async (
   db: Database,
   connection: web3.Connection,
   umi: Umi,
@@ -73,6 +80,7 @@ const upsertPair = async (
   ...pairIds: string[]
 ) => {
   const [program] = init(connection);
+
   let allPairs = await getPairs(db, inArray(pairs.id, pairIds));
 
   const nonExistingPairPubKeys = pairIds
@@ -83,51 +91,68 @@ const upsertPair = async (
     );
 
   if (nonExistingPairPubKeys.length > 0) {
-    const pairAccounts = await program.account.pair.fetchMultiple(
+    const lbPairs = await program.account.lbPair.fetchMultiple(
       nonExistingPairPubKeys,
     );
-    const pairAccountsWithPubKeys = pairAccounts
-      .map((pairAccount, index) => {
+    const lbPairsWithPubkeys = lbPairs
+      .map((lbPair, index) => {
         const pubkey = nonExistingPairPubKeys[index];
-        if (pairAccount) return { pubkey, ...pairAccount };
-
+        if (lbPair) return { pubkey, ...lbPair };
         return null;
       })
-      .filter((pairAccount) => !!pairAccount);
+      .filter((lbPair) => !!lbPair);
 
     const mints = await upsertMint(
       db,
       umi,
-      ...pairAccountsWithPubKeys.flatMap((pair) => [
-        pair.tokenMintX.toBase58(),
-        pair.tokenMintY.toBase58(),
+      ...lbPairsWithPubkeys.flatMap((lbPair) => [
+        lbPair.tokenXMint.toBase58(),
+        lbPair.tokenYMint.toBase58(),
+        ...lbPair.rewardInfos
+          .filter(
+            (rewardInfo) =>
+              !rewardInfo.mint.equals(web3.SystemProgram.programId),
+          )
+          .map((reward) => reward.mint.toBase58()),
       ]),
     );
 
-    const values: z.infer<typeof pairInsertSchema>[] =
-      pairAccountsWithPubKeys.map((pairAccount) => {
-        const pairMints = mints.filter(
+    const values: (z.infer<typeof pairInsertSchema> & {
+      rewardMints: string[];
+    })[] = await Promise.all(
+      lbPairsWithPubkeys.map(async (lbPair) => {
+        const poolMints = mints.filter(
           (mint) =>
-            pairAccount.tokenMintX.equals(new web3.PublicKey(mint.id)) ||
-            pairAccount.tokenMintY.equals(new web3.PublicKey(mint.id)),
+            lbPair.tokenXMint.equals(new web3.PublicKey(mint.id)) ||
+            lbPair.tokenYMint.equals(new web3.PublicKey(mint.id)),
         );
 
         return {
-          id: pairAccount.pubkey.toBase58(),
-          name: pairMints.map((mint) => mint.symbol).join("/"),
-          ...transformSarosPairAccount(pairAccount),
+          id: lbPair.pubkey.toBase58(),
+          name: poolMints.map((mint) => mint.symbol).join("/"),
+          ...transformMeteoraPairAccount(lbPair),
         };
-      });
+      }),
+    );
 
     const createdPairs = await db
       .insert(pairs)
       .values(values)
       .returning({ id: pairs.id })
-      .onConflictDoUpdate({
-        target: [pairs.id],
-        set: { dynamicFee: pairs.dynamicFee, protocolFee: pairs.protocolFee },
-      })
       .execute();
+
+    const rewards = values
+      .filter((value) => value.rewardMints.length > 0)
+      .flatMap((value) =>
+        value.rewardMints.map((mint) => ({ mint, pair: value.id })),
+      );
+
+    if (rewards.length > 0)
+      await db
+        .insert(rewardMints)
+        .values(rewards)
+        .onConflictDoNothing({ target: [rewardMints.pair, rewardMints.mint] })
+        .execute();
 
     allPairs.push(
       ...(await getPairs(
@@ -231,20 +256,21 @@ const upsertPair = async (
   return allPairs;
 };
 
-export const createSarosSwapFn = async (
+export const createMeteoraSwapFn = async (
   db: Database,
   connection: web3.Connection,
   signature: string,
-  ...values: IdlEvents<LiquidityBook>["binSwapEvent"][]
+  ...swapEvents: IdlEvents<LbClmm>["swap"][]
 ) => {
-  assert(values.length > 0, "expect values > 0");
+  assert(swapEvents.length > 0, "expect swapEvents > 0");
 
   const umi = createUmi(connection.rpcEndpoint);
-  const pairIds = values.map((value) => value.pair.toBase58());
+
+  const pairIds = swapEvents.map((swapEvent) => swapEvent.lbPair.toBase58());
 
   const pairs = await cacheResult(
     async (pairIds) =>
-      upsertPair(db, connection, umi, getMultiplePrices, ...pairIds),
+      upsertMeteoraPair(db, connection, umi, getMultiplePrices, ...pairIds),
     ...pairIds,
   );
 
@@ -252,27 +278,32 @@ export const createSarosSwapFn = async (
     db,
     pairs,
     getMultiplePrices,
-    ...values.map(
+    ...swapEvents.map(
       (
-        value,
+        swapEvent,
       ): Omit<
         z.infer<typeof swapInsertSchema>,
         "baseAmountUsd" | "quoteAmountUsd" | "feeUsd"
       > => {
         const pair = pairs.find((pair) =>
-          value.pair.equals(new web3.PublicKey(pair.id)),
+          swapEvent.lbPair.equals(new web3.PublicKey(pair.id)),
         );
         assert(
           pair,
           format(
             "pair %s not created for swap %s",
-            value.pair.toBase58(),
+            swapEvent.lbPair.toBase58(),
             signature,
           ),
         );
-        const baseAmount = value.swapForY ? value.amountIn : value.amountOut;
-        const quoteAmount = value.swapForY ? value.amountOut : value.amountIn;
-        const feeDecimals = value.swapForY
+
+        const baseAmount = swapEvent.swapForY
+          ? swapEvent.amountIn
+          : swapEvent.amountOut;
+        const quoteAmount = swapEvent.swapForY
+          ? swapEvent.amountOut
+          : swapEvent.amountIn;
+        const feeDecimals = swapEvent.swapForY
           ? pair.baseMint.decimals
           : pair.quoteMint.decimals;
 
@@ -280,9 +311,9 @@ export const createSarosSwapFn = async (
           signature,
           extra: {},
           tvl: pair.liquidity,
-          type: value.swapForY ? "sell" : "buy",
-          pair: value.pair.toBase58(),
-          fee: new Decimal(value.fee.toString())
+          type: swapEvent.swapForY ? "sell" : "buy",
+          pair: swapEvent.lbPair.toBase58(),
+          fee: new Decimal(swapEvent.fee.toString())
             .div(Math.pow(10, feeDecimals))
             .toNumber(),
           baseAmount: new Decimal(baseAmount.toString())

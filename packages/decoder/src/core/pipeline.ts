@@ -20,51 +20,61 @@ export class Pipeline<T extends InstructionProcessor<any> | LogProcessor<any>> {
     else if (pipe instanceof LogProcessor) this.logPipes?.push(pipe);
   }
 
-  process(parsedTransactionWithMeta: web3.ParsedTransactionWithMeta) {
+  async process(parsedTransactionWithMeta: web3.ParsedTransactionWithMeta) {
     const nestedInstructions = this.getNestedInstructions(
       parsedTransactionWithMeta,
     );
 
-    if (parsedTransactionWithMeta.meta?.logMessages && this.logPipes)
-      for (const event of this.logPipes) {
-        const parsedEvents = event.process(
-          parsedTransactionWithMeta.meta.logMessages,
-        );
-        if (parsedEvents)
-          event.consume(parsedEvents, {
-            signature: parsedTransactionWithMeta.transaction.signatures[0],
-          });
-      }
+    const promiseJoins = [];
+    const signature = parsedTransactionWithMeta.transaction.signatures[0];
 
+    if (parsedTransactionWithMeta.meta?.logMessages && this.logPipes)
+      promiseJoins.push(
+        ...this.logPipes.map((pipe) => {
+          const parsedEvents = pipe.process(
+            parsedTransactionWithMeta.meta!.logMessages!,
+          );
+          if (parsedEvents && parsedEvents.length > 0)
+            return pipe.consume(parsedEvents, {
+              signature,
+            });
+
+          return null;
+        }),
+      );
     if (this.instructionPipes)
       for (const [index, outerInstruction] of nestedInstructions.entries()) {
-        for (const instruction of this.instructionPipes) {
-          const parsedInstruction = instruction.process(outerInstruction);
-          if (parsedInstruction) {
-            instruction.consume(parsedInstruction, {
-              index,
-              signature: parsedTransactionWithMeta.transaction.signatures[0],
-            });
-            break;
-          }
-        }
+        promiseJoins.push(
+          ...this.instructionPipes.map((pipe) => {
+            const parsedInstruction = pipe.process(outerInstruction);
+            if (parsedInstruction)
+              return pipe.consume(parsedInstruction, {
+                index,
+                signature,
+              });
+            return null;
+          }),
+        );
 
         if (outerInstruction.innerInstructions)
           for (const innerInstruction of outerInstruction.innerInstructions) {
-            for (const instruction of this.instructionPipes) {
-              const parsedInstruction = instruction.process(innerInstruction);
-              if (parsedInstruction) {
-                instruction.consume(parsedInstruction, {
-                  index,
-                  inner: true,
-                  signature:
-                    parsedTransactionWithMeta.transaction.signatures[0],
-                });
-                break;
-              }
-            }
+            promiseJoins.push(
+              ...this.instructionPipes.map((pipe) => {
+                const parsedInstruction = pipe.process(innerInstruction);
+                if (parsedInstruction)
+                  return pipe.consume(parsedInstruction, {
+                    index,
+                    signature,
+                    inner: true,
+                  });
+
+                return null;
+              }),
+            );
           }
       }
+
+    return Promise.all(promiseJoins.filter(Boolean));
   }
 
   protected getNestedInstructions(

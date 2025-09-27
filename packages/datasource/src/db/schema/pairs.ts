@@ -1,7 +1,7 @@
 import { decimal, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { mints } from "./mints";
 
-type Extra = Record<string, never>;
+type Extra = Record<string, unknown>;
 
 export const pairs = pgTable("pairs", {
   id: text().primaryKey(),
@@ -13,6 +13,10 @@ export const pairs = pgTable("pairs", {
   baseMint: text()
     .references(() => mints.id)
     .notNull(),
+  baseReserveAmount: decimal({ mode: "number" }).notNull(),
+  quoteReserveAmount: decimal({ mode: "number" }).notNull(),
+  baseReserveAmountUsd: decimal({ mode: "number" }).notNull(),
+  quoteReserveAmountUsd: decimal({ mode: "number" }).notNull(),
   binStep: decimal({ mode: "number" }).notNull(),
   baseFee: decimal({ mode: "number" }).notNull(),
   maxFee: decimal({ mode: "number" }).notNull(),

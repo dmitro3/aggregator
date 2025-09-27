@@ -4,10 +4,10 @@ import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { eq, inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
-import { init } from "@rhiva-ag/decoder/programs/saros/index";
+import { init } from "@rhiva-ag/decoder/programs/orca/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
-import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
+import type { Whirlpool } from "@rhiva-ag/decoder/programs/idls/types/orca";
 import {
   AccountLayout,
   getAssociatedTokenAddressSync,
@@ -17,53 +17,63 @@ import {
   getPairs,
   pairs,
   upsertMint,
+  rewardMints,
   type Database,
-  type swapInsertSchema,
   type pairInsertSchema,
+  type swapInsertSchema,
 } from "@rhiva-ag/datasource";
 
 import { cacheResult, getMultiplePrices } from "../utils";
 
-export const transformSarosPairAccount = ({
-  binStep,
-  staticFeeParameters,
-  dynamicFeeParameters,
-  tokenMintX,
-  tokenMintY,
-}: IdlAccounts<LiquidityBook>["pair"]): Omit<
-  z.infer<typeof pairInsertSchema>,
-  "id" | "name"
-> => {
-  const baseFee = (staticFeeParameters.baseFactor * binStep) / 1e6;
-  const variableFee =
-    staticFeeParameters.variableFeeControl > 0
-      ? (Math.pow(dynamicFeeParameters.volatilityAccumulator * binStep, 2) *
-          staticFeeParameters.variableFeeControl) /
-        1e6
-      : 0;
+export const transformOrcaPairAccount = (
+  whirlpool: IdlAccounts<Whirlpool>["whirlpool"],
+  oracle?: IdlAccounts<Whirlpool>["oracle"],
+): Omit<z.infer<typeof pairInsertSchema>, "id" | "name"> & {
+  rewardMints: string[];
+} => {
+  let dynamicFee = 0;
+  const baseFee = whirlpool.feeRate / 1e6;
+  const protocolFee = baseFee * (whirlpool.protocolFeeRate / 1e4);
 
-  const dynamicFee = Math.max(baseFee, variableFee);
-  const protocolFee = dynamicFee * (staticFeeParameters.protocolShare / 1e4);
+  if (oracle) {
+    const variableFee =
+      oracle.adaptiveFeeConstants.adaptiveFeeControlFactor > 0
+        ? (Math.pow(
+            oracle.adaptiveFeeVariables.volatilityAccumulator *
+              whirlpool.tickSpacing,
+            2,
+          ) *
+            oracle.adaptiveFeeConstants.adaptiveFeeControlFactor) /
+          1e6
+        : 0;
+
+    dynamicFee = Math.max(baseFee, variableFee);
+  }
 
   return {
-    baseFee,
-    dynamicFee,
-    protocolFee,
     extra: {},
+    baseFee,
+    protocolFee,
+    maxFee: 10,
     liquidity: 0,
-    market: "saros",
-    maxFee: baseFee,
-    binStep: binStep,
+    dynamicFee,
     baseReserveAmount: 0,
     quoteReserveAmount: 0,
     baseReserveAmountUsd: 0,
     quoteReserveAmountUsd: 0,
-    baseMint: tokenMintX.toBase58(),
-    quoteMint: tokenMintY.toBase58(),
+    market: "orca" as const,
+    binStep: whirlpool.tickSpacing,
+    baseMint: whirlpool.tokenMintA.toBase58(),
+    quoteMint: whirlpool.tokenMintB.toBase58(),
+    rewardMints: whirlpool.rewardInfos
+      .filter(
+        (rewardInfo) => !rewardInfo.mint.equals(web3.SystemProgram.programId),
+      )
+      .map((rewardInfo) => rewardInfo.mint.toBase58()),
   };
 };
 
-const upsertPair = async (
+const upsertOrcaPair = async (
   db: Database,
   connection: web3.Connection,
   umi: Umi,
@@ -73,6 +83,7 @@ const upsertPair = async (
   ...pairIds: string[]
 ) => {
   const [program] = init(connection);
+
   let allPairs = await getPairs(db, inArray(pairs.id, pairIds));
 
   const nonExistingPairPubKeys = pairIds
@@ -83,41 +94,80 @@ const upsertPair = async (
     );
 
   if (nonExistingPairPubKeys.length > 0) {
-    const pairAccounts = await program.account.pair.fetchMultiple(
+    const whirlpools = await program.account.whirlpool.fetchMultiple(
       nonExistingPairPubKeys,
     );
-    const pairAccountsWithPubKeys = pairAccounts
-      .map((pairAccount, index) => {
+
+    const whirlpoolsWithPubkeys = whirlpools
+      .map((whirlpool, index) => {
         const pubkey = nonExistingPairPubKeys[index];
-        if (pairAccount) return { pubkey, ...pairAccount };
+        if (whirlpool) {
+          const feeTierIndex = whirlpool?.feeTierIndexSeed[0];
+          whirlpool?.feeTierIndexSeed[1] * 256;
+          if (whirlpool.tickSpacing === feeTierIndex)
+            return { pubkey, oracle: null, ...whirlpool };
+          const [pda] = web3.PublicKey.findProgramAddressSync(
+            [Buffer.from("oracle"), pubkey.encode()],
+            program.programId,
+          );
+          return { pubkey, oracle: pda, ...whirlpool };
+        }
+        return null;
+      })
+      .filter((whirlpool) => !!whirlpool);
+
+    const whirlPoolsWithOraclePubkeys = whirlpoolsWithPubkeys.filter(
+      (whirlpool) => !!whirlpool.oracle,
+    );
+    let oracles: (IdlAccounts<Whirlpool>["oracle"] | null)[] = [];
+    if (whirlPoolsWithOraclePubkeys.length > 0)
+      oracles = await program.account.oracle.fetchMultiple(
+        whirlPoolsWithOraclePubkeys.map((whirlpool) => whirlpool.oracle),
+      );
+
+    const oraclesWithWhirlpool = oracles
+      .map((oracle, index) => {
+        const whirlpool = whirlPoolsWithOraclePubkeys[index];
+        if (oracle) return { ...oracle, pubkey: whirlpool.oracle };
 
         return null;
       })
-      .filter((pairAccount) => !!pairAccount);
+      .filter((oracle) => !!oracle);
 
     const mints = await upsertMint(
       db,
       umi,
-      ...pairAccountsWithPubKeys.flatMap((pair) => [
-        pair.tokenMintX.toBase58(),
-        pair.tokenMintY.toBase58(),
+      ...whirlpoolsWithPubkeys.flatMap((whirlpool) => [
+        whirlpool.tokenMintA.toBase58(),
+        whirlpool.tokenMintB.toBase58(),
+        ...whirlpool.rewardInfos
+          .filter(
+            (rewardInfo) =>
+              !rewardInfo.mint.equals(web3.SystemProgram.programId),
+          )
+          .map((reward) => reward.mint.toBase58()),
       ]),
     );
 
-    const values: z.infer<typeof pairInsertSchema>[] =
-      pairAccountsWithPubKeys.map((pairAccount) => {
-        const pairMints = mints.filter(
-          (mint) =>
-            pairAccount.tokenMintX.equals(new web3.PublicKey(mint.id)) ||
-            pairAccount.tokenMintY.equals(new web3.PublicKey(mint.id)),
-        );
+    const values: (z.infer<typeof pairInsertSchema> & {
+      rewardMints: string[];
+    })[] = whirlpoolsWithPubkeys.map((whirlpool) => {
+      const poolMints = mints.filter(
+        (mint) =>
+          whirlpool.tokenMintA.equals(new web3.PublicKey(mint.id)) ||
+          whirlpool.tokenMintB.equals(new web3.PublicKey(mint.id)),
+      );
 
-        return {
-          id: pairAccount.pubkey.toBase58(),
-          name: pairMints.map((mint) => mint.symbol).join("/"),
-          ...transformSarosPairAccount(pairAccount),
-        };
-      });
+      const oracle = oraclesWithWhirlpool.find((oracle) =>
+        whirlpool.oracle ? oracle.whirlpool.equals(whirlpool.oracle) : false,
+      );
+
+      return {
+        id: whirlpool.pubkey.toBase58(),
+        name: poolMints.map((mint) => mint.symbol).join("/"),
+        ...transformOrcaPairAccount(whirlpool, oracle),
+      };
+    });
 
     const createdPairs = await db
       .insert(pairs)
@@ -128,6 +178,19 @@ const upsertPair = async (
         set: { dynamicFee: pairs.dynamicFee, protocolFee: pairs.protocolFee },
       })
       .execute();
+
+    const rewards = values
+      .filter((value) => value.rewardMints.length > 0)
+      .flatMap((value) =>
+        value.rewardMints.map((mint) => ({ mint, pair: value.id })),
+      );
+
+    if (rewards.length > 0)
+      await db
+        .insert(rewardMints)
+        .values(rewards)
+        .onConflictDoNothing({ target: [rewardMints.pair, rewardMints.mint] })
+        .execute();
 
     allPairs.push(
       ...(await getPairs(
@@ -224,6 +287,7 @@ const upsertPair = async (
           quoteReserveAmountUsd: pair.quoteReserveAmountUsd,
         })
         .where(eq(pairs.id, pair.id))
+
         .execute(),
     ),
   );
@@ -231,20 +295,21 @@ const upsertPair = async (
   return allPairs;
 };
 
-export const createSarosSwapFn = async (
+export const createOrcaSwapFn = async (
   db: Database,
   connection: web3.Connection,
   signature: string,
-  ...values: IdlEvents<LiquidityBook>["binSwapEvent"][]
+  ...swapEvents: IdlEvents<Whirlpool>["traded"][]
 ) => {
-  assert(values.length > 0, "expect values > 0");
+  assert(swapEvents.length > 0, "expect swapEvents > 0");
 
   const umi = createUmi(connection.rpcEndpoint);
-  const pairIds = values.map((value) => value.pair.toBase58());
+
+  const pairIds = swapEvents.map((swapEvent) => swapEvent.whirlpool.toBase58());
 
   const pairs = await cacheResult(
     async (pairIds) =>
-      upsertPair(db, connection, umi, getMultiplePrices, ...pairIds),
+      upsertOrcaPair(db, connection, umi, getMultiplePrices, ...pairIds),
     ...pairIds,
   );
 
@@ -252,27 +317,33 @@ export const createSarosSwapFn = async (
     db,
     pairs,
     getMultiplePrices,
-    ...values.map(
+    ...swapEvents.map(
       (
-        value,
+        swapEvent,
       ): Omit<
         z.infer<typeof swapInsertSchema>,
         "baseAmountUsd" | "quoteAmountUsd" | "feeUsd"
       > => {
         const pair = pairs.find((pair) =>
-          value.pair.equals(new web3.PublicKey(pair.id)),
+          swapEvent.whirlpool.equals(new web3.PublicKey(pair.id)),
         );
         assert(
           pair,
           format(
             "pair %s not created for swap %s",
-            value.pair.toBase58(),
+            swapEvent.whirlpool.toBase58(),
             signature,
           ),
         );
-        const baseAmount = value.swapForY ? value.amountIn : value.amountOut;
-        const quoteAmount = value.swapForY ? value.amountOut : value.amountIn;
-        const feeDecimals = value.swapForY
+
+        const baseAmount = swapEvent.aToB
+          ? swapEvent.inputAmount
+          : swapEvent.outputAmount;
+        const quoteAmount = swapEvent.aToB
+          ? swapEvent.outputAmount
+          : swapEvent.inputAmount;
+
+        const feeDecimals = swapEvent.aToB
           ? pair.baseMint.decimals
           : pair.quoteMint.decimals;
 
@@ -280,9 +351,9 @@ export const createSarosSwapFn = async (
           signature,
           extra: {},
           tvl: pair.liquidity,
-          type: value.swapForY ? "sell" : "buy",
-          pair: value.pair.toBase58(),
-          fee: new Decimal(value.fee.toString())
+          type: swapEvent.aToB ? "sell" : "buy",
+          pair: swapEvent.whirlpool.toBase58(),
+          fee: new Decimal(swapEvent.lpFee.toString())
             .div(Math.pow(10, feeDecimals))
             .toNumber(),
           baseAmount: new Decimal(baseAmount.toString())

@@ -10,7 +10,7 @@ import {
   ProgramInstructionProcessor,
 } from "../../core";
 
-function init(connection: Connection, extra?: { wallet?: Wallet }) {
+export function init(connection: Connection, extra?: { wallet?: Wallet }) {
   const program = new Program<AmmV3>(
     AmmV3IDL,
     new AnchorProvider(
@@ -23,18 +23,18 @@ function init(connection: Connection, extra?: { wallet?: Wallet }) {
   return [program, { name: "raydium-amm-v3" }] as const;
 }
 
-export abstract class RaydiumProgramInstructionProcessor extends ProgramInstructionProcessor<AmmV3> {
+export class RaydiumProgramInstructionProcessor extends ProgramInstructionProcessor<AmmV3> {
   constructor(connection: Connection) {
     super(...init(connection));
   }
 }
-export abstract class RaydiumProgramInstructionEventProcessor extends ProgramInstructionEventProcessor<AmmV3> {
+export class RaydiumProgramInstructionEventProcessor extends ProgramInstructionEventProcessor<AmmV3> {
   constructor(connection: Connection) {
     super(...init(connection));
   }
 }
 
-export abstract class RaydiumProgramEventProcessor extends ProgramEventProcessor<AmmV3> {
+export class RaydiumProgramEventProcessor extends ProgramEventProcessor<AmmV3> {
   constructor(connection: Connection) {
     super(...init(connection));
   }
