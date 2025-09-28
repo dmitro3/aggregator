@@ -9,11 +9,7 @@ import { getEnv } from "./env";
 export const redis = new Redis(getEnv("REDIS_URL"), {
   maxRetriesPerRequest: null,
 });
-console.log(
-  getEnv("RPC_URL")
-    .replace(/^https/, "wss")
-    .replace(/^http?/, "ws"),
-);
+
 export const connection = new web3.Connection(getEnv("RPC_URL"), {
   wsEndpoint: getEnv("RPC_URL")
     .replace(/^https/, "wss")
