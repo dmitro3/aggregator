@@ -40,14 +40,13 @@ RUN bun --mount=type=cache,target=/root/.bun/cache install --frozen-lockfine
 # Build application
 COPY --from=codegen /usr/src/app/out/full . 
 COPY --from=codegen /usr/src/app/servers/ecosystem.config.js servers/ecosystem.config.js 
-RUN bun x turbo build && bun x turbo check
+RUN bun x turbo check
 
 FROM base as runner 
 WORKDIR /usr/src/app
 
 # Copy built application f
 COPY --from=builder /usr/src/app/ .
-COPY --from=builder /usr/src/app/servers/bot/intl servers/bot/dist/intl
 
 WORKDIR /usr/src/app/servers
 
