@@ -94,7 +94,7 @@ export const getAggregratedPairs = async (
       quoteMint: quoteMints._.selectedFields,
       totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee)
         .mapWith(Number)
-        .as("totalfee"),
+        .as("fees"),
       M5: aggregrate(M5Swaps),
       H1: aggregrate(H1Swaps),
       H6: aggregrate(H6Swaps),

@@ -19,8 +19,8 @@ export const pairRoute = router({
     .input(
       z
         .object({
-          limit: z.number(),
-          offset: z.number(),
+          limit: z.number().optional(),
+          offset: z.number().optional(),
           orderBy: pairOrderBySchema.optional(),
           filter: pairFilterSchema.partial().optional(),
           search: pairSearchSchema.partial().optional(),

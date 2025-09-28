@@ -20,3 +20,25 @@ td {
 td:last-child {
   padding: 4px 0;
 }
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input {
+  @apply !outline-none bg-gray/10 p-2 border-1 border-transparent rounded placeholder-white/50 outline-none;
+}
+
+input:not([type="search"]) {
+  @apply focus:border-primary;
+}
+
+.error {
+  @apply border-red-500! bg-red-500/10! ring-red-500/50! focus:border-red-500!;
+}

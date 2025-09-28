@@ -1,3 +1,7 @@
 export type { AppRouter } from "./routes";
 
-export { pairAggregateSchema } from "./routes/pairs/pair.schema";
+export {
+  pairAggregateSchema,
+  pairFilterSchema,
+  pairOrderBySchema,
+} from "./routes/pairs/pair.schema";

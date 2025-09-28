@@ -55,24 +55,28 @@ export default function PoolCard({
         name: "5m",
         volume: pair.M5.volume,
         tvl: pair.M5.tvl,
+        fees: pair.M5.fees,
         tvlFeeRatio: calculateFeeTVLRatio(pair.M5.tvl, pair.M5.fees),
       },
       {
         name: "1h",
         volume: pair.H1.volume,
         tvl: pair.H1.tvl,
+        fees: pair.H1.fees,
         tvlFeeRatio: calculateFeeTVLRatio(pair.H1.tvl, pair.H1.fees),
       },
       {
         name: "6h",
         volume: pair.H6.volume,
         tvl: pair.H6.tvl,
+        fees: pair.H6.fees,
         tvlFeeRatio: calculateFeeTVLRatio(pair.H6.tvl, pair.H6.fees),
       },
       {
         name: "24h",
         volume: pair.H24.volume,
         tvl: pair.H24.tvl,
+        fees: pair.H24.fees,
         tvlFeeRatio: calculateFeeTVLRatio(pair.H24.tvl, pair.H24.fees),
       },
     ],
@@ -183,25 +187,27 @@ export default function PoolCard({
               </tr>
             </thead>
             <tbody>
-              {poolFlowChanges.map(({ name, volume, tvl, tvlFeeRatio }) => (
-                <tr key={name}>
-                  <td className="text-gray/50">{name}</td>
-                  <td>
-                    <Money value={volume} />
-                  </td>
-                  <td className="flex items-center justify-end space-x-2">
-                    <p>
-                      <Money value={tvl} />
-                    </p>
-                    <Decimal
-                      value={tvlFeeRatio}
-                      end="%"
-                      cap={999}
-                      className="w-16 bg-blue-500/10 text-blue text-center rounded-sm"
-                    />
-                  </td>
-                </tr>
-              ))}
+              {poolFlowChanges.map(
+                ({ name, volume, fees, tvl, tvlFeeRatio }) => (
+                  <tr key={name}>
+                    <td className="text-gray/50">{name}</td>
+                    <td>
+                      <Money value={volume} />
+                    </td>
+                    <td className="flex items-center justify-end space-x-2">
+                      <p>
+                        <Money value={fees} />
+                      </p>
+                      <Decimal
+                        value={tvlFeeRatio}
+                        end="%"
+                        cap={999}
+                        className="w-16 bg-blue-500/10 text-blue text-center rounded-sm"
+                      />
+                    </td>
+                  </tr>
+                ),
+              )}
             </tbody>
           </table>
         </div>

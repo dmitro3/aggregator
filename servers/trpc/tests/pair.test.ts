@@ -23,7 +23,7 @@ describe("unit test pair.controller", () => {
     const orderBy = buildOrderByClauseFromObject(
       pairOrderBySchema.parse({
         M5SwapsFeeUsd: "desc",
-        totalFee: "asc",
+        fees: "asc",
       }),
     );
 

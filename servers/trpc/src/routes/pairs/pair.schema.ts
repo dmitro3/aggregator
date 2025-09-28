@@ -9,10 +9,14 @@ import {
 export const pairFilterSchema = z.object({
   name: whereOperator(z.string()),
   totalFee: whereOperator(z.number()),
+  binStep: whereOperator(z.number()),
   baseFee: whereOperator(z.number()),
+  liquidity: whereOperator(z.number()),
+  volume: whereOperator(z.number()),
+  maxFee: whereOperator(z.number()),
   dynamicFee: whereOperator(z.number()),
   protocolFee: whereOperator(z.number()),
-  liquidity: whereOperator(z.number()),
+  market: whereOperator(pairSelectSchema.shape.market),
 });
 
 export const pairSearchSchema = z.object({
@@ -21,11 +25,12 @@ export const pairSearchSchema = z.object({
 
 export const pairOrderBySchema = orderByOperator(
   z.enum([
+    "H24SwapsVolume",
     "M5SwapsFeeUsd",
     "H1SwapsFeeUsd",
     "h6SwapsFeeUsd",
     "H24SwapsFeeUsd",
-    "totalFee",
+    "fees",
     "baseFee",
     "dynamicFee",
     "protocolfee",

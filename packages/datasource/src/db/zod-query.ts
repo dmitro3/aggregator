@@ -86,4 +86,4 @@ export type OrderByOperator = {
 };
 
 export const orderByOperator = <T extends z.ZodEnum>(key: T) =>
-  z.partialRecord(key, z.enum(["desc", "asc"]));
+  z.union([z.partialRecord(key, z.enum(["desc", "asc"])), z.array(key)]);
