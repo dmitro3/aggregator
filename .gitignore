@@ -3,5 +3,4 @@ node_modules
 .turbo
 .claude
 docs/**
-bun.lock
 .next
