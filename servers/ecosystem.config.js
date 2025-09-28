@@ -13,7 +13,7 @@ module.exports = {
       script: "trpc/src/index.ts",
       instances: navigator.hardwareConcurrency + 1,
       env: {
-        PORT: 9001,
+        PORT: 8000,
       },
     },
     {
