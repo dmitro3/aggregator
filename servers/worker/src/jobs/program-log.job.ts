@@ -1,5 +1,4 @@
 import { Worker } from "bullmq";
-import { web3 } from "@coral-xyz/anchor";
 import { Pipeline, type ProgramEventType } from "@rhiva-ag/decoder";
 import { createRaydiumV3SwapFn } from "../controllers/raydium-controller";
 import type { AmmV3 } from "@rhiva-ag/decoder/programs/idls/types/raydium";
@@ -23,12 +22,10 @@ import {
   WhirlpoolProgramInstructionEventProcessor,
 } from "@rhiva-ag/decoder/programs/orca/index";
 
-import { db, redis } from "../instances";
+import { connection, db, redis } from "../instances";
 import { createOrcaSwapFn } from "../controllers/orca-controller";
 import { createSarosSwapFn } from "../controllers/saros-controller";
 import { createMeteoraSwapFn } from "../controllers/meteora-controller";
-
-const connection = new web3.Connection(web3.clusterApiUrl("mainnet-beta"));
 
 const sarosEventConsumer = async (
   events: ProgramEventType<LiquidityBook>[],

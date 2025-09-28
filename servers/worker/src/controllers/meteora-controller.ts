@@ -2,7 +2,7 @@ import assert from "assert";
 import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
-import { eq, inArray } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import type { Umi } from "@metaplex-foundation/umi";
 import { init } from "@rhiva-ag/decoder/programs/meteora/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
@@ -13,12 +13,20 @@ import {
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import {
+  chunkFetchMultipleAccountInfo,
+  collectionToMap,
+  collectMap,
+} from "@rhiva-ag/shared";
+import {
   createSwap,
   getPairs,
+  mints,
   pairs,
   rewardMints,
   upsertMint,
   type Database,
+  type pairSelectSchema,
+  type mintSelectSchema,
   type pairInsertSchema,
   type swapInsertSchema,
 } from "@rhiva-ag/datasource";
@@ -72,16 +80,14 @@ export const transformMeteoraPairAccount = ({
 
 const upsertMeteoraPair = async (
   db: Database,
-  connection: web3.Connection,
   umi: Umi,
-  getMultiplePrices: (
-    mints: string[],
-  ) => Promise<Record<string, { price: number }>>,
+  connection: web3.Connection,
+
   ...pairIds: string[]
 ) => {
   const [program] = init(connection);
 
-  let allPairs = await getPairs(db, inArray(pairs.id, pairIds));
+  const allPairs = await getPairs(db, inArray(pairs.id, pairIds));
 
   const nonExistingPairPubKeys = pairIds
     .map((pairId) => new web3.PublicKey(pairId))
@@ -94,13 +100,11 @@ const upsertMeteoraPair = async (
     const lbPairs = await program.account.lbPair.fetchMultiple(
       nonExistingPairPubKeys,
     );
-    const lbPairsWithPubkeys = lbPairs
-      .map((lbPair, index) => {
-        const pubkey = nonExistingPairPubKeys[index];
-        if (lbPair) return { pubkey, ...lbPair };
-        return null;
-      })
-      .filter((lbPair) => !!lbPair);
+    const lbPairsWithPubkeys = collectMap(lbPairs, (lbPair, index) => {
+      const pubkey = nonExistingPairPubKeys[index];
+      if (lbPair) return { pubkey, ...lbPair };
+      return null;
+    });
 
     const mints = await upsertMint(
       db,
@@ -135,10 +139,37 @@ const upsertMeteoraPair = async (
       }),
     );
 
+    const syncedPairs = await syncMeteoraPairs(
+      db,
+      connection,
+      values,
+      lbPairs,
+      mints,
+    );
     const createdPairs = await db
       .insert(pairs)
-      .values(values)
+      .values(
+        syncedPairs.map((pair) => {
+          const value = values.find((value) => value.id === pair.id)!;
+          return { ...pair, ...value };
+        }),
+      )
       .returning({ id: pairs.id })
+      .onConflictDoUpdate({
+        target: [pairs.id],
+        set: {
+          maxFee: pairs.maxFee,
+          binStep: pairs.binStep,
+          baseFee: pairs.baseFee,
+          dynamicFee: pairs.dynamicFee,
+          protocolFee: pairs.protocolFee,
+          liquidity: pairs.liquidity,
+          baseReserveAmount: pairs.baseReserveAmount,
+          quoteReserveAmount: pairs.quoteReserveAmount,
+          baseReserveAmountUsd: pairs.baseReserveAmountUsd,
+          quoteReserveAmountUsd: pairs.quoteReserveAmountUsd,
+        },
+      })
       .execute();
 
     const rewards = values
@@ -165,94 +196,6 @@ const upsertMeteoraPair = async (
     );
   }
 
-  const prices = await getMultiplePrices(
-    allPairs.flatMap((pair) => [pair.baseMint.id, pair.quoteMint.id]),
-  );
-
-  allPairs = await Promise.all(
-    allPairs.map(async (pair) => {
-      const pairPubKey = new web3.PublicKey(pair.id);
-      const mints = [pair.baseMint, pair.quoteMint];
-
-      const [baseMint, quoteMint] = mints.map(
-        (mint) => new web3.PublicKey(mint.id),
-      );
-
-      const poolMintVaults = await Promise.all(
-        mints.map((mint) =>
-          getAssociatedTokenAddressSync(
-            new web3.PublicKey(mint.id),
-            pairPubKey,
-            true,
-            new web3.PublicKey(mint.tokenProgram),
-          ),
-        ),
-      );
-
-      const poolMintVaultAccounttInfos =
-        await connection.getMultipleAccountsInfo(poolMintVaults);
-
-      let baseTokenReserveAmount = BigInt(0);
-      let quoteTokenReserveAmount = BigInt(0);
-
-      for (const poolMintVault of poolMintVaultAccounttInfos) {
-        if (poolMintVault) {
-          const account = AccountLayout.decode(poolMintVault.data);
-          if (account.mint.equals(baseMint))
-            baseTokenReserveAmount += account.amount;
-          if (account.mint.equals(quoteMint))
-            quoteTokenReserveAmount += account.amount;
-        }
-      }
-
-      const basePrice = prices[pair.baseMint.id];
-      const quotePrice = prices[pair.quoteMint.id];
-
-      const baseReserveAmount = new Decimal(baseTokenReserveAmount)
-        .div(Math.pow(10, pair.baseMint.decimals))
-        .toNumber();
-
-      const quoteReserveAmount = new Decimal(quoteTokenReserveAmount)
-        .div(Math.pow(10, pair.quoteMint.decimals))
-        .toNumber();
-
-      let baseReserveAmountUsd = 0,
-        quoteReserveAmountUsd = 0;
-
-      if (basePrice) {
-        baseReserveAmountUsd = baseReserveAmount * basePrice.price;
-      }
-      if (quotePrice) {
-        quoteReserveAmountUsd = quoteReserveAmount * quotePrice.price;
-      }
-
-      return {
-        ...pair,
-        baseReserveAmount,
-        quoteReserveAmount,
-        baseReserveAmountUsd,
-        quoteReserveAmountUsd,
-        liquidity: baseReserveAmountUsd + quoteReserveAmountUsd,
-      };
-    }),
-  );
-
-  await db.transaction(async (db) =>
-    allPairs.map((pair) =>
-      db
-        .update(pairs)
-        .set({
-          liquidity: pair.liquidity,
-          baseReserveAmount: pair.baseReserveAmount,
-          quoteReserveAmount: pair.quoteReserveAmount,
-          baseReserveAmountUsd: pair.baseReserveAmountUsd,
-          quoteReserveAmountUsd: pair.quoteReserveAmountUsd,
-        })
-        .where(eq(pairs.id, pair.id))
-        .execute(),
-    ),
-  );
-
   return allPairs;
 };
 
@@ -265,12 +208,10 @@ export const createMeteoraSwapFn = async (
   assert(swapEvents.length > 0, "expect swapEvents > 0");
 
   const umi = createUmi(connection.rpcEndpoint);
-
   const pairIds = swapEvents.map((swapEvent) => swapEvent.lbPair.toBase58());
 
   const pairs = await cacheResult(
-    async (pairIds) =>
-      upsertMeteoraPair(db, connection, umi, getMultiplePrices, ...pairIds),
+    async (pairIds) => upsertMeteoraPair(db, umi, connection, ...pairIds),
     ...pairIds,
   );
 
@@ -327,3 +268,145 @@ export const createMeteoraSwapFn = async (
     ),
   );
 };
+
+export async function syncMeteoraPairs(
+  db: Database,
+  connection: web3.Connection,
+  allPairs: Pick<z.infer<typeof pairSelectSchema>, "id">[],
+  pairAccounts?: (IdlAccounts<LbClmm>["lbPair"] | null)[],
+  allPairMints?: Pick<
+    z.infer<typeof mintSelectSchema>,
+    "id" | "decimals" | "tokenProgram"
+  >[],
+) {
+  const [program] = init(connection);
+  assert(allPairs.length < 101, "maximum pairs that can be synced once is 101");
+  pairAccounts = pairAccounts
+    ? pairAccounts
+    : await program.account.lbPair.fetchMultiple(
+        allPairs.map((pair) => pair.id),
+      );
+
+  const mintIds = collectMap(pairAccounts, (pair) =>
+    pair ? [pair.tokenXMint.toBase58(), pair.tokenYMint.toBase58()] : null,
+  ).flat();
+
+  const pairMints = collectionToMap(
+    allPairMints
+      ? allPairMints
+      : await db.query.mints.findMany({
+          where: inArray(mints.id, mintIds),
+          columns: {
+            id: true,
+            decimals: true,
+            tokenProgram: true,
+          },
+        }),
+    (item) => item.id,
+  );
+  const pairAccountWithPubkeys = collectMap(
+    pairAccounts,
+    (pairAccount, index) => {
+      if (pairAccount) {
+        const pubkey = new web3.PublicKey(allPairs[index]);
+        const mintX = pairMints.get(pairAccount.tokenXMint.toBase58());
+        const mintY = pairMints.get(pairAccount.tokenYMint.toBase58());
+
+        assert(mintX && mintY, "mintX and mintY required.");
+
+        const tokenXVault = getAssociatedTokenAddressSync(
+          pairAccount.tokenYMint,
+          pubkey,
+          true,
+          new web3.PublicKey(mintX.tokenProgram),
+        );
+        const tokenYVault = getAssociatedTokenAddressSync(
+          pairAccount.tokenYMint,
+          pubkey,
+          true,
+          new web3.PublicKey(mintY.tokenProgram),
+        );
+        return {
+          ...pairAccount,
+          pubkey,
+          mintX,
+          mintY,
+          tokenXVault,
+          tokenYVault,
+        };
+      }
+
+      return null;
+    },
+  );
+
+  const tokenAccounts = await chunkFetchMultipleAccountInfo(
+    connection.getMultipleAccountsInfo,
+    101,
+  )(
+    pairAccountWithPubkeys.flatMap((pair) => [
+      pair.tokenXVault,
+      pair.tokenYVault,
+    ]),
+  );
+
+  const prices = await getMultiplePrices(mintIds);
+
+  const updates = collectMap(
+    pairAccountWithPubkeys,
+    (
+      pair,
+    ): (Partial<z.infer<typeof pairInsertSchema>> & { id: string }) | null => {
+      const tokenXPrice = prices[pair.tokenXMint.toBase58()];
+      const tokenYPrice = prices[pair.tokenYMint.toBase58()];
+
+      const tokenXVaultAccountInfo = tokenAccounts.get(
+        pair.tokenXVault.toBase58(),
+      );
+      const tokenYVaultAccountInfo = tokenAccounts.get(
+        pair.tokenYVault.toBase58(),
+      );
+
+      if (tokenXVaultAccountInfo && tokenYVaultAccountInfo) {
+        const tokenXVaultAccount = AccountLayout.decode(
+          tokenXVaultAccountInfo.data,
+        );
+        const tokenYVaultAccount = AccountLayout.decode(
+          tokenYVaultAccountInfo.data,
+        );
+
+        const baseReserveAmount = new Decimal(tokenXVaultAccount.amount)
+          .div(Math.pow(10, pair.mintX.decimals))
+          .toNumber();
+        const quoteReserveAmount = new Decimal(tokenYVaultAccount.amount)
+          .div(Math.pow(10, pair.mintY.decimals))
+          .toNumber();
+        const baseReserveAmountUsd = baseReserveAmount * tokenXPrice.price;
+        const quoteReserveAmountUsd = baseReserveAmount * tokenYPrice.price;
+
+        const transformedPairAccount = transformMeteoraPairAccount(pair);
+
+        if (tokenXPrice && tokenYPrice) {
+          return {
+            syncAt: new Date(),
+            baseReserveAmount,
+            quoteReserveAmount,
+            baseReserveAmountUsd,
+            quoteReserveAmountUsd,
+            id: pair.pubkey.toBase58(),
+            baseFee: transformedPairAccount.baseFee,
+            maxFee: transformedPairAccount.maxFee,
+            binStep: transformedPairAccount.binStep,
+            dynamicFee: transformedPairAccount.dynamicFee,
+            protocolFee: transformedPairAccount.protocolFee,
+            liquidity: baseReserveAmountUsd + quoteReserveAmountUsd,
+          };
+        }
+      }
+
+      return null;
+    },
+  );
+
+  return updates;
+}
