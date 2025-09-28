@@ -35,6 +35,6 @@
   "workspaces": [
     "packages/*",
     "servers/*",
-    "apps/lens"
+    "apps/*"
   ]
 }
