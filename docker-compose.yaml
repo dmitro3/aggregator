@@ -42,5 +42,7 @@ services:
 networks:
   webnet:
     driver: bridge
+    external: true
 volumes:
   redis-data:
+    external: true
