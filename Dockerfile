@@ -25,7 +25,7 @@ COPY package.json ./package.json
 
 # Run turbo prune for docker build
 RUN bun install turbo --global && \
-    bun x turbo prune @rhiva-ag/rpc @rhiva-ag/worker --docker
+    bun x turbo prune @rhiva-ag/trpc @rhiva-ag/worker --docker
 
 FROM base as builder
 WORKDIR /usr/src/app
@@ -34,6 +34,7 @@ ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 
 # Install node modules
 COPY --from=codegen /usr/src/app/out/json .
+RUN bun install --global pm2 turbo
 RUN bun --mount=type=cache,target=/root/.bun/cache install --frozen-lockfine
 
 # Build application

@@ -4,7 +4,8 @@
     "useIgnoreFile": true
   },
   "files": {
-    "includes": ["**", "!**/.next"]
+    "ignoreUnknown": true,
+    "includes": ["**", "!**/.next", "!bun.lock"]
   },
   "linter": {
     "rules": {
