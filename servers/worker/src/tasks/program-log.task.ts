@@ -17,7 +17,7 @@ event.on("failed", ({ jobId, failedReason }) =>
   logger.error({ jobId, failedReason }, "job.failed"),
 );
 
-export const runTask = (programs: web3.PublicKey[]) => {
+export const runProgramLogTask = (programs: web3.PublicKey[]) => {
   const subscriptions: number[] = [];
 
   for (const program of programs) {

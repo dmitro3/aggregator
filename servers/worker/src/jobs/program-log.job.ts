@@ -113,7 +113,7 @@ export const pipeline = new Pipeline([
   ),
 ]);
 
-export const worker = new Worker(
+export const programLogWorker = new Worker(
   "programLog",
   async (job) => {
     const transactions = await connection.getParsedTransactions(

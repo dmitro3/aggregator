@@ -328,7 +328,7 @@ export async function syncRaydiumPairs(
           ),
       (ammConfig, index) => {
         const pairAccount = purePairAccountWithPubkeys[index];
-        if (ammConfig) return { ...ammConfig, pubkey: pairAccount.pubkey };
+        if (ammConfig) return { ...ammConfig, pubkey: pairAccount.ammConfig };
         return null;
       },
     ),
@@ -352,7 +352,7 @@ export async function syncRaydiumPairs(
     pairAccounts,
     (pairAccount, index) => {
       if (pairAccount) {
-        const pubkey = new web3.PublicKey(allPairs[index]);
+        const pubkey = new web3.PublicKey(allPairs[index].id);
         const mintX = pairMints.get(pairAccount.tokenMint0.toBase58());
         const mintY = pairMints.get(pairAccount.tokenMint1.toBase58());
         const ammConfigAccount = ammConfigs.get(
@@ -376,7 +376,7 @@ export async function syncRaydiumPairs(
   );
 
   const tokenAccounts = await chunkFetchMultipleAccountInfo(
-    connection.getMultipleAccountsInfo,
+    connection.getMultipleAccountsInfo.bind(connection),
     101,
   )(
     pairAccountWithPubkeys.flatMap((pair) => [

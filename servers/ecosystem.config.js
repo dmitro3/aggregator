@@ -10,7 +10,7 @@ module.exports = {
       name: "api",
       exec_mode: "fork",
       increment_var: "PORT",
-      script: "api/src/index.js",
+      script: "trpc/src/index.ts",
       instances: navigator.hardwareConcurrency + 1,
       env: {
         PORT: 9001,

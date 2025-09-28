@@ -333,7 +333,7 @@ export async function syncOrcaPairs(
     pairAccounts,
     (pairAccount, index) => {
       if (pairAccount) {
-        const pubkey = new web3.PublicKey(allPairs[index]);
+        const pubkey = new web3.PublicKey(allPairs[index].id);
         const mintX = pairMints.get(pairAccount.tokenMintA.toBase58());
         const mintY = pairMints.get(pairAccount.tokenMintB.toBase58());
         assert(mintX && mintY, "mintX and mintY required.");
@@ -381,7 +381,7 @@ export async function syncOrcaPairs(
       (oracle) => oracle.pubkey.toBase58(),
     );
   const tokenAccounts = await chunkFetchMultipleAccountInfo(
-    connection.getMultipleAccountsInfo,
+    connection.getMultipleAccountsInfo.bind(connection),
     101,
   )(
     pairAccountWithPubkeys.flatMap((pair) => [
@@ -391,7 +391,6 @@ export async function syncOrcaPairs(
   );
 
   const prices = await getMultiplePrices(mintIds);
-
   const updates = collectMap(
     pairAccountWithPubkeys,
     (
@@ -405,7 +404,6 @@ export async function syncOrcaPairs(
       const oracle = pair.oracle
         ? oracles.get(pair.oracle.toBase58())
         : undefined;
-
       const tokenXVaultAccountInfo = tokenAccounts.get(
         pair.tokenVaultA.toBase58(),
       );

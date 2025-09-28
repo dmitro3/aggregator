@@ -116,5 +116,5 @@ export const getAggregratedPairs = async (
     if (extra.orderBy) query.orderBy(...extra.orderBy);
   }
 
-  return query.execute() as unknown as z.infer<typeof pairAggregateSchema>;
+  return query.execute() as unknown as z.infer<typeof pairAggregateSchema>[];
 };

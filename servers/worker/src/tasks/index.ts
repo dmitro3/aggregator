@@ -1,13 +1,18 @@
 import { web3 } from "@coral-xyz/anchor";
-import { runTask } from "./program-log.task";
+
+import { runSyncPairTask } from "./sync-pair.task";
+import { runProgramLogTask } from "./program-log.task";
 
 (() => {
-  const stop = runTask([
+  const stopSyncPairTask = runSyncPairTask(["saros"]);
+
+  const stopProgramLogTask = runProgramLogTask([
     new web3.PublicKey("1qbkdrr3z4ryLA7pZykqxvxWPoeifcVKo6ZG9CfkvVE"),
   ]);
 
   const shutdown = async () => {
-    await stop();
+    await stopSyncPairTask();
+    await stopProgramLogTask();
     process.exit(0);
   };
 

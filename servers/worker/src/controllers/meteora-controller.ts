@@ -3,15 +3,12 @@ import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { inArray } from "drizzle-orm";
+import { AccountLayout } from "@solana/spl-token";
 import type { Umi } from "@metaplex-foundation/umi";
 import { init } from "@rhiva-ag/decoder/programs/meteora/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
 import type { LbClmm } from "@rhiva-ag/decoder/programs/idls/types/meteora";
-import {
-  AccountLayout,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
 import {
   chunkFetchMultipleAccountInfo,
   collectionToMap,
@@ -138,7 +135,6 @@ const upsertMeteoraPair = async (
         };
       }),
     );
-
     const syncedPairs = await syncMeteoraPairs(
       db,
       connection,
@@ -146,6 +142,7 @@ const upsertMeteoraPair = async (
       lbPairs,
       mints,
     );
+
     const createdPairs = await db
       .insert(pairs)
       .values(
@@ -308,31 +305,17 @@ export async function syncMeteoraPairs(
     pairAccounts,
     (pairAccount, index) => {
       if (pairAccount) {
-        const pubkey = new web3.PublicKey(allPairs[index]);
+        const pubkey = new web3.PublicKey(allPairs[index].id);
         const mintX = pairMints.get(pairAccount.tokenXMint.toBase58());
         const mintY = pairMints.get(pairAccount.tokenYMint.toBase58());
 
         assert(mintX && mintY, "mintX and mintY required.");
 
-        const tokenXVault = getAssociatedTokenAddressSync(
-          pairAccount.tokenYMint,
-          pubkey,
-          true,
-          new web3.PublicKey(mintX.tokenProgram),
-        );
-        const tokenYVault = getAssociatedTokenAddressSync(
-          pairAccount.tokenYMint,
-          pubkey,
-          true,
-          new web3.PublicKey(mintY.tokenProgram),
-        );
         return {
           ...pairAccount,
           pubkey,
           mintX,
           mintY,
-          tokenXVault,
-          tokenYVault,
         };
       }
 
@@ -341,14 +324,9 @@ export async function syncMeteoraPairs(
   );
 
   const tokenAccounts = await chunkFetchMultipleAccountInfo(
-    connection.getMultipleAccountsInfo,
+    connection.getMultipleAccountsInfo.bind(connection),
     101,
-  )(
-    pairAccountWithPubkeys.flatMap((pair) => [
-      pair.tokenXVault,
-      pair.tokenYVault,
-    ]),
-  );
+  )(pairAccountWithPubkeys.flatMap((pair) => [pair.reserveX, pair.reserveY]));
 
   const prices = await getMultiplePrices(mintIds);
 
@@ -359,12 +337,11 @@ export async function syncMeteoraPairs(
     ): (Partial<z.infer<typeof pairInsertSchema>> & { id: string }) | null => {
       const tokenXPrice = prices[pair.tokenXMint.toBase58()];
       const tokenYPrice = prices[pair.tokenYMint.toBase58()];
-
       const tokenXVaultAccountInfo = tokenAccounts.get(
-        pair.tokenXVault.toBase58(),
+        pair.reserveX.toBase58(),
       );
       const tokenYVaultAccountInfo = tokenAccounts.get(
-        pair.tokenYVault.toBase58(),
+        pair.reserveY.toBase58(),
       );
 
       if (tokenXVaultAccountInfo && tokenYVaultAccountInfo) {

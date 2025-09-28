@@ -1,10 +1,13 @@
-import { worker } from "../jobs/program-log.job";
+import { syncPairWorker } from "./sync-pair.job";
+import { programLogWorker } from "./program-log.job";
 
 (async () => {
-  if (!worker.isRunning()) await worker.run();
+  const workers = [programLogWorker, syncPairWorker];
+
+  for (const worker of workers) if (!worker.isRunning()) await worker.run();
 
   const stop = async () => {
-    await worker.close();
+    for (const worker of workers) worker.close();
     process.exit(0);
   };
 

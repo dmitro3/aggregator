@@ -152,9 +152,9 @@ const upsertPair = async (
           maxFee: pairs.maxFee,
           binStep: pairs.binStep,
           baseFee: pairs.baseFee,
+          liquidity: pairs.liquidity,
           dynamicFee: pairs.dynamicFee,
           protocolFee: pairs.protocolFee,
-          liquidity: pairs.liquidity,
           baseReserveAmount: pairs.baseReserveAmount,
           quoteReserveAmount: pairs.quoteReserveAmount,
           baseReserveAmountUsd: pairs.baseReserveAmountUsd,
@@ -279,7 +279,7 @@ export async function syncSarosPairs(
     pairAccounts,
     (pairAccount, index) => {
       if (pairAccount) {
-        const pubkey = new web3.PublicKey(allPairs[index]);
+        const pubkey = new web3.PublicKey(allPairs[index].id);
         const mintX = pairMints.get(pairAccount.tokenMintX.toBase58());
         const mintY = pairMints.get(pairAccount.tokenMintY.toBase58());
 
@@ -312,7 +312,7 @@ export async function syncSarosPairs(
   );
 
   const tokenAccounts = await chunkFetchMultipleAccountInfo(
-    connection.getMultipleAccountsInfo,
+    connection.getMultipleAccountsInfo.bind(connection),
     101,
   )(
     pairAccountWithPubkeys.flatMap((pair) => [
@@ -355,9 +355,9 @@ export async function syncSarosPairs(
         const quoteReserveAmount = new Decimal(tokenYVaultAccount.amount)
           .div(Math.pow(10, pair.mintY.decimals))
           .toNumber();
-        const baseReserveAmountUsd = baseReserveAmount * tokenXPrice.price;
-        const quoteReserveAmountUsd = baseReserveAmount * tokenYPrice.price;
 
+        const baseReserveAmountUsd = baseReserveAmount * tokenXPrice.price;
+        const quoteReserveAmountUsd = quoteReserveAmount * tokenYPrice.price;
         const transformedPairAccount = transformSarosPairAccount(pair);
 
         if (tokenXPrice && tokenYPrice) {
