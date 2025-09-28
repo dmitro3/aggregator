@@ -1,10 +1,11 @@
 {
   "name": "@rhiva-ag/shared",
-  "version": "0.0.0",
   "private": true,
-  "main": "src/index.ts",
-  "types": "src/index.ts",
-  "module": "src/index.ts",
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "module": "./src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -16,6 +17,10 @@
   },
   "peerDependencies": {},
   "dependencies": {
-    "ioredis": "^5.7.0"
+    "lodash.chunk": "^4.2.0"
+  },
+  "devDependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "@types/lodash.chunk": "^4.2.9"
   }
 }

@@ -92,9 +92,9 @@ export const getAggregratedPairs = async (
       ...getTableColumns(pairs),
       baseMint: baseMints._.selectedFields,
       quoteMint: quoteMints._.selectedFields,
-      totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee).mapWith(
-        Number,
-      ),
+      totalFee: add(pairs.baseFee, pairs.protocolFee, pairs.dynamicFee)
+        .mapWith(Number)
+        .as("totalfee"),
       M5: aggregrate(M5Swaps),
       H1: aggregrate(H1Swaps),
       H6: aggregrate(H6Swaps),

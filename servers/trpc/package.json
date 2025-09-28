@@ -14,6 +14,7 @@
   },
   "scripts": {
     "check": "tsc --noEmit",
+    "codegen": "bun x @rhiva-ag/env",
     "dev": "bun run --watch src/index.ts"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "@fastify/websocket": "^11.2.0",
     "@rhiva-ag/datasource": "*",
     "@rhiva-ag/shared": "*",
+    "@rhiva-ag/env": "*",
     "@trpc/server": "^11.6.0",
     "drizzle-orm": "^0.44.5",
     "fastify": "^5.6.1",

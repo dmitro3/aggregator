@@ -1,7 +1,7 @@
 @unocss all;
 
 .dollar::before {
-  content: "$ ";
+  content: "$";
 }
 
 th {

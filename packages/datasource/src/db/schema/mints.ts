@@ -1,8 +1,8 @@
 import { integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 type Extra = {
-  uri: string;
-  metadata?: Record<string, any>;
+  uri?: string;
+  metadata?: Record<string, unknown>;
 };
 
 export const mints = pgTable("mints", {
@@ -12,6 +12,6 @@ export const mints = pgTable("mints", {
   decimals: integer().notNull(),
   extra: jsonb().$type<Extra>().notNull(),
   tokenProgram: text().notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-  syncAt: timestamp().defaultNow().notNull(),
+  syncAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });

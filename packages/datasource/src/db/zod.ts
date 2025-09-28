@@ -6,8 +6,8 @@ import { mints, pairs, swaps } from "./schema";
 export const metadataSchema = z.object({
   name: z.string().optional(),
   symbol: z.string().optional(),
+  image: z.url().optional(),
   description: z.string().optional(),
-  image: z.string().url().optional(),
   animation_url: z.url().optional(),
   external_url: z.url().optional(),
 });
@@ -15,7 +15,7 @@ export const metadataSchema = z.object({
 export const mintInsertSchema = createInsertSchema(mints, {
   extra: z.object({
     uri: z.url().optional(),
-    metadata: metadataSchema.nullish(),
+    metadata: metadataSchema.partial(),
   }),
 });
 export const mintSelectSchema = createSelectSchema(mints);

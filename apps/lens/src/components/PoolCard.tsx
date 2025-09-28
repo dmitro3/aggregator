@@ -1,15 +1,16 @@
 import type z from "zod";
 import Link from "next/link";
 import Image from "next/image";
+import { useCallback, useMemo } from "react";
 import type { pairAggregateSchema } from "@rhiva-ag/trpc";
 
 import Money from "./Money";
+import Decimal from "./Decimal";
 import BirdEye from "../assets/b.png";
 import Photon from "../assets/ph.png";
 import Axios from "../assets/axi.png";
 import Jupiter from "../assets/jup.png";
 import Dexscreener from "../assets/dex.png";
-import { useCallback, useMemo } from "react";
 
 export default function PoolCard({
   pair,
@@ -66,20 +67,20 @@ export default function PoolCard({
         name: "6h",
         volume: pair.H6.volume,
         tvl: pair.H6.tvl,
-        tvlFeeRatio: calculateFeeTVLRatio(pair.H6.tvl, pair.M5.fees),
+        tvlFeeRatio: calculateFeeTVLRatio(pair.H6.tvl, pair.H6.fees),
       },
       {
         name: "24h",
         volume: pair.H24.volume,
         tvl: pair.H24.tvl,
-        tvlFeeRatio: calculateFeeTVLRatio(pair.H24.tvl, pair.M5.fees),
+        tvlFeeRatio: calculateFeeTVLRatio(pair.H24.tvl, pair.H24.fees),
       },
     ],
     [pair, calculateFeeTVLRatio],
   );
 
   return (
-    <div className="flex flex-col space-y-2 bg-white/3 p-4 md:max-w-96">
+    <div className="flex flex-col space-y-2 bg-white/3 p-4 md:w-96">
       <div className="flex space-x-2">
         {links.map((link) => (
           <Link
@@ -119,7 +120,7 @@ export default function PoolCard({
         <div className="flex flex-col items-end space-y-1">
           <p>24hr Fee/TVL</p>
           <p className="px-4 py-0.5 text-center bg-violet-700/25 text-violet-500">
-            {H24FeeTVLRatio}%
+            <Decimal value={H24FeeTVLRatio} />%
           </p>
         </div>
       </div>
@@ -157,12 +158,14 @@ export default function PoolCard({
                   <td className="invisible">-25%</td>
                   <td>
                     <div className="flex items-center justify-end space-x-2">
-                      <p className="px-4  bg-green-500/25 text-green text-center rounded-sm">
-                        {buyCount}
-                      </p>
-                      <p className="px-4 bg-red500/25 text-red text-center rounded-sm">
-                        {sellCount}
-                      </p>
+                      <Decimal
+                        value={buyCount}
+                        className="w-12 px-4  bg-green-500/10 text-green text-center rounded-sm"
+                      />
+                      <Decimal
+                        value={sellCount}
+                        className="w-12 px-4 bg-red-500/10 text-red text-center rounded-sm"
+                      />
                     </div>
                   </td>
                 </tr>
@@ -190,9 +193,12 @@ export default function PoolCard({
                     <p>
                       <Money value={tvl} />
                     </p>
-                    <p className="px-4 bg-blue-500/20 text-blue text-center rounded-sm">
-                      {tvlFeeRatio}%
-                    </p>
+                    <Decimal
+                      value={tvlFeeRatio}
+                      end="%"
+                      cap={999}
+                      className="w-16 bg-blue-500/10 text-blue text-center rounded-sm"
+                    />
                   </td>
                 </tr>
               ))}

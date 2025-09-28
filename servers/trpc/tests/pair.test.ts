@@ -16,8 +16,7 @@ describe("unit test pair.controller", () => {
   test("should pass pair aggregrate", async () => {
     const where = buildDrizzleWhereClauseFromObject(
       pairFilterSchema.partial().parse({
-        name: { eq: "" },
-        totalFee: { eq: 5 },
+        name: { eq: "USDC/USDT" },
       }),
     );
 

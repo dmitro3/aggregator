@@ -6,14 +6,15 @@ import { whereOperator } from "../src/db/zod-query";
 import { createDB, pairs, type Database } from "../src";
 import {
   buildDrizzleWhereClauseFromObject,
-  buildOrderByClauseFromArray,
+  buildOrderByClauseFromObject,
 } from "../src/db/drizzle-query";
+import { getEnv } from "../src/env";
 
 describe("test building drizzle query schema", () => {
   let db: Database;
 
   beforeAll(() => {
-    db = createDB(process.env.DATABASE_URL!);
+    db = createDB(getEnv("DATABASE_URL"));
   });
 
   test("first order simple query", () => {
@@ -32,7 +33,7 @@ describe("test building drizzle query schema", () => {
       }),
     );
 
-    const orderBy = buildOrderByClauseFromArray({
+    const orderBy = buildOrderByClauseFromObject({
       createdAt: "desc",
       id: "asc",
     });

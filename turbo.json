@@ -19,6 +19,7 @@
       "persistent": true,
       "cache": false
     },
+    "codegen": {},
     "lint": {}
   }
 }

@@ -8,6 +8,7 @@ import {
 
 import { createContext } from "./context";
 import { appRouter, type AppRouter } from "./routes";
+import { getEnv } from "./env";
 
 const server = fastify({
   logger: true,
@@ -29,4 +30,7 @@ server.register(fastifyTRPCPlugin, {
   } satisfies FastifyTRPCPluginOptions<AppRouter>["trpcOptions"],
 });
 
-server.listen({ port: parseFloat(process.env.PORT!), host: process.env.HOST });
+server.listen({
+  port: getEnv<number>("PORT", Number),
+  host: getEnv<string>("HOST"),
+});

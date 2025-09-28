@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "check": "tsc --noEmit",
+    "codegen": "bun x @rhiva-ag/env",
     "migrate": "drizzle-kit generate && drizzle-kit migrate"
   },
   "exports": {
@@ -19,6 +20,8 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@rhiva-ag/env": "*",
+    "@rhiva-ag/dex-api": "*",
     "@coral-xyz/anchor": "^0.31.1",
     "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
     "@metaplex-foundation/mpl-toolbox": "^0.10.0",

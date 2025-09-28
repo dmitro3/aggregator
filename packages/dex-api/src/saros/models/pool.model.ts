@@ -1,3 +1,11 @@
+export type Pool = {
+  pairs: Pair[];
+  totalLiquidity: string;
+  volume24h: string;
+  fees24h: string;
+  apr24h: number;
+} & Pick<Pair, "tokenX" | "tokenY">;
+
 export interface Pair {
   _id: string;
   pair: string;
@@ -12,7 +20,7 @@ export interface Pair {
     mintAddress: string;
     name: string;
     symbol: string;
-    decimal: number;
+    decimals: number;
     image: string;
   };
   tokenY: {
@@ -20,7 +28,7 @@ export interface Pair {
     mintAddress: string;
     name: string;
     symbol: string;
-    decimal: number;
+    decimals: number;
     image: string;
   };
   reserveX: string;

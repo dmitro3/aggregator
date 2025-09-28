@@ -19,5 +19,5 @@ export const swaps = pgTable("swaps", {
   quoteAmount: decimal({ mode: "number" }).notNull(),
   tvl: decimal({ mode: "number" }),
   price: decimal({ mode: "number" }),
-  createdAt: timestamp().defaultNow().notNull(),
+  createdAt: timestamp({ withTimezone: true }).defaultNow().notNull(),
 });
