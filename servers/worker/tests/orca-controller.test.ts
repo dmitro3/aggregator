@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, test } from "bun:test";
 import { init } from "@rhiva-ag/decoder/programs/orca/index";
 import type { Whirlpool } from "@rhiva-ag/decoder/programs/idls/types/orca";
 
-import { transformOrcaPairAccount } from "../src/controllers/orca-controller";
+import { transformOrcaPairAccount } from "@rhiva-ag/datasource";
 
 describe("Orca Controller", () => {
   let program: Program<Whirlpool>;

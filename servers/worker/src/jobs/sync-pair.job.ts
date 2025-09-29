@@ -1,13 +1,16 @@
 import { Worker } from "bullmq";
 import { eq } from "drizzle-orm";
 import type { z } from "zod/mini";
-import { pairs, type pairSelectSchema } from "@rhiva-ag/datasource";
+import {
+  pairs,
+  syncMeteoraPairs,
+  syncOrcaPairs,
+  syncRaydiumPairs,
+  syncSarosPairs,
+  type pairSelectSchema,
+} from "@rhiva-ag/datasource";
 
 import { db, connection, redis } from "../instances";
-import { syncSarosPairs } from "../controllers/saros-controller";
-import { syncOrcaPairs } from "../controllers/orca-controller";
-import { syncRaydiumPairs } from "../controllers/raydium-controller";
-import { syncMeteoraPairs } from "../controllers/meteora-controller";
 
 type SyncPairJobData = {
   offset: number;

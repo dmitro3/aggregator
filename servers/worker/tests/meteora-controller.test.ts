@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, test } from "bun:test";
 import { init } from "@rhiva-ag/decoder/programs/meteora/index";
 import type { LbClmm } from "@rhiva-ag/decoder/programs/idls/types/meteora";
 
-import { transformMeteoraPairAccount } from "../src/controllers/meteora-controller";
+import { transformMeteoraPairAccount } from "@rhiva-ag/datasource";
 
 describe("Raydium Controller", () => {
   let program: Program<LbClmm>;

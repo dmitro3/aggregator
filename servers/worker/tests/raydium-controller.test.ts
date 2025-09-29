@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, test } from "bun:test";
 import { init } from "@rhiva-ag/decoder/programs/raydium/index";
 import type { AmmV3 } from "@rhiva-ag/decoder/programs/idls/types/raydium";
 
-import { transformRaydiumPairAccount } from "../src/controllers/raydium-controller";
+import { transformRaydiumPairAccount } from "@rhiva-ag/datasource";
 
 describe("Raydium Controller", () => {
   let program: Program<AmmV3>;

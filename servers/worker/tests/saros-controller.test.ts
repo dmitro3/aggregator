@@ -1,9 +1,8 @@
 import { type Program, web3 } from "@coral-xyz/anchor";
 import { describe, test, beforeAll, expect } from "bun:test";
 import { init } from "@rhiva-ag/decoder/programs/saros/index";
+import { transformSarosPairAccount } from "@rhiva-ag/datasource";
 import type { LiquidityBook } from "@rhiva-ag/decoder/programs/idls/types/saros";
-
-import { transformSarosPairAccount } from "../src/controllers/saros-controller";
 
 describe("SarosController", () => {
   let program: Program<LiquidityBook>;
