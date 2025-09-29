@@ -12,7 +12,7 @@ import {
   pairOrderBySchema,
 } from "../src/routes/pairs/pair.schema";
 
-describe("unit test pair.controller", () => {
+describe("pair.controller", () => {
   test("should pass pair aggregrate", async () => {
     const where = buildDrizzleWhereClauseFromObject(
       pairFilterSchema.partial().parse({

@@ -20,6 +20,7 @@
     }
   },
   "peerDependencies": {
+    "@rhiva-ag/shared": "*",
     "@coral-xyz/anchor": "0.31.1",
     "typescript": "^5.9.2",
     "@solana/spl-token": "^0.4.14"

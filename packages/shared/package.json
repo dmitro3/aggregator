@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@solana/web3.js": "^1.98.4",
-    "@types/lodash.chunk": "^4.2.9"
+    "@types/lodash.chunk": "^4.2.9",
+    "ioredis": "^5.8.0"
   }
 }

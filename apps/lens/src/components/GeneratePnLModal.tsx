@@ -1,4 +1,9 @@
+import type { z } from "zod/mini";
+import { useState } from "react";
+import { Field, Form, Formik } from "formik";
+import { object, string } from "yup";
 import { MdClose } from "react-icons/md";
+import type { pnlSchema } from "@rhiva-ag/trpc";
 import {
   Dialog,
   DialogPanel,
@@ -6,9 +11,15 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 
+import PnLCard from "./PnLCard";
+import { useTRPCClient } from "../trpc.client";
+
 export default function GeneratePnLModal(
   props: React.ComponentProps<typeof Dialog>,
 ) {
+  const trpc = useTRPCClient();
+  const [pnl, setPNL] = useState<z.infer<typeof pnlSchema> | null>(null);
+
   return (
     <Dialog
       as="div"
@@ -47,18 +58,43 @@ export default function GeneratePnLModal(
                 SolanaFM, OKLink and tx IDs.
               </p>
             </div>
-            <div className="flex flex-col space-y-8">
-              <div className="flex flex-col space-y-2">
-                <p className="text-gray">Put your transaction here</p>
-                <input className="bg-transparent p-2 bg-white/3 border-1 border-gray/20 rounded-md focus:border-primary" />
-              </div>
-              <button
-                type="submit"
-                className="bg-primary text-black p-3 rounded-md"
-              >
-                Generate
-              </button>
-            </div>
+            <Formik
+              validateOnMount
+              validationSchema={object({ signature: string().required() })}
+              initialValues={{
+                signature: "",
+              }}
+              onSubmit={async (values) =>
+                trpc.pnl.retrieve
+                  .query({ ...values, market: "saros" })
+                  .then((value) => {
+                    if (value) setPNL(value);
+                  })
+              }
+            >
+              {({ isSubmitting }) => (
+                <Form className="flex flex-col space-y-8">
+                  <div className="flex flex-col space-y-2">
+                    <p className="text-gray">Put your transaction here</p>
+                    <Field
+                      name="signature"
+                      className="bg-transparent p-2 bg-white/3 border-1 border-gray/20 rounded-md focus:border-primary"
+                    />
+                  </div>
+                  {pnl && <PnLCard pnl={pnl} />}
+                  <button
+                    type="submit"
+                    className="bg-primary text-black rounded-md"
+                  >
+                    {isSubmitting ? (
+                      <div className="m-auto my-2.5 size-6 border-3 border-black border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <p className="p-3">Generate</p>
+                    )}
+                  </button>
+                </Form>
+              )}
+            </Formik>
           </section>
         </DialogPanel>
       </div>

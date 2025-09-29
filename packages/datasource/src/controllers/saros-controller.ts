@@ -3,7 +3,6 @@ import { format } from "util";
 import type z from "zod/mini";
 import Decimal from "decimal.js";
 import { inArray } from "drizzle-orm";
-import type { Umi } from "@metaplex-foundation/umi";
 import { init } from "@rhiva-ag/decoder/programs/saros/index";
 import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import { web3, type IdlAccounts, type IdlEvents } from "@coral-xyz/anchor";
@@ -30,7 +29,8 @@ import {
   type mintSelectSchema,
 } from "@rhiva-ag/datasource";
 
-import { cacheResult, getMultiplePrices } from "../utils";
+import { cacheResult } from "../instances";
+import { getMultiplePrices } from "./price-controller";
 
 export const transformSarosPairAccount = ({
   binStep,
@@ -71,13 +71,13 @@ export const transformSarosPairAccount = ({
   };
 };
 
-const upsertPair = async (
+export const upsertSarosPair = async (
   db: Database,
-  umi: Umi,
   connection: web3.Connection,
   ...pairIds: string[]
 ) => {
   const [program] = init(connection);
+  const umi = createUmi(connection.rpcEndpoint);
   const allPairs = await getPairs(db, inArray(pairs.id, pairIds));
   const nonExistingPairPubKeys = pairIds
     .map((pairId) => new web3.PublicKey(pairId))
@@ -177,7 +177,7 @@ const upsertPair = async (
   return allPairs;
 };
 
-export const createSarosSwapFn = async (
+export const createSarosSwap = async (
   db: Database,
   connection: web3.Connection,
   signature: string,
@@ -185,11 +185,10 @@ export const createSarosSwapFn = async (
 ) => {
   assert(values.length > 0, "expect values > 0");
 
-  const umi = createUmi(connection.rpcEndpoint);
   const pairIds = values.map((value) => value.pair.toBase58());
 
   const pairs = await cacheResult(
-    async (pairIds) => upsertPair(db, umi, connection, ...pairIds),
+    async (pairIds) => upsertSarosPair(db, connection, ...pairIds),
     ...pairIds,
   );
 

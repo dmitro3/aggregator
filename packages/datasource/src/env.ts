@@ -2,7 +2,7 @@ import "dotenv/config";
 
 import { format } from "util";
 
-type Env = "DATABASE_URL";
+type Env = "REDIS_URL" | "SOLANA_TRACKER_API_KEY" | "DATABASE_URL";
 
 export const getEnv = <T extends object | number | string | null = string>(
   name: Env,

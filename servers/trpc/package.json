@@ -24,11 +24,13 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
     "@fastify/cors": "^11.1.0",
     "@fastify/websocket": "^11.2.0",
     "@rhiva-ag/datasource": "*",
-    "@rhiva-ag/shared": "*",
     "@rhiva-ag/env": "*",
+    "@rhiva-ag/shared": "*",
+    "@solana-tracker/data-api": "^0.1.4",
     "@trpc/server": "^11.6.0",
     "drizzle-orm": "^0.44.5",
     "fastify": "^5.6.1",

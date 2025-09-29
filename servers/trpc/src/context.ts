@@ -1,8 +1,9 @@
-import { db } from "./instances";
+import { connection, db } from "./instances";
 
 export const createContext = async () => {
   return {
     drizzle: db,
+    solanaConnection: connection,
   };
 };
 

@@ -1,10 +1,8 @@
 import xior from "xior";
 import { format } from "util";
-import { cacheResultFn } from "@rhiva-ag/shared";
 
-import { redis, solanatracker } from "./instances";
-
-export const cacheResult = cacheResultFn(redis, 60);
+import { cacheResult, solanatracker } from "../instances";
+import type { PriceTimestampData } from "@solana-tracker/data-api";
 
 export const priceFallback = async (mints: string[]) => {
   const response = await xior.get<{ prices: Record<string, number> }>(
@@ -50,4 +48,23 @@ export const getMultiplePrices = async (
   return Object.fromEntries(
     prices.map((price) => [price.id, { price: price.price }]),
   );
+};
+
+export const getMultiplePriceByTimestamp = async (
+  mints: string[],
+  timestamp: number,
+): Promise<Record<string, PriceTimestampData>> => {
+  if (mints.length > 0) {
+    const prices = await Promise.all(
+      mints.map((mint) => solanatracker.getPriceAtTimestamp(mint, timestamp)),
+    );
+    const priceEntries = prices.map((price, index) => {
+      const mint = mints[index];
+      return [mint, price];
+    });
+
+    return Object.fromEntries(priceEntries);
+  }
+
+  return {};
 };

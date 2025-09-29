@@ -42,3 +42,17 @@ input:not([type="search"]) {
 .error {
   @apply border-red-500! bg-red-500/10! ring-red-500/50! focus:border-red-500!;
 }
+
+.text-outline {
+  text-shadow: 0 4px 0 rgb(0, 0, 0);
+}
+
+.card-profit-bg {
+  background: linear-gradient(120deg, #432da9, #6542ff, #4ca8d2, #40d866);
+}
+
+.card-loass-bg {
+  background:
+    linear-gradient(to top right, red, transparent 40%),
+    linear-gradient(120deg, #432da9, #6542ff, #4ca8d2, #40d866);
+}

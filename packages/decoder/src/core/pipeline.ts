@@ -20,61 +20,50 @@ export class Pipeline<T extends InstructionProcessor<any> | LogProcessor<any>> {
     else if (pipe instanceof LogProcessor) this.logPipes?.push(pipe);
   }
 
-  async process(parsedTransactionWithMeta: web3.ParsedTransactionWithMeta) {
-    const nestedInstructions = this.getNestedInstructions(
-      parsedTransactionWithMeta,
-    );
-
-    const promiseJoins = [];
-    const signature = parsedTransactionWithMeta.transaction.signatures[0];
-
-    if (parsedTransactionWithMeta.meta?.logMessages && this.logPipes)
-      promiseJoins.push(
-        ...this.logPipes.map((pipe) => {
-          const parsedEvents = pipe.process(
-            parsedTransactionWithMeta.meta!.logMessages!,
-          );
-          if (parsedEvents && parsedEvents.length > 0)
-            return pipe.consume(parsedEvents, {
-              signature,
-            });
-
-          return null;
-        }),
-      );
-    if (this.instructionPipes)
-      for (const [index, outerInstruction] of nestedInstructions.entries()) {
-        promiseJoins.push(
-          ...this.instructionPipes.map((pipe) => {
-            const parsedInstruction = pipe.process(outerInstruction);
-            if (parsedInstruction)
-              return pipe.consume(parsedInstruction, {
-                index,
-                signature,
-              });
-            return null;
-          }),
+  async process(
+    ...parsedTransactionWithMetas: web3.ParsedTransactionWithMeta[]
+  ) {
+    return Promise.all(
+      parsedTransactionWithMetas.map((parsedTransactionWithMeta) => {
+        const nestedInstructions = this.getNestedInstructions(
+          parsedTransactionWithMeta,
         );
 
-        if (outerInstruction.innerInstructions)
-          for (const innerInstruction of outerInstruction.innerInstructions) {
-            promiseJoins.push(
-              ...this.instructionPipes.map((pipe) => {
-                const parsedInstruction = pipe.process(innerInstruction);
-                if (parsedInstruction)
-                  return pipe.consume(parsedInstruction, {
-                    index,
-                    signature,
-                    inner: true,
-                  });
+        const promiseJoins = [];
+        const blockTime = parsedTransactionWithMeta.blockTime;
+        const signature = parsedTransactionWithMeta.transaction.signatures[0];
 
-                return null;
-              }),
-            );
-          }
-      }
+        if (parsedTransactionWithMeta.meta?.logMessages && this.logPipes)
+          promiseJoins.push(
+            ...this.logPipes.map((pipe) => {
+              const parsedEvents = pipe.process(
+                parsedTransactionWithMeta.meta!.logMessages!,
+              );
+              if (parsedEvents && parsedEvents.length > 0)
+                return pipe.consume(parsedEvents, {
+                  signature,
+                });
 
-    return Promise.all(promiseJoins.filter(Boolean));
+              return null;
+            }),
+          );
+        if (this.instructionPipes) {
+          promiseJoins.push(
+            ...this.instructionPipes.map((pipe) => {
+              const parsedInstructions = pipe.process(...nestedInstructions);
+              if (parsedInstructions.length > 0)
+                return pipe.consume(parsedInstructions, {
+                  signature,
+                  blockTime,
+                });
+              return null;
+            }),
+          );
+        }
+
+        return Promise.all(promiseJoins.filter(Boolean));
+      }),
+    );
   }
 
   protected getNestedInstructions(
@@ -82,25 +71,16 @@ export class Pipeline<T extends InstructionProcessor<any> | LogProcessor<any>> {
   ) {
     assert(parsedTransactionWithMeta.meta, "meta expected in transaction");
 
-    const nestedInstructions: ((
+    const nestedInstructions: (
       | web3.ParsedInstruction
       | web3.PartiallyDecodedInstruction
-    ) & {
-      innerInstructions?: (
-        | web3.ParsedInstruction
-        | web3.PartiallyDecodedInstruction
-      )[];
-    })[] = [...parsedTransactionWithMeta.transaction.message.instructions];
+    )[] = [...parsedTransactionWithMeta.transaction.message.instructions];
 
     const { innerInstructions } = parsedTransactionWithMeta.meta;
 
-    if (innerInstructions) {
-      for (const { index, instructions } of innerInstructions) {
-        const outerInstruction = nestedInstructions[index];
-
-        if (outerInstruction) outerInstruction.innerInstructions = instructions;
-      }
-    }
+    if (innerInstructions)
+      for (const { instructions } of innerInstructions)
+        nestedInstructions.push(...instructions);
 
     return nestedInstructions;
   }

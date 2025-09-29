@@ -26,13 +26,15 @@
   },
   "javascript": {
     "formatter": {
+      "indentStyle": "space",
       "quoteStyle": "double",
       "attributePosition": "multiline"
     }
   },
   "html": {
     "formatter": {
-      "attributePosition": "multiline"
+      "attributePosition": "multiline",
+      "indentStyle": "space"
     }
   },
   "assist": {

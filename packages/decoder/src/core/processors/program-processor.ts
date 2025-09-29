@@ -10,6 +10,7 @@ import {
 import { LogProcessor } from "./log-processor";
 import { InstructionProcessor } from "./instruction-processor";
 import type { ProgramEventType, ProgramInstructionType } from "./types";
+import { collectMap } from "@rhiva-ag/shared";
 
 abstract class SharedProgramInstance<
   T extends Idl,
@@ -34,23 +35,28 @@ export abstract class ProgramInstructionProcessor<
   T extends Idl,
 > extends SharedProgramInstance<T, ProgramInstructionType<T>> {
   process(
-    instruction: web3.ParsedInstruction | web3.PartiallyDecodedInstruction,
+    ...instructions: (
+      | web3.ParsedInstruction
+      | web3.PartiallyDecodedInstruction
+    )[]
   ) {
-    if ("data" in instruction && this.isProgram(instruction.programId)) {
-      const parsed = this.coder.instruction.decode(
-        instruction.data,
-        "base58",
-      ) as ProgramInstructionType<T> | null;
+    return collectMap(instructions, (instruction) => {
+      if ("data" in instruction && this.isProgram(instruction.programId)) {
+        const parsed = this.coder.instruction.decode(
+          instruction.data,
+          "base58",
+        ) as ProgramInstructionType<T> | null;
 
-      return {
-        parsed,
-        program: this.extra.name,
-        programId: instruction.programId,
-        accounts: instruction.accounts,
-      };
-    }
+        return {
+          parsed,
+          program: this.extra.name,
+          programId: instruction.programId,
+          accounts: instruction.accounts,
+        };
+      }
 
-    return null;
+      return null;
+    });
   }
 }
 
@@ -58,25 +64,30 @@ export abstract class ProgramInstructionEventProcessor<
   T extends Idl,
 > extends SharedProgramInstance<T, ProgramEventType<T>> {
   process(
-    instruction: web3.ParsedInstruction | web3.PartiallyDecodedInstruction,
+    ...instructions: (
+      | web3.ParsedInstruction
+      | web3.PartiallyDecodedInstruction
+    )[]
   ) {
-    if ("data" in instruction && this.isProgram(instruction.programId)) {
-      const rawData = bs58.decode(instruction.data);
-      const bs64 = base64.encode(rawData.subarray(8));
-      const parsed = this.program.coder.events.decode(
-        bs64,
-      ) as ProgramEventType<T> | null;
+    return collectMap(instructions, (instruction) => {
+      if ("data" in instruction && this.isProgram(instruction.programId)) {
+        const rawData = bs58.decode(instruction.data);
+        const bs64 = base64.encode(rawData.subarray(8));
+        const parsed = this.program.coder.events.decode(
+          bs64,
+        ) as ProgramEventType<T> | null;
 
-      if (parsed)
-        return {
-          parsed,
-          program: this.extra.name,
-          programId: instruction.programId,
-          accounts: instruction.accounts,
-        };
-    }
+        if (parsed)
+          return {
+            parsed,
+            program: this.extra.name,
+            programId: instruction.programId,
+            accounts: instruction.accounts,
+          };
+      }
 
-    return null;
+      return null;
+    });
   }
 }
 

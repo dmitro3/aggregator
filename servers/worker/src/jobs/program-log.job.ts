@@ -1,6 +1,5 @@
 import { Worker } from "bullmq";
 import { Pipeline, type ProgramEventType } from "@rhiva-ag/decoder";
-import { createRaydiumV3SwapFn } from "../controllers/raydium-controller";
 import type { AmmV3 } from "@rhiva-ag/decoder/programs/idls/types/raydium";
 import type { Whirlpool } from "@rhiva-ag/decoder/programs/idls/types/orca";
 import type { LbClmm } from "@rhiva-ag/decoder/programs/idls/types/meteora";
@@ -21,11 +20,14 @@ import {
   WhirlpoolProgramEventProcessor,
   WhirlpoolProgramInstructionEventProcessor,
 } from "@rhiva-ag/decoder/programs/orca/index";
+import {
+  createMeteoraSwap,
+  createOrcaSwap,
+  createRaydiumV3Swap,
+  createSarosSwap,
+} from "@rhiva-ag/datasource";
 
 import { connection, db, redis } from "../instances";
-import { createOrcaSwapFn } from "../controllers/orca-controller";
-import { createSarosSwapFn } from "../controllers/saros-controller";
-import { createMeteoraSwapFn } from "../controllers/meteora-controller";
 
 const sarosEventConsumer = async (
   events: ProgramEventType<LiquidityBook>[],
@@ -33,7 +35,7 @@ const sarosEventConsumer = async (
 ) => {
   const swapEvents = events.filter((event) => event.name === "binSwapEvent");
   if (swapEvents.length > 0)
-    return createSarosSwapFn(
+    return createSarosSwap(
       db,
       connection,
       signature,
@@ -48,7 +50,7 @@ const raydiumEventConsumer = async (
   const swapEvents = events.filter((event) => event.name === "swapEvent");
 
   if (swapEvents.length > 0)
-    return createRaydiumV3SwapFn(
+    return createRaydiumV3Swap(
       db,
       connection,
       signature,
@@ -63,7 +65,7 @@ const meteoraEventConsumer = async (
   const swapEvents = events.filter((event) => event.name === "swap");
 
   if (swapEvents.length > 0)
-    return createMeteoraSwapFn(
+    return createMeteoraSwap(
       db,
       connection,
       signature,
@@ -78,7 +80,7 @@ const orcaEventConsumer = async (
   const swapEvents = events.filter((event) => event.name === "traded");
 
   if (swapEvents.length > 0)
-    return createOrcaSwapFn(
+    return createOrcaSwap(
       db,
       connection,
       signature,
@@ -89,27 +91,39 @@ const orcaEventConsumer = async (
 export const pipeline = new Pipeline([
   new SarosProgramEventProcessor(connection).addConsumer(sarosEventConsumer),
   new SarosProgramInstructionEventProcessor(connection).addConsumer(
-    async (instruction, extra) =>
-      sarosEventConsumer([instruction.parsed], extra),
+    async (instructions, extra) =>
+      sarosEventConsumer(
+        instructions.map((instruction) => instruction.parsed),
+        extra,
+      ),
   ),
   new RaydiumProgramEventProcessor(connection).addConsumer(
     raydiumEventConsumer,
   ),
   new RaydiumProgramInstructionEventProcessor(connection).addConsumer(
-    async (instruction, extra) =>
-      raydiumEventConsumer([instruction.parsed], extra),
+    async (instructions, extra) =>
+      raydiumEventConsumer(
+        instructions.map((instruction) => instruction.parsed),
+        extra,
+      ),
   ),
   new MeteoraProgramEventProcessor(connection).addConsumer(
     meteoraEventConsumer,
   ),
   new MeteoraProgramInstructionEventProcessor(connection).addConsumer(
-    async (instruction, extra) =>
-      meteoraEventConsumer([instruction.parsed], extra),
+    async (instructions, extra) =>
+      meteoraEventConsumer(
+        instructions.map((instruction) => instruction.parsed),
+        extra,
+      ),
   ),
   new WhirlpoolProgramEventProcessor(connection).addConsumer(orcaEventConsumer),
   new WhirlpoolProgramInstructionEventProcessor(connection).addConsumer(
-    async (instruction, extra) =>
-      orcaEventConsumer([instruction.parsed], extra),
+    async (instructions, extra) =>
+      orcaEventConsumer(
+        instructions.map((instruction) => instruction.parsed),
+        extra,
+      ),
   ),
 ]);
 

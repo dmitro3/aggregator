@@ -9,8 +9,9 @@
     "noEmit": true,
     "incremental": true,
     "module": "esnext",
+
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",

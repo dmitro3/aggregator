@@ -1,4 +1,5 @@
 import chunk from "lodash.chunk";
+import type { Redis } from "ioredis";
 import type { PublicKey } from "@solana/web3.js";
 
 export const collectMap = <
@@ -51,3 +52,37 @@ export function chunkFetchMultipleAccountInfo<
     );
   };
 }
+
+export const cacheResultFn =
+  (redis: Redis, duration: number) =>
+  async <U extends { id: string }>(
+    upsertFn: (ids: string[]) => Promise<U[]>,
+    ...ids: string[]
+  ) => {
+    const cacheResults = await redis.mget(...ids).then((cache) =>
+      cache
+        .map((cache) => {
+          if (cache) return JSON.parse(cache) as U;
+          return null;
+        })
+        .filter((pair) => !!pair),
+    );
+
+    const uncache = ids.filter(
+      (pairId) => !cacheResults.some((cachedPair) => cachedPair.id === pairId),
+    );
+
+    let upserts: U[] | undefined;
+
+    if (uncache.length > 0) upserts = await upsertFn(uncache);
+
+    if (upserts) {
+      const pipeline = redis.pipeline();
+      for (const upsert of upserts)
+        pipeline.setex(upsert.id, duration, JSON.stringify(upsert));
+
+      await pipeline.exec();
+    }
+
+    return [...(upserts ? upserts : []), ...cacheResults];
+  };
