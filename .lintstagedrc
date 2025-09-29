@@ -1,3 +1,0 @@
-{
-  "*": "bun lint && bun x turbo check"
-}
