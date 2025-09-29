@@ -1,0 +1,27 @@
+{
+  "name": "@rhiva-ag/shared",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "peerDependencies": {},
+  "dependencies": {
+    "lodash.chunk": "^4.2.0"
+  },
+  "devDependencies": {
+    "@solana/web3.js": "^1.98.4",
+    "@types/lodash.chunk": "^4.2.9",
+    "ioredis": "^5.8.0"
+  }
+}

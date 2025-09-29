@@ -1,0 +1,376 @@
+{
+  "id": "f5d34eb5-cd6d-4b9d-97a3-dd99ba9dc3a9",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.mints": {
+      "name": "mints",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "symbol": {
+          "name": "symbol",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "decimals": {
+          "name": "decimals",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "extra": {
+          "name": "extra",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tokenProgram": {
+          "name": "tokenProgram",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "syncAt": {
+          "name": "syncAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.pairs": {
+      "name": "pairs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "extra": {
+          "name": "extra",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quoteMint": {
+          "name": "quoteMint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseMint": {
+          "name": "baseMint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "binStep": {
+          "name": "binStep",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseFee": {
+          "name": "baseFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "maxFee": {
+          "name": "maxFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "protocolFee": {
+          "name": "protocolFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dynamicFee": {
+          "name": "dynamicFee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "liquidity": {
+          "name": "liquidity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseReserveAmount": {
+          "name": "baseReserveAmount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quoteReserveAmount": {
+          "name": "quoteReserveAmount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseReserveAmountUsd": {
+          "name": "baseReserveAmountUsd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quoteReserveAmountUsd": {
+          "name": "quoteReserveAmountUsd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "syncAt": {
+          "name": "syncAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "market": {
+          "name": "market",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "pairs_quoteMint_mints_id_fk": {
+          "name": "pairs_quoteMint_mints_id_fk",
+          "tableFrom": "pairs",
+          "tableTo": "mints",
+          "columnsFrom": ["quoteMint"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "pairs_baseMint_mints_id_fk": {
+          "name": "pairs_baseMint_mints_id_fk",
+          "tableFrom": "pairs",
+          "tableTo": "mints",
+          "columnsFrom": ["baseMint"],
+          "columnsTo": ["id"],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.swaps": {
+      "name": "swaps",
+      "schema": "",
+      "columns": {
+        "signature": {
+          "name": "signature",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "extra": {
+          "name": "extra",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pair": {
+          "name": "pair",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "feeUsd": {
+          "name": "feeUsd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseAmountUsd": {
+          "name": "baseAmountUsd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quoteAmountUsd": {
+          "name": "quoteAmountUsd",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fee": {
+          "name": "fee",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "baseAmount": {
+          "name": "baseAmount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quoteAmount": {
+          "name": "quoteAmount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tvl": {
+          "name": "tvl",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "price": {
+          "name": "price",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "swaps_pair_pairs_id_fk": {
+          "name": "swaps_pair_pairs_id_fk",
+          "tableFrom": "swaps",
+          "tableTo": "pairs",
+          "columnsFrom": ["pair"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rewardMints": {
+      "name": "rewardMints",
+      "schema": "",
+      "columns": {
+        "pair": {
+          "name": "pair",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mint": {
+          "name": "mint",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "rewardMints_pair_pairs_id_fk": {
+          "name": "rewardMints_pair_pairs_id_fk",
+          "tableFrom": "rewardMints",
+          "tableTo": "pairs",
+          "columnsFrom": ["pair"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "rewardMints_mint_mints_id_fk": {
+          "name": "rewardMints_mint_mints_id_fk",
+          "tableFrom": "rewardMints",
+          "tableTo": "mints",
+          "columnsFrom": ["mint"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "rewardMints_pair_mint_unique": {
+          "name": "rewardMints_pair_mint_unique",
+          "nullsNotDistinct": true,
+          "columns": ["pair", "mint"]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

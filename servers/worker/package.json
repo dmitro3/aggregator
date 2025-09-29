@@ -1,0 +1,40 @@
+{
+  "name": "@rhiva-ag/worker",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "check": "tsc --noEmit",
+    "codegen": "bun x @rhiva-ag/env",
+    "dev": "bun run --watch src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/lodash.range": "^3.2.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.31.1",
+    "@metaplex-foundation/umi": "^1.4.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.4.1",
+    "@rhiva-ag/datasource": "*",
+    "@rhiva-ag/decoder": "*",
+    "@rhiva-ag/env": "*",
+    "@rhiva-ag/shared": "*",
+    "@solana-tracker/data-api": "^0.1.4",
+    "@solana/spl-token": "^0.4.14",
+    "@types/lodash.chunk": "^4.2.9",
+    "assert": "^2.1.0",
+    "bullmq": "^5.58.7",
+    "decimal.js": "^10.6.0",
+    "drizzle-orm": "^0.44.5",
+    "ioredis": "^5.7.0",
+    "lodash.chunk": "^4.2.0",
+    "lodash.range": "^3.2.0",
+    "node-cron": "^4.2.1",
+    "pino": "^9.11.0",
+    "xior": "^0.7.8",
+    "zod": "^4.1.11"
+  }
+}

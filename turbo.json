@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalEnv": [],
+  "tasks": {
+    "build": {
+      "env": ["SENTRY_AUTH_TOKEN"],
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "outputs": ["dist/**"]
+    },
+    "migrate": {
+      "dependsOn": ["^migrate"],
+      "inputs": ["$TURBO_DEFAULT$", ".env"]
+    },
+    "check": {
+      "dependsOn": ["^check", "^lint"]
+    },
+    "dev": {
+      "persistent": true,
+      "cache": false
+    },
+    "codegen": {},
+    "lint": {}
+  }
+}
