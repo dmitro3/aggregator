@@ -77,7 +77,7 @@ export default function PoolList({ pools, chart, limit }: PoolListProps) {
   return (
     <section className="flex-1 flex flex-col space-y-4 p-4 md:px-8 2xl:px-16">
       <div className="flex flex-col space-y-4">
-        <div className="lt-md:flex-col lt-md:space-y-4 md:flex md:space-x-4 md:items-center">
+        <div className="lt-md:flex-col lt-md:space-y-4 md:flex md:space-x-4 md:items-start">
           <Search
             className="flex-1"
             onSearchAction={(value) => {
@@ -92,11 +92,11 @@ export default function PoolList({ pools, chart, limit }: PoolListProps) {
           {chart && (
             <div className="flex space-x-4">
               <div className="flex flex-col space-y-1 bg-white/5 border border-white/15 p-4 rounded lt-md:flex-1">
-                <p className="text-gray">Total Value Locked</p>
+                <p className="text-gray">TVL</p>
                 <Decimal
                   leading="$"
                   value={parseFloat(chart.liquidity)}
-                  className="text-xl"
+                  className="text-base md:text-xl"
                 />
               </div>
               <div className="flex flex-col space-y-1 bg-white/5 border border-white/15 p-4 rounded lt-md:flex-1">
@@ -104,7 +104,7 @@ export default function PoolList({ pools, chart, limit }: PoolListProps) {
                 <Decimal
                   leading="$"
                   value={parseFloat(chart.cumulativeVolume)}
-                  className="text-xl"
+                  className="text-base md:text-xl"
                 />
               </div>
             </div>
