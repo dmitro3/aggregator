@@ -122,14 +122,13 @@ export const buildOrderByClauseFromObject = <
   orderBy: T,
 ) => {
   const query: SQL<unknown>[] = [];
-  if (Array.isArray(orderBy))
-    return orderBy.map((value) => asc(sql.raw(value)));
+  if (Array.isArray(orderBy)) return orderBy.map((value) => asc(sql`${value}`));
 
   for (const [value, opName] of Object.entries(orderBy)) {
     if (opName in mapOrderByOperators) {
       const op =
         mapOrderByOperators[opName as keyof typeof mapOrderByOperators];
-      query.push(op(sql.raw(value)));
+      query.push(op(sql`${value}`));
     } else
       throw new FilterSchemaError(format("op %s is not supported", opName));
   }

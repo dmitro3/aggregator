@@ -25,7 +25,7 @@ export const pairSearchSchema = z.object({
 
 export const pairOrderBySchema = orderByOperator(
   z.enum([
-    "H24SwapsVolume",
+    "H24SwapsVolumeUsd",
     "M5SwapsFeeUsd",
     "H1SwapsFeeUsd",
     "h6SwapsFeeUsd",

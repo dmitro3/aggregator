@@ -22,7 +22,7 @@ export default function Filter({ onChangeAction }: FilterProps) {
       validateOnBlur
       validateOnChange
       initialValues={{
-        orderBy: "H24SwapsVolume" as const,
+        orderBy: "H24SwapsVolumeUsd" as const,
         volume: {
           min: undefined,
           max: undefined,
@@ -42,7 +42,7 @@ export default function Filter({ onChangeAction }: FilterProps) {
       }}
       validationSchema={object({
         orderBy: string().oneOf([
-          "H24SwapsVolume",
+          "H24SwapsVolumeUsd",
           "M5SwapsFeeUsd",
           "H1SwapsFeeUsd",
           "h6SwapsFeeUsd",
@@ -70,11 +70,7 @@ export default function Filter({ onChangeAction }: FilterProps) {
         }),
       })}
       onSubmit={(values) => {
-        const filter: Partial<z.infer<typeof pairFilterSchema>> = {
-          liquidity: {},
-          binStep: {},
-          baseFee: {},
-        };
+        const filter: Partial<z.infer<typeof pairFilterSchema>> = {};
 
         for (const [key, value] of Object.entries(values)) {
           const clauses = [];

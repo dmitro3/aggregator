@@ -16,15 +16,12 @@ describe("unit test pair.controller", () => {
   test("should pass pair aggregrate", async () => {
     const where = buildDrizzleWhereClauseFromObject(
       pairFilterSchema.partial().parse({
-        name: { eq: "USDC/USDT" },
+        market: { eq: "saros" },
       }),
     );
 
     const orderBy = buildOrderByClauseFromObject(
-      pairOrderBySchema.parse({
-        M5SwapsFeeUsd: "desc",
-        fees: "asc",
-      }),
+      pairOrderBySchema.parse(["H24SwapsVolumeUsd"]),
     );
 
     const pairs = await getAggregratedPairs(db, {

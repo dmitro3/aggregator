@@ -187,27 +187,25 @@ export default function PoolCard({
               </tr>
             </thead>
             <tbody>
-              {poolFlowChanges.map(
-                ({ name, volume, fees, tvl, tvlFeeRatio }) => (
-                  <tr key={name}>
-                    <td className="text-gray/50">{name}</td>
-                    <td>
-                      <Money value={volume} />
-                    </td>
-                    <td className="flex items-center justify-end space-x-2">
-                      <p>
-                        <Money value={fees} />
-                      </p>
-                      <Decimal
-                        value={tvlFeeRatio}
-                        end="%"
-                        cap={999}
-                        className="w-16 bg-blue-500/10 text-blue text-center rounded-sm"
-                      />
-                    </td>
-                  </tr>
-                ),
-              )}
+              {poolFlowChanges.map(({ name, volume, fees, tvlFeeRatio }) => (
+                <tr key={name}>
+                  <td className="text-gray/50">{name}</td>
+                  <td>
+                    <Money value={volume} />
+                  </td>
+                  <td className="flex items-center justify-end space-x-2">
+                    <p>
+                      <Money value={fees} />
+                    </p>
+                    <Decimal
+                      value={tvlFeeRatio}
+                      end="%"
+                      cap={999}
+                      className="w-16 bg-blue-500/10 text-blue text-center rounded-sm"
+                    />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

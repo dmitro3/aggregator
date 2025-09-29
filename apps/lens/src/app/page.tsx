@@ -23,7 +23,7 @@ export default function HomePage() {
     trpc.pair.aggregrate.queryOptions({
       ...args,
       filter: {
-        market: "saros",
+        market: { eq: "saros" },
         ...args?.filter,
       },
     }),

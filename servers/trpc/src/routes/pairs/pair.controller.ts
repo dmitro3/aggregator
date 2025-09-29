@@ -1,5 +1,6 @@
 import moment from "moment";
 import { format } from "util";
+import type { z } from "zod/mini";
 import {
   add,
   caseWhen,
@@ -20,7 +21,6 @@ import {
   eq,
   type SQL,
 } from "drizzle-orm";
-import type { z } from "zod/mini";
 import type { pairAggregateSchema } from "./pair.schema";
 
 export const getAggregratedPairs = async (
@@ -58,6 +58,9 @@ export const getAggregratedPairs = async (
         quoteAmountUsd: sum(swaps.quoteAmountUsd)
           .mapWith(Number)
           .as(format("%sQuoteAmountUsd", as)),
+        volumeUsd: sum(add(swaps.baseAmountUsd, swaps.quoteAmountUsd))
+          .mapWith(Number)
+          .as(format("%sVolumeUsd", as)),
       })
       .from(swaps)
       .groupBy(swaps.pair)
@@ -80,10 +83,7 @@ export const getAggregratedPairs = async (
       fees: coalesce(column.feeUsd, 0).mapWith(Number),
       buyCount: coalesce(column.buyCount, 0).mapWith(Number),
       sellCount: coalesce(column.sellCount, 0).mapWith(Number),
-      volume: coalesce(
-        add(column.baseAmountUsd, column.quoteAmountUsd),
-        0,
-      ).mapWith(Number),
+      volume: coalesce(column.volumeUsd, 0).mapWith(Number),
     };
   };
 

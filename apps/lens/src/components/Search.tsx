@@ -1,6 +1,6 @@
 "use client";
 import debounce from "lodash.debounce";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { MdSearch } from "react-icons/md";
 
 type SearchProps = {
@@ -14,9 +14,13 @@ export default function Search({ onSearchAction }: SearchProps) {
         const value = event.target.value;
         if (value.trim().length > 0) onSearchAction(value);
         else onSearchAction(undefined);
-      }),
+      }, 500),
     [onSearchAction],
   );
+
+  useEffect(() => {
+    return () => onChange.cancel();
+  }, [onChange]);
 
   return (
     <div className="flex items-center space-x-2 border border-white/10 rounded-md px-2 focus-within:border-primary focus-within:ring-4 focus-within:ring-primary/20 group">
