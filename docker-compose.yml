@@ -74,5 +74,4 @@ networks:
   webnet:
     driver: overlay
   redis:
-    driver: overlay
     external: true
