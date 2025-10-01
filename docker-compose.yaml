@@ -2,7 +2,7 @@ services:
   trpc:
     build:
       context: .
-      target: api
+      target: trpc
     ports:
       - "8000:8000"
     deploy:
