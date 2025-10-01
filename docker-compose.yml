@@ -12,7 +12,6 @@ services:
           cpus: "0.5"
         limits:
           cpus: "1.0"
-    restart: unless-stopped
     networks:
       - webnet
       - redis
@@ -29,7 +28,6 @@ services:
           cpus: "0.5"
         limits:
           cpus: "1.0"
-    restart: unless-stopped
     networks:
       - redis
     env_file: .env
@@ -45,7 +43,6 @@ services:
           cpus: "0.5"
         limits:
           cpus: "1.0"
-    restart: unless-stopped
     depends_on:
       - tasks
     networks:
@@ -65,7 +62,6 @@ services:
           cpus: "0.5"
         limits:
           cpus: "1.0"
-    restart: unless-stopped
     depends_on:
       - tasks
     networks:
@@ -73,6 +69,7 @@ services:
     environment:
       PORT: 8001
     env_file: .env
+
 networks:
   webnet:
     driver: bridge
