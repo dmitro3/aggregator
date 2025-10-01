@@ -72,6 +72,7 @@ services:
 
 networks:
   webnet:
-    driver: bridge
+    driver: overlay
   redis:
+    driver: overlay
     external: true
