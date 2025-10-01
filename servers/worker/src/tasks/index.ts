@@ -1,5 +1,6 @@
 import { web3 } from "@coral-xyz/anchor";
 
+import { logger } from "../instances";
 import { runSyncPairTask } from "./sync-pair.task";
 import { runProgramLogTask } from "./program-log.task";
 
@@ -18,4 +19,10 @@ import { runProgramLogTask } from "./program-log.task";
 
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
+  process.on("uncaughtException", (err) =>
+    logger.error(err, "Uncaught exception"),
+  );
+  process.on("unhandledRejection", (reason, promise) =>
+    logger.error({ promise, reason }, "Unhandled Rejection"),
+  );
 })();

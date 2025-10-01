@@ -1,21 +1,12 @@
-import { Queue, QueueEvents } from "bullmq";
+import { Queue } from "bullmq";
 import type { web3 } from "@coral-xyz/anchor";
 
 import { connection, logger, redis } from "../instances";
 
 const queue = new Queue("programLog", {
-  connection: redis,
+  connection: redis.options,
   defaultJobOptions: { removeOnComplete: true, removeOnFail: true },
 });
-const event = new QueueEvents("programLog", { connection: redis });
-
-event.on("completed", ({ jobId, returnvalue }) =>
-  logger.info({ jobId, returnvalue }, "job.completed"),
-);
-
-event.on("failed", ({ jobId, failedReason }) =>
-  logger.error({ jobId, failedReason }, "job.failed"),
-);
 
 export const runProgramLogTask = (programs: web3.PublicKey[]) => {
   const subscriptions: number[] = [];
@@ -39,7 +30,6 @@ export const runProgramLogTask = (programs: web3.PublicKey[]) => {
   return async () =>
     Promise.allSettled([
       queue.close(),
-      event.close(),
       subscriptions.filter(Boolean).forEach(connection.removeOnLogsListener),
     ]);
 };

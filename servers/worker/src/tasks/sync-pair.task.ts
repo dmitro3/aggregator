@@ -1,25 +1,16 @@
 import { format } from "util";
+import { Queue } from "bullmq";
 import nodeCron from "node-cron";
 import type { z } from "zod/mini";
 import { count, eq } from "drizzle-orm";
-import { Queue, QueueEvents } from "bullmq";
 import { pairs, type pairSelectSchema } from "@rhiva-ag/datasource";
 
-import { db, logger, redis } from "../instances";
+import { db, redis } from "../instances";
 
 const queue = new Queue("syncPair", {
-  connection: redis,
+  connection: redis.options,
   defaultJobOptions: { removeOnComplete: true, removeOnFail: true },
 });
-const event = new QueueEvents("syncPair", { connection: redis });
-
-event.on("completed", ({ jobId, returnvalue }) =>
-  logger.info({ jobId, returnvalue }, "job.completed"),
-);
-
-event.on("failed", ({ jobId, failedReason }) =>
-  logger.error({ jobId, failedReason }, "job.failed"),
-);
 
 export const runSyncPairTask = (
   markets: z.infer<typeof pairSelectSchema>["market"][],

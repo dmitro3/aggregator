@@ -1,15 +1,45 @@
 services:
-  rhiva-ag:
+  trpc:
     build:
       context: .
-      dockerfile: Dockerfile
+      target: api
     ports:
-      - "${PORT}:${PORT}"
-      - "8000-8005:8000-8005"
+      - "8000:8000"
+    deploy:
+      restart_policy: 
+        condition: on-failure
+    restart: unless-stopped
     networks:
       - webnet
+      - redis
     env_file: .env
+  tasks:
+    build:
+      context: .
+      target: tasks
+    deploy:
+      replicas: 1
+      restart_policy: 
+        condition: on-failure
+    restart: unless-stopped
+    networks:
+      - redis
+  jobs:
+    build:
+      context: .
+      target: jobs
+    deploy:
+      replicas: 2
+      restart_policy: 
+        condition: on-failure
+    restart: unless-stopped
+    depends_on: 
+      - tasks 
+    networks:
+      - redis
+  
 networks:
   webnet:
     driver: bridge
-    external: true
+  redis: 
+    external: true 

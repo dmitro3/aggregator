@@ -1,3 +1,4 @@
+import { logger } from "../instances";
 import { syncPairWorker } from "./sync-pair.job";
 import { programLogWorker } from "./program-log.job";
 
@@ -13,4 +14,10 @@ import { programLogWorker } from "./program-log.job";
 
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);
+  process.on("uncaughtException", (err) =>
+    logger.error(err, "Uncaught exception"),
+  );
+  process.on("unhandledRejection", (reason, promise) =>
+    logger.error({ promise, reason }, "Unhandled Rejection"),
+  );
 })();

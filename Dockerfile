@@ -3,13 +3,10 @@
 FROM node:lts-alpine AS base
 
 ENV NODE_ENV="production"
-RUN apk update -qq && \
-    apk add build-base pkgconf ca-certificates
 
-RUN apk add --no-cache curl unzip bash \
-    && curl -fsSL https://bun.sh/install | bash \
-    && export BUN_INSTALL="/root/.bun" \
-    && export PATH="$BUN_INSTALL/bin:$PATH"
+RUN apk update -qq \
+    && apk add --no-cache curl unzip bash ca-certificates \
+    && curl -fsSL https://bun.sh/install | bash
 
 ENV PATH="/root/.bun/bin:$PATH"
 
@@ -25,32 +22,44 @@ COPY package.json ./package.json
 
 # Run turbo prune for docker build
 RUN bun install turbo --global && \
-    bun x turbo prune @rhiva-ag/trpc @rhiva-ag/worker --docker
+    bun x turbo prune @rhiva-ag/trpc @rhiva-ag/worker @rhiva-ag/metrics --docker
 
 FROM base as builder
 WORKDIR /usr/src/app
 ARG SENTRY_AUTH_TOKEN
 ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 
-# Install node modules
 COPY --from=codegen /usr/src/app/out/json .
-RUN bun install --global pm2 turbo
-RUN bun --mount=type=cache,target=/root/.bun/cache install --frozen-lockfine
+RUN --mount=type=cache,target=/root/.bun/cache\
+    bun install --frozen-lockfine
 
-# Build application
 COPY --from=codegen /usr/src/app/out/full . 
-COPY --from=codegen /usr/src/app/servers/ecosystem.config.js servers/ecosystem.config.js 
 RUN bun x turbo check
 
-FROM base as runner 
+FROM base as runtime
 WORKDIR /usr/src/app
 
-# Copy built application f
 COPY --from=builder /usr/src/app/ .
-
-WORKDIR /usr/src/app/servers
 
 ENV HOST="0.0.0.0"
 ENV NODE_ENV=production
 
-CMD ["bun", "x", "pm2-runtime", "start", "ecosystem.config.js"]
+FROM runtime as trpc 
+WORKDIR /usr/src/app/servers/trpc
+
+CMD ["bun", "src/index.ts"]
+
+FROM runtime as tasks 
+WORKDIR /usr/src/app/servers/worker
+
+CMD ["bun", "src/tasks/index.ts"]
+
+FROM runtime as jobs
+WORKDIR /usr/src/app/servers/worker
+
+CMD ["bun", "src/jobs/index.ts"]
+
+FROM runtime as metrics 
+WORKDIR /usr/src/app/servers/metrics
+
+CMD ["bun", "src/index.ts"]
