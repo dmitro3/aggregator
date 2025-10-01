@@ -1,13 +1,11 @@
 services:
   trpc:
-    build:
-      context: .
-      target: trpc
+    image: rhive-ag_trpc:latest
     ports:
       - "8000:8000"
     deploy:
-      replicas: 1
-      restart_policy: 
+      replicas: 2
+      restart_policy:
         condition: on-failure
       resources:
         reservations:
@@ -19,14 +17,12 @@ services:
       - webnet
       - redis
     env_file: .env
-    
+
   tasks:
-    build:
-      context: .
-      target: tasks
+    image: rhive-ag_tasks:latest
     deploy:
       replicas: 1
-      restart_policy: 
+      restart_policy:
         condition: on-failure
       resources:
         reservations:
@@ -37,14 +33,12 @@ services:
     networks:
       - redis
     env_file: .env
-    
+
   jobs:
-    build:
-      context: .
-      target: jobs
+    image: rhive-ag_jobs:latest
     deploy:
       replicas: 2
-      restart_policy: 
+      restart_policy:
         condition: on-failure
       resources:
         reservations:
@@ -52,13 +46,35 @@ services:
         limits:
           cpus: "1.0"
     restart: unless-stopped
-    depends_on: 
-      - tasks 
+    depends_on:
+      - tasks
     networks:
       - redis
+    env_file: .env
+
+  metrics:
+    image: rhive-ag_metrics:latest
+    ports:
+      - "8001:8001"
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        reservations:
+          cpus: "0.5"
+        limits:
+          cpus: "1.0"
+    restart: unless-stopped
+    depends_on:
+      - tasks
+    networks:
+      - redis
+    environment:
+      PORT: 8001
     env_file: .env
 networks:
   webnet:
     driver: bridge
-  redis: 
-    external: true 
+  redis:
+    external: true
