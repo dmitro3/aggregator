@@ -1,9 +1,10 @@
 #!/bin/sh 
+set -e
 
-SERVICES = "trpc tasks jobs metrics"
+SERVICES="trpc tasks jobs metrics"
 
 for service in $SERVICES; do
-  docker build --target trpc -t @rhiva-ag_$service:latest .
+  docker build --target trpc -t rhiva-ag_$service:latest .
 done
 
 
