@@ -27,7 +27,7 @@ import {
   createSarosSwap,
 } from "@rhiva-ag/datasource";
 
-import { connection, db, redis } from "../instances";
+import { connection, db, logger, redis } from "../instances";
 
 const sarosEventConsumer = async (
   events: ProgramEventType<LiquidityBook>[],
@@ -142,7 +142,12 @@ export const programLogWorker = new Worker(
       }),
     );
   },
-  {
-    connection: redis,
-  },
+  { concurrency: 10, connection: redis },
+);
+
+programLogWorker.on("failed", (job) =>
+  logger.error({ error: job?.failedReason, id: job?.id }, "job.failed"),
+);
+programLogWorker.on("completed", (job) =>
+  logger.info({ id: job.id, result: job.returnvalue }, "job.success"),
 );
