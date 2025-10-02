@@ -34,6 +34,7 @@ RUN --mount=type=cache,target=/root/.bun/cache\
     bun install --frozen-lockfine
 
 COPY --from=codegen /usr/src/app/out/full . 
+COPY --from=codegen /usr/src/app/servers/ecosystem.config.js servers/ecosystem.config.js
 RUN bun x turbo check
 
 FROM base as runtime
@@ -43,6 +44,10 @@ COPY --from=builder /usr/src/app/ .
 
 ENV HOST="0.0.0.0"
 ENV NODE_ENV=production
+
+FROM runtime as dev
+WORKDIR /usr/src/app/servers
+CMD ["bun", "x", "pm2-runtime", "start", "ecosystem.config.js"]
 
 FROM runtime as trpc 
 WORKDIR /usr/src/app/servers/trpc
