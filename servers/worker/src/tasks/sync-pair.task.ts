@@ -5,7 +5,7 @@ import type { z } from "zod/mini";
 import { count, eq } from "drizzle-orm";
 import { pairs, type pairSelectSchema } from "@rhiva-ag/datasource";
 
-import { db, redis } from "../instances";
+import { db, logger, redis } from "../instances";
 
 const queue = new Queue("syncPair", {
   connection: redis.options,
@@ -26,6 +26,7 @@ export const runSyncPairTask = (
           .where(eq(pairs.market, market))
           .execute();
         const pages = Math.ceil(pairCount / limit);
+        logger.info({ market, pages }, "syncPair.tasks");
         for (let index = 0; index < pages; index++)
           queue.add(format("sync%", market), {
             market,

@@ -5,11 +5,10 @@ import { runSyncPairTask } from "./sync-pair.task";
 import { runProgramLogTask } from "./program-log.task";
 
 (() => {
-  const stopSyncPairTask = runSyncPairTask(["saros"]);
-
   const stopProgramLogTask = runProgramLogTask([
     new web3.PublicKey("1qbkdrr3z4ryLA7pZykqxvxWPoeifcVKo6ZG9CfkvVE"),
   ]);
+  const stopSyncPairTask = runSyncPairTask(["saros"]);
 
   const shutdown = async () => {
     await stopSyncPairTask();
