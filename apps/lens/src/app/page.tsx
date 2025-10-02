@@ -7,6 +7,7 @@ import Header from "../components/Header";
 import { trpcClient } from "../trpc.server";
 import PoolList from "../components/PoolList";
 
+export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const dexApi = new SarosApi("https://api.saros.xyz/api/");
   const sarosCharts = await dexApi.pool.chart(
